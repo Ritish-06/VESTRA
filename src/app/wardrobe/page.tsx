@@ -1,11 +1,23 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
 import CartDrawer from "@/components/navigation/CartDrawer";
-import WardrobeCanvas from "@/components/3d/WardrobeCanvas";
 import ProductInspectorModal from "@/components/ui/ProductInspectorModal";
+
+const WardrobeCanvas = dynamic(() => import("@/components/3d/WardrobeCanvas"), {
+  ssr: false,
+  loading: () => (
+    <div className="w-full h-full flex flex-col items-center justify-center text-[#c5a880] gap-3">
+      <div className="w-10 h-10 rounded-full border-2 border-[#c5a880]/30 border-t-[#c5a880] animate-spin" />
+      <span className="text-xs uppercase tracking-[0.25em] font-mono text-[#9ca3af]">
+        Calibrating 3D Wardrobe...
+      </span>
+    </div>
+  ),
+});
 import { PRODUCTS } from "@/data/products";
 import { Product, ProductCategory, Colorway } from "@/types/product";
 import { useCartStore } from "@/store/useCartStore";
@@ -302,3 +314,4 @@ export default function WardrobePage() {
     </div>
   );
 }
+

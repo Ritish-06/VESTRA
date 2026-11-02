@@ -435,3 +435,4 @@ export const PRODUCTS: Product[] = [
     tags: ["Technical", "Modular", "Futuristic", "Layering"],
   },
 ];
+

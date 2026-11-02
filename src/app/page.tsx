@@ -2,11 +2,26 @@
 
 import React, { useState } from "react";
 import NextLink from "next/link";
+import dynamic from "next/dynamic";
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
 import CartDrawer from "@/components/navigation/CartDrawer";
-import ProductInspectorCanvas from "@/components/3d/ProductInspectorCanvas";
 import ProductInspectorModal from "@/components/ui/ProductInspectorModal";
+
+const ProductInspectorCanvas = dynamic(
+  () => import("@/components/3d/ProductInspectorCanvas"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex flex-col items-center justify-center text-[#c5a880] gap-3">
+        <div className="w-8 h-8 rounded-full border-2 border-[#c5a880]/30 border-t-[#c5a880] animate-spin" />
+        <span className="text-[10px] uppercase tracking-[0.2em] font-mono text-[#9ca3af]">
+          Initializing 3D Centerpiece...
+        </span>
+      </div>
+    ),
+  }
+);
 import { PRODUCTS, COLLECTIONS } from "@/data/products";
 import { Product } from "@/types/product";
 import { useCartStore } from "@/store/useCartStore";

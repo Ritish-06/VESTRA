@@ -83,3 +83,4 @@ export interface Collection {
   productCount: number;
   palette: string[];
 }
+

@@ -1,10 +1,25 @@
 "use client";
 
 import React, { useState } from "react";
+import dynamic from "next/dynamic";
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
 import CartDrawer from "@/components/navigation/CartDrawer";
-import VirtualMannequinCanvas from "@/components/3d/VirtualMannequinCanvas";
+
+const VirtualMannequinCanvas = dynamic(
+  () => import("@/components/3d/VirtualMannequinCanvas"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex flex-col items-center justify-center text-[#c5a880] gap-3">
+        <div className="w-10 h-10 rounded-full border-2 border-[#c5a880]/30 border-t-[#c5a880] animate-spin" />
+        <span className="text-xs uppercase tracking-[0.25em] font-mono text-[#9ca3af]">
+          Sculpting 3D Avatar Rig...
+        </span>
+      </div>
+    ),
+  }
+);
 import { PRODUCTS } from "@/data/products";
 import { STYLIST_PROMPTS } from "@/data/stylistPresets";
 import { Product } from "@/types/product";
@@ -355,3 +370,4 @@ export default function StudioPage() {
     </div>
   );
 }
+

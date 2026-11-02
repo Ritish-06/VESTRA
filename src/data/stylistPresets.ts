@@ -88,3 +88,4 @@ export const STYLIST_PROMPTS: StylistPrompt[] = [
       "Parisian elegance thrives on subtle contradictions: the protective, structured volume of the double-breasted gabardine trench belted softly over the liquid drape of the Lyon silk blouse. Clean, cinematic, and timeless.",
   },
 ];
+

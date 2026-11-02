@@ -36,3 +36,4 @@ export interface UserStyleProfile {
   savedOutfitsCount: number;
   loyaltyTier: "Atelier Black" | "Private Client" | "Haute Circle";
 }
+
