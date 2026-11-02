@@ -67,7 +67,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#070709] text-[#f5f4f0] flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-[#FAF8F5] text-[#1C1917] flex flex-col justify-between">
       <Navbar />
       <CartDrawer />
 
@@ -76,7 +76,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
         <div className="mb-6">
           <NextLink
             href="/explore"
-            className="inline-flex items-center gap-2 text-xs text-[#9ca3af] hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 text-xs text-[#78716C] hover:text-[#1C1917] transition-colors font-medium"
           >
             <ArrowLeft size={14} />
             <span>Return to Catalog</span>
@@ -86,7 +86,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
         {/* 3D Inspector Hero Section */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-stretch">
           {/* Left: 3D Viewport */}
-          <div className="lg:col-span-7 h-[480px] sm:h-[580px] lg:h-[680px] rounded-3xl bg-gradient-to-b from-[#111116] to-[#09090c] border border-white/[0.08] relative overflow-hidden flex flex-col shadow-2xl">
+          <div className="lg:col-span-7 h-[480px] sm:h-[580px] lg:h-[680px] rounded-3xl bg-gradient-to-b from-[#111116] to-[#09090c] border border-[#1C1917]/10 relative overflow-hidden flex flex-col shadow-xl">
             <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
               <span className="text-[10px] uppercase tracking-[0.2em] text-[#c5a880] px-3 py-1 rounded-full bg-black/50 border border-[#c5a880]/30 font-mono">
                 3D Product Turntable
@@ -97,7 +97,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                   setAutoRotate(!autoRotate);
                   sounds.playClick();
                 }}
-                className={`text-xs px-2.5 py-1 rounded-full border backdrop-blur-sm flex items-center gap-1 transition-colors ${
+                className={`text-xs px-2.5 py-1 rounded-full border backdrop-blur-sm flex items-center gap-1 transition-colors cursor-pointer ${
                   autoRotate
                     ? "bg-[#c5a880]/20 border-[#c5a880] text-[#c5a880]"
                     : "bg-black/30 border-white/10 text-[#9ca3af] hover:text-white"
@@ -112,7 +112,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                   setMacroZoom(!macroZoom);
                   sounds.playClick();
                 }}
-                className={`text-xs px-2.5 py-1 rounded-full border backdrop-blur-sm flex items-center gap-1 transition-colors ${
+                className={`text-xs px-2.5 py-1 rounded-full border backdrop-blur-sm flex items-center gap-1 transition-colors cursor-pointer ${
                   macroZoom
                     ? "bg-[#c5a880]/20 border-[#c5a880] text-[#c5a880]"
                     : "bg-black/30 border-white/10 text-[#9ca3af] hover:text-white"
@@ -141,36 +141,36 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           <div className="lg:col-span-5 flex flex-col justify-between space-y-6">
             <div className="space-y-6">
               <div>
-                <span className="text-[10px] uppercase tracking-[0.3em] text-[#c5a880] font-mono">
+                <span className="text-[10px] uppercase tracking-[0.3em] text-[#9A7B4F] font-mono font-semibold">
                   {product.collectionName}
                 </span>
-                <h1 className="font-serif text-3xl sm:text-4xl text-white font-medium mt-1">
+                <h1 className="font-serif text-3xl sm:text-4xl text-[#1C1917] font-medium mt-1">
                   {product.name}
                 </h1>
-                <p className="text-xs text-[#9ca3af] mt-1 italic">{product.subtitle}</p>
+                <p className="text-xs text-[#78716C] mt-1 italic">{product.subtitle}</p>
 
                 <div className="flex items-baseline gap-3 mt-4">
-                  <span className="font-serif text-2xl font-bold text-[#c5a880]">
+                  <span className="font-serif text-2xl font-bold text-[#9A7B4F]">
                     ${product.price.toLocaleString()}
                   </span>
                   {product.originalPrice && (
-                    <span className="text-xs text-[#6b7280] line-through">
+                    <span className="text-xs text-[#78716C] line-through">
                       ${product.originalPrice.toLocaleString()}
                     </span>
                   )}
                 </div>
               </div>
 
-              <div className="p-4 rounded-xl bg-white/[0.02] border-l-2 border-[#c5a880] text-xs text-white/90 italic leading-relaxed">
+              <div className="p-4 rounded-xl bg-white border-l-2 border-[#C5A880] text-xs text-[#1C1917]/90 italic leading-relaxed shadow-xs">
                 &ldquo;{product.editorialQuote}&rdquo;
               </div>
 
-              <p className="text-xs text-[#9ca3af] leading-relaxed">{product.description}</p>
+              <p className="text-xs text-[#78716C] leading-relaxed">{product.description}</p>
 
               {/* Colorway Selection */}
               <div>
-                <span className="text-[10px] uppercase tracking-wider text-[#9ca3af] font-mono block mb-2">
-                  Tone Colorway: {selectedColor.name}
+                <span className="text-[10px] uppercase tracking-wider text-[#78716C] font-mono block mb-2">
+                  Tone Colorway: <strong className="text-[#1C1917]">{selectedColor.name}</strong>
                 </span>
                 <div className="flex items-center gap-2">
                   {product.colorways.map((c) => (
@@ -180,10 +180,10 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                         setSelectedColor(c);
                         sounds.playClick();
                       }}
-                      className={`w-7 h-7 rounded-full border-2 transition-all ${
+                      className={`w-7 h-7 rounded-full border-2 transition-all cursor-pointer ${
                         selectedColor.id === c.id
-                          ? "border-[#c5a880] scale-110"
-                          : "border-transparent opacity-70 hover:opacity-100"
+                          ? "border-[#9A7B4F] scale-110 shadow-sm"
+                          : "border-black/10 opacity-75 hover:opacity-100"
                       }`}
                       style={{ backgroundColor: c.hex }}
                       title={c.name}
@@ -194,7 +194,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
               {/* Size Selection */}
               <div>
-                <span className="text-[10px] uppercase tracking-wider text-[#9ca3af] font-mono block mb-2">
+                <span className="text-[10px] uppercase tracking-wider text-[#78716C] font-mono block mb-2">
                   Tailored Size:
                 </span>
                 <div className="grid grid-cols-5 gap-2">
@@ -205,10 +205,10 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                         setSelectedSize(s);
                         sounds.playClick();
                       }}
-                      className={`py-2 text-xs rounded-lg font-medium transition-colors border ${
+                      className={`py-2 text-xs rounded-lg font-medium transition-colors border cursor-pointer ${
                         selectedSize === s
-                          ? "bg-[#c5a880] text-[#0b0b0c] border-[#c5a880] font-bold"
-                          : "bg-white/[0.03] text-[#9ca3af] border-white/10 hover:text-white"
+                          ? "bg-[#1C1917] text-white border-[#1C1917] font-bold shadow-xs"
+                          : "bg-white text-[#78716C] border-[#1C1917]/15 hover:text-[#1C1917]"
                       }`}
                     >
                       {s.split(" ")[0]}
@@ -218,22 +218,22 @@ export default function ProductDetailClient({ product }: { product: Product }) {
               </div>
 
               {/* Fabric Specs */}
-              <div className="p-4 rounded-2xl bg-[#0e0e12] border border-white/[0.06] space-y-2 text-xs text-[#9ca3af]">
-                <div className="flex justify-between py-1 border-b border-white/[0.03]">
+              <div className="p-4 rounded-2xl atelier-card space-y-2 text-xs text-[#78716C]">
+                <div className="flex justify-between py-1 border-b border-[#1C1917]/[0.05]">
                   <span>Composition</span>
-                  <span className="text-white">{product.fabric.composition}</span>
+                  <span className="text-[#1C1917] font-medium">{product.fabric.composition}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-white/[0.03]">
+                <div className="flex justify-between py-1 border-b border-[#1C1917]/[0.05]">
                   <span>Origin</span>
-                  <span className="text-white">{product.fabric.origin}</span>
+                  <span className="text-[#1C1917] font-medium">{product.fabric.origin}</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-white/[0.03]">
+                <div className="flex justify-between py-1 border-b border-[#1C1917]/[0.05]">
                   <span>Weight</span>
-                  <span className="text-white font-mono">{product.fabric.weightGsm} GSM</span>
+                  <span className="text-[#1C1917] font-mono">{product.fabric.weightGsm} GSM</span>
                 </div>
-                <div className="flex justify-between py-1 border-b border-white/[0.03]">
+                <div className="flex justify-between py-1">
                   <span>Weave</span>
-                  <span className="text-white">{product.fabric.weave}</span>
+                  <span className="text-[#1C1917] font-medium">{product.fabric.weave}</span>
                 </div>
               </div>
             </div>
@@ -244,9 +244,9 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                 onClick={() => {
                   addItem(product, selectedColor, selectedSize, 1);
                 }}
-                className="w-full py-4 rounded-full bg-gradient-to-r from-[#c5a880] to-[#e6d5b8] text-[#0b0b0c] font-semibold text-xs tracking-widest uppercase flex items-center justify-center gap-2 hover:shadow-[0_0_25px_rgba(197,168,128,0.3)] transition-all"
+                className="w-full py-4 rounded-full bg-[#1C1917] hover:bg-[#2A2725] text-white font-semibold text-xs tracking-widest uppercase flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
               >
-                <ShoppingBag size={15} />
+                <ShoppingBag size={15} className="text-[#C5A880]" />
                 <span>Acquire Piece • ${product.price.toLocaleString()}</span>
               </button>
 
@@ -257,16 +257,16 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                     setHungSuccess(true);
                     setTimeout(() => setHungSuccess(false), 2500);
                   }}
-                  className="py-2.5 rounded-full bg-white/[0.04] border border-white/10 hover:border-[#c5a880] text-white text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
+                  className="py-2.5 rounded-full bg-white border border-[#1C1917]/15 hover:border-[#C5A880] text-[#1C1917] text-xs font-medium flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer"
                 >
                   {hungSuccess ? (
                     <>
-                      <Check size={13} className="text-emerald-400" />
-                      <span className="text-emerald-400">Hung on Rail</span>
+                      <Check size={13} className="text-emerald-600" />
+                      <span className="text-emerald-600 font-semibold">Hung on Rail</span>
                     </>
                   ) : (
                     <>
-                      <Sliders size={13} className="text-[#c5a880]" />
+                      <Sliders size={13} className="text-[#9A7B4F]" />
                       <span>Hang in Wardrobe</span>
                     </>
                   )}
@@ -274,18 +274,18 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
                 <button
                   onClick={handleTryOnAvatar}
-                  className="py-2.5 rounded-full bg-white/[0.04] border border-white/10 hover:border-[#c5a880] text-white text-xs font-medium flex items-center justify-center gap-1.5 transition-colors"
+                  className="py-2.5 rounded-full bg-white border border-[#1C1917]/15 hover:border-[#C5A880] text-[#1C1917] text-xs font-medium flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer"
                 >
-                  <Sparkles size={13} className="text-[#c5a880]" />
+                  <Sparkles size={13} className="text-[#9A7B4F]" />
                   <span>Try on 3D Avatar</span>
                 </button>
               </div>
 
               <button
                 onClick={() => toggleWishlist(product.id)}
-                className="w-full py-1 text-xs text-[#9ca3af] hover:text-white flex items-center justify-center gap-1.5 transition-colors"
+                className="w-full py-1 text-xs text-[#78716C] hover:text-[#1C1917] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
               >
-                <Heart size={13} className={isWishlisted ? "fill-[#c5a880] text-[#c5a880]" : ""} />
+                <Heart size={13} className={isWishlisted ? "fill-[#C5A880] text-[#9A7B4F]" : ""} />
                 <span>{isWishlisted ? "Saved in Private Vault" : "Add to Vault Wishlist"}</span>
               </button>
             </div>
@@ -294,8 +294,8 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
         {/* Complimentary Collection Pieces */}
         {complimentaryProducts.length > 0 && (
-          <div className="mt-20 pt-12 border-t border-white/[0.08]">
-            <h2 className="font-serif text-2xl text-white mb-6">
+          <div className="mt-20 pt-12 border-t border-[#1C1917]/[0.08]">
+            <h2 className="font-serif text-2xl text-[#1C1917] mb-6">
               Complimentary Pieces from {product.collectionName}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -303,17 +303,17 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                 <NextLink
                   key={comp.id}
                   href={`/product/${comp.id}`}
-                  className="group rounded-2xl bg-[#0e0e12] border border-white/5 hover:border-white/15 p-4 transition-all"
+                  className="group rounded-2xl atelier-card p-4 transition-all"
                 >
-                  <div className="aspect-[3/4] w-full rounded-xl bg-[#18181e] overflow-hidden mb-3">
+                  <div className="aspect-[3/4] w-full rounded-xl bg-[#FAF8F5] overflow-hidden mb-3 border border-[#1C1917]/[0.04]">
                     <img
                       src={comp.images.hero}
                       alt={comp.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
-                  <h3 className="font-serif text-sm text-white truncate">{comp.name}</h3>
-                  <span className="text-xs font-serif text-[#c5a880] font-bold block mt-1">
+                  <h3 className="font-serif text-sm text-[#1C1917] font-medium truncate">{comp.name}</h3>
+                  <span className="text-xs font-serif text-[#9A7B4F] font-bold block mt-1">
                     ${comp.price.toLocaleString()}
                   </span>
                 </NextLink>

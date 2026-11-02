@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/navigation";
 import { usePathname } from "next/navigation";
 import NextLink from "next/link";
 import {
@@ -16,6 +15,7 @@ import {
   Sparkles,
   User,
   Sliders,
+  LogIn,
 } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { useWardrobeStore } from "@/store/useWardrobeStore";
@@ -48,10 +48,12 @@ export default function Navbar() {
     }
   };
 
+  const isDarkScene = pathname === "/wardrobe" || pathname === "/studio";
+
   const navLinks = [
     { href: "/wardrobe", label: "3D Wardrobe", badge: "Interactive", icon: Sliders },
-    { href: "/explore", label: "Catalog", icon: Compass },
-    { href: "/collections", label: "Collections", icon: Layers },
+    { href: "/explore", label: "Collections", icon: Compass },
+    { href: "/collections", label: "Seasonal Drops", icon: Layers },
     { href: "/studio", label: "Virtual Studio", badge: "3D Try-On", icon: Sparkles },
     { href: "/stylist", label: "AI Stylist", icon: Sparkles },
   ];
@@ -64,7 +66,9 @@ export default function Navbar() {
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled
-            ? "bg-[#0b0b0c]/85 backdrop-blur-md border-b border-white/[0.06] py-3.5 shadow-2xl"
+            ? isDarkScene
+              ? "bg-[#121110]/90 backdrop-blur-md border-b border-white/[0.08] py-3.5 shadow-2xl"
+              : "bg-[#FAF8F5]/90 backdrop-blur-md border-b border-[#1C1917]/[0.06] py-3.5 shadow-sm"
             : "bg-transparent py-5"
         }`}
       >
@@ -76,14 +80,20 @@ export default function Navbar() {
               onClick={() => sounds.playClick()}
               className="flex items-center gap-3 group"
             >
-              <div className="w-8 h-8 rounded-full border border-[#c5a880]/60 flex items-center justify-center text-[#c5a880] text-xs font-serif tracking-widest group-hover:scale-105 group-hover:border-[#c5a880] transition-transform">
+              <div className="w-8 h-8 rounded-full border border-[#C5A880] flex items-center justify-center text-[#9A7B4F] text-xs font-serif tracking-widest group-hover:scale-105 transition-transform bg-[#C5A880]/10">
                 V
               </div>
               <div className="flex flex-col">
-                <span className="font-serif tracking-[0.3em] text-lg font-bold text-white group-hover:text-[#c5a880] transition-colors">
+                <span
+                  className={`font-serif tracking-[0.3em] text-lg font-bold transition-colors ${
+                    isDarkScene
+                      ? "text-white group-hover:text-[#C5A880]"
+                      : "text-[#1C1917] group-hover:text-[#9A7B4F]"
+                  }`}
+                >
                   VESTRA
                 </span>
-                <span className="text-[8px] uppercase tracking-[0.4em] text-[#9ca3af] -mt-1 font-sans">
+                <span className="text-[8px] uppercase tracking-[0.4em] text-[#78716C] -mt-1 font-sans">
                   Haute Atelier
                 </span>
               </div>
@@ -98,20 +108,24 @@ export default function Navbar() {
                     key={link.href}
                     href={link.href}
                     onClick={() => sounds.playClick()}
-                    className={`relative px-3.5 py-2 rounded-full text-xs font-medium tracking-wider transition-all duration-300 flex items-center gap-1.5 ${
+                    className={`relative px-3.5 py-1.5 rounded-full text-xs font-medium tracking-wider transition-all duration-300 flex items-center gap-1.5 ${
                       isActive
-                        ? "text-[#f5f4f0] bg-white/[0.08] border border-[#c5a880]/30 shadow-sm"
-                        : "text-[#9ca3af] hover:text-[#f5f4f0] hover:bg-white/[0.04]"
+                        ? isDarkScene
+                          ? "text-[#FAF8F5] bg-white/[0.08] border border-[#C5A880]/40 shadow-sm"
+                          : "text-[#1C1917] bg-[#1C1917]/[0.05] border border-[#C5A880]/60 shadow-sm"
+                        : isDarkScene
+                        ? "text-[#A8A29E] hover:text-white hover:bg-white/[0.04]"
+                        : "text-[#78716C] hover:text-[#1C1917] hover:bg-[#1C1917]/[0.04]"
                     }`}
                   >
                     <span>{link.label}</span>
                     {link.badge && (
-                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#c5a880]/15 text-[#c5a880] border border-[#c5a880]/30 font-sans tracking-normal">
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#C5A880]/15 text-[#9A7B4F] border border-[#C5A880]/30 font-sans tracking-normal font-semibold">
                         {link.badge}
                       </span>
                     )}
                     {isActive && (
-                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-[2px] bg-[#c5a880] rounded-full" />
+                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-[2px] bg-[#C5A880] rounded-full" />
                     )}
                   </NextLink>
                 );
@@ -123,7 +137,11 @@ export default function Navbar() {
               {/* Sound Toggle */}
               <button
                 onClick={toggleSound}
-                className="w-9 h-9 rounded-full flex items-center justify-center text-[#9ca3af] hover:text-[#c5a880] hover:bg-white/[0.06] border border-transparent hover:border-white/10 transition-colors"
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
+                  isDarkScene
+                    ? "text-[#A8A29E] hover:text-[#C5A880] hover:bg-white/[0.06]"
+                    : "text-[#78716C] hover:text-[#1C1917] hover:bg-[#1C1917]/[0.04]"
+                }`}
                 title={soundEnabled ? "Mute Tactile Audio" : "Enable Tactile Audio"}
                 aria-label="Toggle Sound"
               >
@@ -136,43 +154,52 @@ export default function Navbar() {
                 onClick={() => sounds.playClick()}
                 className={`relative w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
                   pathname === "/wishlist"
-                    ? "text-[#c5a880] bg-white/[0.08] border border-[#c5a880]/30"
-                    : "text-[#9ca3af] hover:text-[#f5f4f0] hover:bg-white/[0.06]"
+                    ? "text-[#9A7B4F] bg-[#C5A880]/15 border border-[#C5A880]/40"
+                    : isDarkScene
+                    ? "text-[#A8A29E] hover:text-white hover:bg-white/[0.06]"
+                    : "text-[#78716C] hover:text-[#1C1917] hover:bg-[#1C1917]/[0.04]"
                 }`}
                 aria-label="Wishlist"
               >
                 <Heart size={16} />
                 {wishlistCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#c5a880] text-[#0b0b0c] text-[10px] font-bold flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#C5A880] text-[#1C1917] text-[10px] font-bold flex items-center justify-center">
                     {wishlistCount}
                   </span>
                 )}
               </NextLink>
 
-              {/* User Profile Vault */}
+              {/* User Profile / Auth Link */}
               <NextLink
-                href="/profile"
+                href="/login"
                 onClick={() => sounds.playClick()}
                 className={`relative w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
-                  pathname === "/profile"
-                    ? "text-[#c5a880] bg-white/[0.08] border border-[#c5a880]/30"
-                    : "text-[#9ca3af] hover:text-[#f5f4f0] hover:bg-white/[0.06]"
+                  pathname === "/profile" || pathname === "/login"
+                    ? "text-[#9A7B4F] bg-[#C5A880]/15 border border-[#C5A880]/40"
+                    : isDarkScene
+                    ? "text-[#A8A29E] hover:text-white hover:bg-white/[0.06]"
+                    : "text-[#78716C] hover:text-[#1C1917] hover:bg-[#1C1917]/[0.04]"
                 }`}
+                title="Client Portal & Sign In"
                 aria-label="User Profile"
               >
                 <User size={16} />
               </NextLink>
 
-              {/* Cart Button */}
+              {/* Shopping Bag Button */}
               <button
                 onClick={() => setIsOpen(true)}
-                className="relative px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#1c1c1f] to-[#121214] border border-[#c5a880]/40 text-[#f5f4f0] text-xs font-medium tracking-wider flex items-center gap-2 hover:border-[#c5a880] hover:shadow-[0_0_15px_rgba(197,168,128,0.2)] transition-all"
-                aria-label="Open Shopping Cart"
+                className={`relative px-4 py-1.5 rounded-full border text-xs font-medium tracking-wider flex items-center gap-2 transition-all ${
+                  isDarkScene
+                    ? "bg-[#1C1917] border-[#C5A880]/40 text-white hover:border-[#C5A880]"
+                    : "bg-[#1C1917] border-[#1C1917] text-[#FAF8F5] hover:bg-[#2A2725] shadow-sm"
+                }`}
+                aria-label="Open Shopping Bag"
               >
-                <ShoppingBag size={14} className="text-[#c5a880]" />
+                <ShoppingBag size={14} className="text-[#C5A880]" />
                 <span className="hidden sm:inline">Bag</span>
                 {cartCount > 0 && (
-                  <span className="w-4 h-4 rounded-full bg-[#c5a880] text-[#0b0b0c] text-[10px] font-bold flex items-center justify-center">
+                  <span className="w-4 h-4 rounded-full bg-[#C5A880] text-[#1C1917] text-[10px] font-bold flex items-center justify-center">
                     {cartCount}
                   </span>
                 )}
@@ -184,7 +211,9 @@ export default function Navbar() {
                   setMobileMenuOpen(!mobileMenuOpen);
                   sounds.playClick();
                 }}
-                className="lg:hidden w-9 h-9 rounded-full flex items-center justify-center text-[#9ca3af] hover:text-[#f5f4f0] hover:bg-white/[0.06] transition-colors"
+                className={`lg:hidden w-9 h-9 rounded-full flex items-center justify-center transition-colors ${
+                  isDarkScene ? "text-white" : "text-[#1C1917]"
+                }`}
                 aria-label="Toggle mobile menu"
               >
                 {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -196,9 +225,9 @@ export default function Navbar() {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-[#0b0b0c]/95 backdrop-blur-2xl lg:hidden flex flex-col pt-24 px-6 pb-12 animate-in fade-in duration-300">
+        <div className="fixed inset-0 z-40 bg-[#FAF8F5]/98 backdrop-blur-2xl lg:hidden flex flex-col pt-24 px-6 pb-12 animate-in fade-in duration-300 text-[#1C1917]">
           <div className="flex flex-col gap-4 flex-1">
-            <span className="text-[10px] uppercase tracking-[0.3em] text-[#9ca3af] border-b border-white/[0.08] pb-2 font-mono">
+            <span className="text-[10px] uppercase tracking-[0.3em] text-[#78716C] border-b border-[#1C1917]/[0.08] pb-2 font-mono">
               Curated Navigation
             </span>
             {navLinks.map((link) => {
@@ -211,14 +240,14 @@ export default function Navbar() {
                     setMobileMenuOpen(false);
                     sounds.playClick();
                   }}
-                  className="flex items-center justify-between py-3 border-b border-white/[0.05] text-lg font-serif text-[#f5f4f0] hover:text-[#c5a880] transition-colors"
+                  className="flex items-center justify-between py-3 border-b border-[#1C1917]/[0.06] text-lg font-serif text-[#1C1917] hover:text-[#9A7B4F] transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <Icon size={18} className="text-[#c5a880]" />
+                    <Icon size={18} className="text-[#9A7B4F]" />
                     <span>{link.label}</span>
                   </div>
                   {link.badge && (
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#c5a880]/20 text-[#c5a880] border border-[#c5a880]/30 font-sans">
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#C5A880]/20 text-[#9A7B4F] border border-[#C5A880]/30 font-sans">
                       {link.badge}
                     </span>
                   )}
@@ -226,12 +255,23 @@ export default function Navbar() {
               );
             })}
             <NextLink
+              href="/login"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                sounds.playClick();
+              }}
+              className="py-3 border-b border-[#1C1917]/[0.06] text-sm text-[#78716C] hover:text-[#1C1917] flex items-center gap-2"
+            >
+              <LogIn size={15} className="text-[#9A7B4F]" />
+              <span>Client Sign In / Register</span>
+            </NextLink>
+            <NextLink
               href="/orders"
               onClick={() => {
                 setMobileMenuOpen(false);
                 sounds.playClick();
               }}
-              className="py-3 border-b border-white/[0.05] text-sm text-[#9ca3af] hover:text-white transition-colors"
+              className="py-3 border-b border-[#1C1917]/[0.06] text-sm text-[#78716C] hover:text-[#1C1917]"
             >
               Order Tracking & Archives
             </NextLink>
@@ -241,19 +281,18 @@ export default function Navbar() {
                 setMobileMenuOpen(false);
                 sounds.playClick();
               }}
-              className="py-3 border-b border-white/[0.05] text-sm text-[#9ca3af] hover:text-white transition-colors"
+              className="py-3 border-b border-[#1C1917]/[0.06] text-sm text-[#78716C] hover:text-[#1C1917]"
             >
               Atelier Backstage / Admin
             </NextLink>
           </div>
 
-          <div className="pt-6 border-t border-white/[0.08] flex items-center justify-between text-xs text-[#9ca3af]">
+          <div className="pt-6 border-t border-[#1C1917]/[0.08] flex items-center justify-between text-xs text-[#78716C]">
             <span>VESTRA Digital Fashion</span>
-            <span className="text-[#c5a880]">Paris • Milan • Tokyo</span>
+            <span className="text-[#9A7B4F]">Paris • Milan • Tokyo</span>
           </div>
         </div>
       )}
     </>
   );
 }
-

@@ -90,77 +90,77 @@ export default function AdminPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070709] text-[#f5f4f0] flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-[#FAF8F5] text-[#1C1917] flex flex-col justify-between">
       <Navbar />
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 space-y-10">
-        <div className="flex flex-col sm:flex-row items-baseline justify-between gap-4 pb-8 border-b border-white/[0.08]">
+        <div className="flex flex-col sm:flex-row items-baseline justify-between gap-4 pb-8 border-b border-[#1C1917]/[0.08]">
           <div>
-            <span className="text-[10px] uppercase tracking-[0.3em] text-[#c5a880] font-mono">
+            <span className="text-[10px] uppercase tracking-[0.3em] text-[#9A7B4F] font-mono">
               Atelier Management Console
             </span>
-            <h1 className="font-serif text-3xl sm:text-5xl text-white font-medium mt-1">
+            <h1 className="font-serif text-3xl sm:text-5xl text-[#1C1917] font-medium mt-1">
               Backstage Operations
             </h1>
           </div>
 
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-5 py-2.5 rounded-full bg-[#c5a880] text-[#0b0b0c] text-xs font-semibold hover:bg-[#e6d5b8] transition-colors flex items-center gap-2"
+            className="px-5 py-2.5 rounded-full bg-[#1C1917] hover:bg-[#2A2725] text-white text-xs font-semibold transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
           >
-            <Plus size={15} />
+            <Plus size={15} className="text-[#C5A880]" />
             <span>Commission New Garment</span>
           </button>
         </div>
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-          <div className="p-6 rounded-2xl bg-[#0e0e12] border border-white/[0.06]">
-            <span className="text-[10px] uppercase tracking-wider text-[#9ca3af] font-mono">
+          <div className="p-6 rounded-2xl atelier-card">
+            <span className="text-[10px] uppercase tracking-wider text-[#78716C] font-mono">
               Archival Designs
             </span>
-            <p className="font-serif text-3xl text-white font-bold mt-2">
+            <p className="font-serif text-3xl text-[#1C1917] font-bold mt-2">
               {productList.length}
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-[#0e0e12] border border-white/[0.06]">
-            <span className="text-[10px] uppercase tracking-wider text-[#9ca3af] font-mono">
+          <div className="p-6 rounded-2xl atelier-card">
+            <span className="text-[10px] uppercase tracking-wider text-[#78716C] font-mono">
               Active Collections
             </span>
-            <p className="font-serif text-3xl text-[#c5a880] font-bold mt-2">
+            <p className="font-serif text-3xl text-[#9A7B4F] font-bold mt-2">
               {COLLECTIONS.length}
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-[#0e0e12] border border-white/[0.06]">
-            <span className="text-[10px] uppercase tracking-wider text-[#9ca3af] font-mono">
+          <div className="p-6 rounded-2xl atelier-card">
+            <span className="text-[10px] uppercase tracking-wider text-[#78716C] font-mono">
               Total Catalog Valuation
             </span>
-            <p className="font-serif text-3xl text-white font-bold mt-2">
+            <p className="font-serif text-3xl text-[#1C1917] font-bold mt-2">
               ${totalValue.toLocaleString()}
             </p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-[#0e0e12] border border-white/[0.06]">
-            <span className="text-[10px] uppercase tracking-wider text-[#9ca3af] font-mono">
+          <div className="p-6 rounded-2xl atelier-card">
+            <span className="text-[10px] uppercase tracking-wider text-[#78716C] font-mono">
               Client Acquisitions
             </span>
-            <p className="font-serif text-3xl text-emerald-400 font-bold mt-2">
+            <p className="font-serif text-3xl text-emerald-700 font-bold mt-2">
               {orders.length + 1}
             </p>
           </div>
         </div>
 
         {/* Product Inventory Table */}
-        <div className="p-6 rounded-3xl bg-[#0e0e12] border border-white/[0.08] shadow-xl space-y-4">
-          <h2 className="font-serif text-xl text-white font-medium">
+        <div className="p-6 rounded-3xl atelier-card space-y-4">
+          <h2 className="font-serif text-xl text-[#1C1917] font-medium">
             Active 3D Wardrobe Inventory
           </h2>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="text-[10px] uppercase font-mono text-[#6b7280] border-b border-white/[0.06]">
+              <thead className="text-[10px] uppercase font-mono text-[#78716C] border-b border-[#1C1917]/[0.08]">
                 <tr>
                   <th className="pb-3">Garment</th>
                   <th className="pb-3">Collection</th>
@@ -170,23 +170,31 @@ export default function AdminPage() {
                   <th className="pb-3 text-right">Price</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/[0.04] text-[#9ca3af]">
+              <tbody className="divide-y divide-[#1C1917]/[0.06] text-[#78716C]">
                 {productList.map((p) => (
-                  <tr key={p.id} className="hover:bg-white/[0.02]">
+                  <tr key={p.id} className="hover:bg-[#FAF8F5]">
                     <td className="py-3.5 pr-4 flex items-center gap-3">
-                      <div className="w-9 h-11 rounded bg-[#18181e] overflow-hidden flex-shrink-0">
-                        <img src={p.images.hero} alt={p.name} className="w-full h-full object-cover" />
+                      <div
+                        className="w-9 h-11 rounded bg-white overflow-hidden shrink-0 border border-[#1C1917]/[0.08]"
+                        style={{ width: "36px", height: "44px" }}
+                      >
+                        <img
+                          src={p.images.hero}
+                          alt={p.name}
+                          className="w-full h-full object-cover"
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        />
                       </div>
                       <div>
-                        <span className="font-serif text-white font-medium block">{p.name}</span>
-                        <span className="text-[10px] text-[#6b7280]">#{p.id}</span>
+                        <span className="font-serif text-[#1C1917] font-medium block">{p.name}</span>
+                        <span className="text-[10px] text-[#78716C]">#{p.id}</span>
                       </div>
                     </td>
                     <td className="py-3.5">{p.collectionName}</td>
                     <td className="py-3.5 capitalize">{p.category}</td>
-                    <td className="py-3.5 font-mono text-[11px] text-[#c5a880]">{p.geometryType}</td>
-                    <td className="py-3.5 font-mono">{p.fabric.weightGsm} GSM</td>
-                    <td className="py-3.5 text-right font-serif font-bold text-white">
+                    <td className="py-3.5 font-mono text-[11px] text-[#9A7B4F] font-semibold">{p.geometryType}</td>
+                    <td className="py-3.5 font-mono text-[#1C1917]">{p.fabric.weightGsm} GSM</td>
+                    <td className="py-3.5 text-right font-serif font-bold text-[#1C1917]">
                       ${p.price.toLocaleString()}
                     </td>
                   </tr>
@@ -198,30 +206,30 @@ export default function AdminPage() {
 
         {/* Commission Modal */}
         {showAddModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-            <div className="relative w-full max-w-lg p-8 rounded-3xl bg-[#0f0f12] border border-white/10 shadow-2xl space-y-6">
-              <h3 className="font-serif text-2xl text-white">Commission Archival Piece</h3>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+            <div className="relative w-full max-w-lg p-8 rounded-3xl bg-white border border-[#1C1917]/10 shadow-2xl space-y-6">
+              <h3 className="font-serif text-2xl text-[#1C1917]">Commission Archival Piece</h3>
 
               <form onSubmit={handleCreateProduct} className="space-y-4 text-xs">
                 <div>
-                  <label className="block text-[#9ca3af] mb-1">Garment Name</label>
+                  <label className="block text-[#78716C] mb-1">Garment Name</label>
                   <input
                     type="text"
                     placeholder="e.g. Sovereign Imperial Trench"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-3.5 py-2 text-white focus:outline-none focus:border-[#c5a880]"
+                    className="w-full bg-[#FAF8F5] border border-[#1C1917]/15 rounded-xl px-3.5 py-2 text-[#1C1917] focus:outline-none focus:border-[#C5A880]"
                     required
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[#9ca3af] mb-1">Category</label>
+                    <label className="block text-[#78716C] mb-1">Category</label>
                     <select
                       value={category}
                       onChange={(e) => setCategory(e.target.value as ProductCategory)}
-                      className="w-full bg-[#18181e] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none"
+                      className="w-full bg-[#FAF8F5] border border-[#1C1917]/15 rounded-xl px-3 py-2 text-[#1C1917] focus:outline-none"
                     >
                       <option value="outerwear">Outerwear</option>
                       <option value="tailoring">Tailoring</option>
@@ -232,11 +240,11 @@ export default function AdminPage() {
                   </div>
 
                   <div>
-                    <label className="block text-[#9ca3af] mb-1">3D Mesh Geometry</label>
+                    <label className="block text-[#78716C] mb-1">3D Mesh Geometry</label>
                     <select
                       value={geometryType}
                       onChange={(e) => setGeometryType(e.target.value as GarmentGeometryType)}
-                      className="w-full bg-[#18181e] border border-white/10 rounded-xl px-3 py-2 text-white focus:outline-none"
+                      className="w-full bg-[#FAF8F5] border border-[#1C1917]/15 rounded-xl px-3 py-2 text-[#1C1917] focus:outline-none"
                     >
                       <option value="trench_coat">Trench Coat</option>
                       <option value="tailored_blazer">Tailored Blazer</option>
@@ -252,22 +260,22 @@ export default function AdminPage() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[#9ca3af] mb-1">Price (USD)</label>
+                    <label className="block text-[#78716C] mb-1">Price (USD)</label>
                     <input
                       type="number"
                       value={price}
                       onChange={(e) => setPrice(e.target.value)}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-3.5 py-2 text-white focus:outline-none"
+                      className="w-full bg-[#FAF8F5] border border-[#1C1917]/15 rounded-xl px-3.5 py-2 text-[#1C1917] focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[#9ca3af] mb-1">Fabric Weight (GSM)</label>
+                    <label className="block text-[#78716C] mb-1">Fabric Weight (GSM)</label>
                     <input
                       type="number"
                       value={weightGsm}
                       onChange={(e) => setWeightGsm(e.target.value)}
-                      className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-3.5 py-2 text-white focus:outline-none"
+                      className="w-full bg-[#FAF8F5] border border-[#1C1917]/15 rounded-xl px-3.5 py-2 text-[#1C1917] focus:outline-none"
                     />
                   </div>
                 </div>
@@ -275,16 +283,16 @@ export default function AdminPage() {
                 <div className="pt-4 flex gap-3">
                   <button
                     type="submit"
-                    className="flex-1 py-3 rounded-full bg-[#c5a880] text-[#0b0b0c] font-semibold text-xs tracking-wider uppercase hover:bg-[#e6d5b8] transition-colors flex items-center justify-center gap-2"
+                    className="flex-1 py-3 rounded-full bg-[#1C1917] text-white font-semibold text-xs tracking-wider uppercase hover:bg-[#2A2725] transition-colors flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    {createdSuccess ? <Check size={14} /> : <Plus size={14} />}
+                    {createdSuccess ? <Check size={14} className="text-[#C5A880]" /> : <Plus size={14} className="text-[#C5A880]" />}
                     <span>{createdSuccess ? "Piece Registered" : "Save & Render in 3D"}</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setShowAddModal(false)}
-                    className="px-5 py-3 rounded-full bg-white/[0.05] text-[#9ca3af] hover:text-white transition-colors"
+                    className="px-5 py-3 rounded-full bg-[#FAF8F5] text-[#78716C] hover:text-[#1C1917] transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>

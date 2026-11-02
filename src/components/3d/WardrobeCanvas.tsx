@@ -29,22 +29,22 @@ function CameraRig({
 }) {
   useFrame((state, delta) => {
     let targetX = 0;
-    let targetY = 0.15;
-    let targetZ = 3.8;
+    let targetY = 0.0;
+    let targetZ = 2.5;
 
     if (mode === "boutique") {
       targetX = 0;
-      targetY = 0.5;
-      targetZ = 4.8;
+      targetY = 0.35;
+      targetZ = 4.2;
     } else {
       // Rail Mode
       if (selectedProduct) {
-        // Center camera gently toward focused product
-        targetZ = 3.2;
-        targetY = 0.05;
+        // Intimate spotlight focus on active garment
+        targetZ = 2.1;
+        targetY = -0.05;
       } else {
-        targetZ = 3.9;
-        targetY = 0.1;
+        targetZ = 2.5;
+        targetY = 0.0;
       }
     }
 
@@ -67,7 +67,7 @@ export default function WardrobeCanvas({
   return (
     <div className="w-full h-full relative r3f-container select-none">
       <Canvas
-        camera={{ position: [0, 0.2, 4], fov: 45 }}
+        camera={{ position: [0, 0.0, 2.6], fov: 40 }}
         dpr={[1, 2]}
         gl={{ antialias: true, alpha: true }}
       >

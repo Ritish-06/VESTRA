@@ -56,40 +56,40 @@ export default function CartPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070709] text-[#f5f4f0] flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-[#FAF8F5] text-[#1C1917] flex flex-col justify-between">
       <Navbar />
       <CartDrawer />
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20">
-        <div className="pb-8 border-b border-white/[0.08] flex items-baseline justify-between">
+        <div className="pb-8 border-b border-[#1C1917]/[0.08] flex items-baseline justify-between">
           <div>
-            <span className="text-[10px] uppercase tracking-[0.3em] text-[#c5a880] font-mono">
+            <span className="text-[10px] uppercase tracking-[0.3em] text-[#9A7B4F] font-mono">
               Client Portfolio
             </span>
-            <h1 className="font-serif text-3xl sm:text-5xl text-white font-medium mt-1">
+            <h1 className="font-serif text-3xl sm:text-5xl text-[#1C1917] font-medium mt-1">
               Your Curated Bag
             </h1>
           </div>
-          <span className="text-xs text-[#9ca3af]">
+          <span className="text-xs text-[#78716C]">
             {items.length} {items.length === 1 ? "creation" : "creations"}
           </span>
         </div>
 
         {items.length === 0 ? (
-          <div className="text-center py-24 my-8 rounded-3xl bg-white/[0.02] border border-white/5 max-w-xl mx-auto space-y-4">
-            <div className="w-16 h-16 rounded-full border border-white/10 flex items-center justify-center text-[#c5a880] mx-auto">
+          <div className="text-center py-24 my-8 rounded-3xl atelier-card max-w-xl mx-auto space-y-4">
+            <div className="w-16 h-16 rounded-full border border-[#1C1917]/10 flex items-center justify-center text-[#9A7B4F] mx-auto bg-[#FAF8F5]">
               <ShoppingBag size={24} />
             </div>
-            <h2 className="font-serif text-xl text-white">Your Shopping Bag is Empty</h2>
-            <p className="text-xs text-[#9ca3af] max-w-sm mx-auto">
+            <h2 className="font-serif text-xl text-[#1C1917]">Your Shopping Bag is Empty</h2>
+            <p className="text-xs text-[#78716C] max-w-sm mx-auto">
               Browse our interactive 3D Wardrobe or inspect our haute couture collections.
             </p>
             <NextLink
               href="/wardrobe"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#c5a880] text-[#0b0b0c] text-xs font-semibold hover:bg-[#e6d5b8] transition-colors"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#1C1917] text-white text-xs font-semibold hover:bg-[#2A2725] transition-colors"
             >
               <span>Explore 3D Wardrobe</span>
-              <ArrowRight size={14} />
+              <ArrowRight size={14} className="text-[#C5A880]" />
             </NextLink>
           </div>
         ) : (
@@ -99,48 +99,52 @@ export default function CartPage() {
               {items.map((item) => (
                 <div
                   key={item.id}
-                  className="p-5 rounded-2xl bg-[#0e0e12] border border-white/[0.06] hover:border-white/10 transition-colors flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between"
+                  className="p-5 rounded-2xl atelier-card flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between"
                 >
                   <div className="flex gap-4 items-center">
-                    <div className="w-20 h-24 rounded-xl bg-[#18181e] overflow-hidden flex-shrink-0 relative border border-white/5">
+                    <div
+                      className="w-20 h-24 rounded-xl bg-white overflow-hidden shrink-0 relative border border-[#1C1917]/[0.08]"
+                      style={{ width: "80px", height: "96px" }}
+                    >
                       <img
                         src={item.product.images.hero}
                         alt={item.product.name}
                         className="w-full h-full object-cover"
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
                       />
                     </div>
                     <div>
-                      <span className="text-[9px] uppercase tracking-wider text-[#c5a880] font-mono">
+                      <span className="text-[9px] uppercase tracking-wider text-[#9A7B4F] font-mono">
                         {item.product.collectionName}
                       </span>
-                      <h3 className="font-serif text-base sm:text-lg text-white font-medium">
+                      <h3 className="font-serif text-base sm:text-lg text-[#1C1917] font-medium">
                         {item.product.name}
                       </h3>
-                      <p className="text-xs text-[#9ca3af] mt-0.5">
+                      <p className="text-xs text-[#78716C] mt-0.5">
                         Size: {item.selectedSize} • Tone: {item.selectedColor.name}
                       </p>
-                      <span className="text-xs font-serif text-[#c5a880] font-bold mt-1 block">
+                      <span className="text-xs font-serif text-[#9A7B4F] font-bold mt-1 block">
                         ${item.product.price.toLocaleString()} each
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-white/[0.05]">
+                  <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-[#1C1917]/[0.06]">
                     {/* Quantity Selector */}
-                    <div className="flex items-center gap-2 border border-white/10 rounded-full px-3 py-1">
+                    <div className="flex items-center gap-2 border border-[#1C1917]/15 rounded-full px-3 py-1 bg-[#FAF8F5]">
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="text-[#9ca3af] hover:text-white"
+                        className="text-[#78716C] hover:text-[#1C1917]"
                         aria-label="Decrease quantity"
                       >
                         <Minus size={13} />
                       </button>
-                      <span className="text-xs font-mono text-white px-2">
+                      <span className="text-xs font-mono text-[#1C1917] px-2 font-medium">
                         {item.quantity}
                       </span>
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="text-[#9ca3af] hover:text-white"
+                        className="text-[#78716C] hover:text-[#1C1917]"
                         aria-label="Increase quantity"
                       >
                         <Plus size={13} />
@@ -148,14 +152,14 @@ export default function CartPage() {
                     </div>
 
                     <div className="text-right">
-                      <span className="font-serif text-base font-bold text-white block">
+                      <span className="font-serif text-base font-bold text-[#1C1917] block">
                         ${(item.product.price * item.quantity).toLocaleString()}
                       </span>
                     </div>
 
                     <button
                       onClick={() => removeItem(item.id)}
-                      className="text-[#9ca3af] hover:text-red-400 p-1.5 transition-colors"
+                      className="text-[#78716C] hover:text-red-600 p-1.5 transition-colors"
                       title="Remove item"
                     >
                       <Trash2 size={16} />
@@ -166,8 +170,8 @@ export default function CartPage() {
             </div>
 
             {/* Summary & Checkout Column */}
-            <div className="lg:col-span-4 p-6 rounded-3xl bg-[#0e0e12] border border-white/[0.08] shadow-2xl space-y-6 h-fit">
-              <h2 className="font-serif text-xl text-white font-medium">
+            <div className="lg:col-span-4 p-6 rounded-3xl atelier-card space-y-6 h-fit">
+              <h2 className="font-serif text-xl text-[#1C1917] font-medium">
                 Investment Dossier
               </h2>
 
@@ -178,11 +182,11 @@ export default function CartPage() {
                   placeholder="Privilege Code (VESTRA10)"
                   value={couponInput}
                   onChange={(e) => setCouponInput(e.target.value)}
-                  className="flex-1 bg-white/[0.03] border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white placeholder-[#6b7280] focus:outline-none focus:border-[#c5a880]"
+                  className="flex-1 bg-[#FAF8F5] border border-[#1C1917]/15 rounded-xl px-3.5 py-2 text-xs text-[#1C1917] placeholder-[#78716C] focus:outline-none focus:border-[#C5A880]"
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-white/[0.08] hover:bg-[#c5a880] hover:text-[#0b0b0c] text-white text-xs font-medium transition-colors"
+                  className="px-4 py-2 rounded-xl bg-[#1C1917] hover:bg-[#2A2725] text-white text-xs font-medium transition-colors"
                 >
                   Apply
                 </button>
@@ -191,7 +195,7 @@ export default function CartPage() {
               {couponMessage && (
                 <p
                   className={`text-xs ${
-                    couponMessage.type === "success" ? "text-[#c5a880]" : "text-red-400"
+                    couponMessage.type === "success" ? "text-[#9A7B4F]" : "text-red-600"
                   }`}
                 >
                   {couponMessage.text}
@@ -199,39 +203,39 @@ export default function CartPage() {
               )}
 
               {promoCode && (
-                <div className="flex items-center justify-between bg-[#c5a880]/10 border border-[#c5a880]/20 rounded-xl px-3.5 py-2 text-xs text-[#c5a880]">
+                <div className="flex items-center justify-between bg-[#C5A880]/15 border border-[#C5A880]/30 rounded-xl px-3.5 py-2 text-xs text-[#9A7B4F]">
                   <span>{promoCode.description}</span>
-                  <button onClick={removePromo} className="underline hover:text-white">
+                  <button onClick={removePromo} className="underline hover:text-[#1C1917]">
                     Remove
                   </button>
                 </div>
               )}
 
               {/* Summary Breakdown */}
-              <div className="space-y-2 text-xs text-[#9ca3af] pt-4 border-t border-white/[0.05]">
+              <div className="space-y-2 text-xs text-[#78716C] pt-4 border-t border-[#1C1917]/[0.06]">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span className="text-white">${subtotal.toLocaleString()}</span>
+                  <span className="text-[#1C1917] font-mono">${subtotal.toLocaleString()}</span>
                 </div>
                 {discount > 0 && (
-                  <div className="flex justify-between text-[#c5a880]">
+                  <div className="flex justify-between text-[#9A7B4F]">
                     <span>Privilege Benefit</span>
-                    <span>-${discount.toLocaleString()}</span>
+                    <span className="font-mono">-${discount.toLocaleString()}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
                   <span>Duty & Luxury Apparel Tax (8%)</span>
-                  <span className="text-white">${tax.toLocaleString()}</span>
+                  <span className="text-[#1C1917] font-mono">${tax.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>White-Glove Courier Service</span>
-                  <span className="text-white">
+                  <span className="text-[#1C1917] font-mono">
                     {shipping === 0 ? "Complimentary" : `$${shipping}`}
                   </span>
                 </div>
-                <div className="flex justify-between text-base font-serif text-white pt-3 border-t border-white/[0.08]">
+                <div className="flex justify-between text-base font-serif text-[#1C1917] pt-3 border-t border-[#1C1917]/[0.08] font-bold">
                   <span>Total Investment</span>
-                  <span className="text-[#c5a880] font-bold">
+                  <span className="text-[#9A7B4F]">
                     ${total.toLocaleString()}
                   </span>
                 </div>
@@ -243,14 +247,14 @@ export default function CartPage() {
                   sounds.playClick();
                   router.push("/checkout");
                 }}
-                className="w-full py-4 rounded-full bg-gradient-to-r from-[#c5a880] to-[#e6d5b8] text-[#0b0b0c] font-semibold text-xs tracking-widest uppercase flex items-center justify-center gap-2 hover:shadow-[0_0_25px_rgba(197,168,128,0.3)] transition-all"
+                className="w-full py-4 rounded-full bg-[#1C1917] hover:bg-[#2A2725] text-white font-semibold text-xs tracking-widest uppercase flex items-center justify-center gap-2 transition-all shadow-md"
               >
                 <span>Proceed to Private Checkout</span>
-                <ArrowRight size={14} />
+                <ArrowRight size={14} className="text-[#C5A880]" />
               </button>
 
-              <div className="flex items-center justify-center gap-2 text-[10px] text-[#9ca3af]">
-                <ShieldCheck size={12} className="text-[#c5a880]" />
+              <div className="flex items-center justify-center gap-2 text-[10px] text-[#78716C]">
+                <ShieldCheck size={12} className="text-[#9A7B4F]" />
                 <span>Encrypted Atelier Checkout • NFC Microchip Certificate</span>
               </div>
             </div>

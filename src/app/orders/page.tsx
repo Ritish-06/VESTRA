@@ -95,21 +95,21 @@ export default function OrdersPage() {
         ];
 
   return (
-    <div className="min-h-screen bg-[#070709] text-[#f5f4f0] flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-[#FAF8F5] text-[#1C1917] flex flex-col justify-between">
       <Navbar />
       <CartDrawer />
 
       <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 space-y-12">
-        <div className="pb-8 border-b border-white/[0.08] flex items-baseline justify-between">
+        <div className="pb-8 border-b border-[#1C1917]/[0.08] flex items-baseline justify-between">
           <div>
-            <span className="text-[10px] uppercase tracking-[0.3em] text-[#c5a880] font-mono">
+            <span className="text-[10px] uppercase tracking-[0.3em] text-[#9A7B4F] font-mono">
               Client Archival History
             </span>
-            <h1 className="font-serif text-3xl sm:text-5xl text-white font-medium mt-1">
+            <h1 className="font-serif text-3xl sm:text-5xl text-[#1C1917] font-medium mt-1">
               Order Tracking & Archives
             </h1>
           </div>
-          <span className="text-xs text-[#9ca3af]">
+          <span className="text-xs text-[#78716C]">
             {displayOrders.length} {displayOrders.length === 1 ? "Acquisition" : "Acquisitions"}
           </span>
         </div>
@@ -119,47 +119,59 @@ export default function OrdersPage() {
           {displayOrders.map((order) => (
             <div
               key={order.id}
-              className="p-6 sm:p-8 rounded-3xl bg-[#0e0e12] border border-white/[0.08] shadow-2xl space-y-8"
+              className="atelier-card rounded-3xl p-6 sm:p-8 space-y-8"
             >
               {/* Order Header */}
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-white/[0.06]">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-[#1C1917]/[0.06]">
                 <div>
                   <div className="flex items-center gap-3">
-                    <span className="font-mono text-base sm:text-lg text-white font-bold">
+                    <span className="font-mono text-base sm:text-lg text-[#1C1917] font-bold">
                       Order #{order.orderNumber}
                     </span>
-                    <span className="text-[10px] uppercase font-mono px-2.5 py-0.5 rounded-full bg-[#c5a880]/15 text-[#c5a880] border border-[#c5a880]/30">
+                    <span className="text-[10px] uppercase font-mono px-2.5 py-0.5 rounded-full bg-[#C5A880]/15 text-[#9A7B4F] border border-[#C5A880]/30 font-semibold">
                       {order.status.replace("_", " ")}
                     </span>
                   </div>
-                  <p className="text-xs text-[#9ca3af] mt-1">
+                  <p className="text-xs text-[#78716C] mt-1">
                     Placed {order.createdAt ? order.createdAt.slice(0, 10) : "Nov 02, 2026"} • Total: ${order.total.toLocaleString()}
                   </p>
                 </div>
 
-                <div className="text-xs text-[#9ca3af] text-right">
-                  <span className="block text-white font-medium">{order.shippingAddress.fullName}</span>
-                  <span>{order.shippingAddress.city}, {order.shippingAddress.country}</span>
+                <div className="flex items-center gap-4">
+                  <div className="text-xs text-[#78716C] text-right hidden sm:block">
+                    <span className="block text-[#1C1917] font-medium">{order.shippingAddress.fullName}</span>
+                    <span>{order.shippingAddress.city}, {order.shippingAddress.country}</span>
+                  </div>
+
+                  <NextLink
+                    href={`/orders/${order.orderNumber}`}
+                    onClick={() => sounds.playClick()}
+                    className="px-4 py-2 rounded-full bg-[#1C1917] hover:bg-[#2A2725] text-white text-xs font-mono font-medium flex items-center gap-1.5 transition-colors shadow-xs"
+                  >
+                    <Truck size={13} className="text-[#C5A880]" />
+                    <span>Live GPS Telemetry</span>
+                    <ArrowRight size={13} />
+                  </NextLink>
                 </div>
               </div>
 
               {/* Interactive Courier Tracking Timeline */}
               <div>
-                <h3 className="text-xs uppercase tracking-[0.25em] text-[#c5a880] font-mono mb-6">
+                <h3 className="text-xs uppercase tracking-[0.25em] text-[#9A7B4F] font-mono mb-6">
                   Live Courier Timeline & NFC Authentication
                 </h3>
 
-                <div className="relative pl-6 sm:pl-8 space-y-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-[2px] before:bg-white/[0.08]">
+                <div className="relative pl-6 sm:pl-8 space-y-6 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-[2px] before:bg-[#1C1917]/[0.08]">
                   {order.trackingTimeline.map((step, idx) => (
                     <div key={idx} className="relative flex items-start gap-4">
                       {/* Step Indicator Dot */}
                       <div
                         className={`absolute -left-6 sm:-left-8 top-1 w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${
                           step.isCompleted
-                            ? "bg-[#c5a880] text-[#0b0b0c]"
+                            ? "bg-[#C5A880] text-[#1C1917] font-bold"
                             : step.isCurrent
-                            ? "bg-[#0b0b0c] border-2 border-[#c5a880] text-[#c5a880] animate-pulse"
-                            : "bg-[#18181e] border border-white/20 text-[#6b7280]"
+                            ? "bg-[#1C1917] ring-2 ring-[#C5A880] text-[#C5A880] animate-pulse"
+                            : "bg-white border border-[#1C1917]/20 text-[#78716C]"
                         }`}
                       >
                         {step.isCompleted ? <CheckCircle2 size={12} /> : idx + 1}
@@ -170,19 +182,19 @@ export default function OrdersPage() {
                           <h4
                             className={`font-serif text-sm ${
                               step.isCurrent
-                                ? "text-[#c5a880] font-semibold"
+                                ? "text-[#9A7B4F] font-semibold"
                                 : step.isCompleted
-                                ? "text-white"
-                                : "text-[#6b7280]"
+                                ? "text-[#1C1917] font-medium"
+                                : "text-[#78716C]"
                             }`}
                           >
                             {step.label}
                           </h4>
-                          <span className="text-[11px] font-mono text-[#9ca3af]">
+                          <span className="text-[11px] font-mono text-[#78716C]">
                             {step.timestamp}
                           </span>
                         </div>
-                        <p className="text-xs text-[#9ca3af] mt-0.5 leading-relaxed">
+                        <p className="text-xs text-[#78716C] mt-0.5 leading-relaxed">
                           {step.description}
                         </p>
                       </div>
@@ -193,28 +205,32 @@ export default function OrdersPage() {
 
               {/* Items Purchased if available */}
               {order.items.length > 0 && (
-                <div className="pt-6 border-t border-white/[0.06]">
-                  <h4 className="text-xs uppercase tracking-[0.2em] text-[#9ca3af] font-mono mb-3">
+                <div className="pt-6 border-t border-[#1C1917]/[0.06]">
+                  <h4 className="text-xs uppercase tracking-[0.2em] text-[#78716C] font-mono mb-3">
                     Archival Garments in this Crate
                   </h4>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {order.items.map((item) => (
                       <div
                         key={item.id}
-                        className="p-3 rounded-xl bg-white/[0.02] border border-white/5 flex gap-3 items-center"
+                        className="p-3 rounded-xl bg-[#FAF8F5] border border-[#1C1917]/[0.04] flex gap-3 items-center"
                       >
-                        <div className="w-12 h-14 rounded-lg bg-[#18181e] overflow-hidden flex-shrink-0">
+                        <div
+                          className="w-12 h-14 rounded-lg bg-white overflow-hidden shrink-0 border border-[#1C1917]/[0.08]"
+                          style={{ width: "48px", height: "56px" }}
+                        >
                           <img
                             src={item.product.images.hero}
                             alt={item.product.name}
                             className="w-full h-full object-cover"
+                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
                           />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h5 className="font-serif text-xs text-white truncate">
+                          <h5 className="font-serif text-xs text-[#1C1917] truncate font-medium">
                             {item.product.name}
                           </h5>
-                          <p className="text-[10px] text-[#9ca3af]">
+                          <p className="text-[10px] text-[#78716C]">
                             {item.selectedSize} • {item.selectedColor.name}
                           </p>
                           <button
@@ -222,7 +238,7 @@ export default function OrdersPage() {
                               setInspectingProduct(item.product);
                               sounds.playGarmentInspect();
                             }}
-                            className="text-[10px] text-[#c5a880] hover:underline flex items-center gap-1 mt-1"
+                            className="text-[10px] text-[#9A7B4F] hover:text-[#1C1917] flex items-center gap-1 mt-1 transition-colors font-medium"
                           >
                             <Eye size={10} />
                             <span>Inspect 3D</span>

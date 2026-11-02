@@ -39,7 +39,7 @@ export default function GarmentMesh({
   });
 
   return (
-    <group ref={meshGroupRef}>
+    <group ref={meshGroupRef} scale={1.2}>
       {/* Wooden & Brass Hanger */}
       <group position={[0, 0.45, 0]}>
         {/* Brass Hook */}

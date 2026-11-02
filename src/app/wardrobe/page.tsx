@@ -45,36 +45,117 @@ export default function WardrobePage() {
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(PRODUCTS);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(PRODUCTS[0]);
   const [inspectingProduct, setInspectingProduct] = useState<Product | null>(null);
-  const [railOffset, setRailOffset] = useState(0);
+  const [railOffset, setRailOffset] = useState(() => -((0 - (PRODUCTS.length - 1) / 2) * 0.58));
   const [itemColors, setItemColors] = useState<Record<string, Colorway>>({});
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [dragStartX, setDragStartX] = useState<number | null>(null);
+  const [dragStartOffset, setDragStartOffset] = useState<number>(0);
+
+  const getOffsetForIndex = (idx: number, total: number) => {
+    if (total <= 1) return 0;
+    return -((idx - (total - 1) / 2) * 0.58);
+  };
 
   useEffect(() => {
-    if (selectedCategory === "all") {
-      setFilteredProducts(PRODUCTS);
-    } else {
-      setFilteredProducts(PRODUCTS.filter((p) => p.category === selectedCategory));
-    }
-    setRailOffset(0);
+    const nextList =
+      selectedCategory === "all"
+        ? PRODUCTS
+        : PRODUCTS.filter((p) => p.category === selectedCategory);
+    setFilteredProducts(nextList);
+    const first = nextList[0] || null;
+    setSelectedProduct(first);
+    setRailOffset(getOffsetForIndex(0, nextList.length));
   }, [selectedCategory]);
 
   const currentIndex = selectedProduct
-    ? filteredProducts.findIndex((p) => p.id === selectedProduct.id)
+    ? Math.max(0, filteredProducts.findIndex((p) => p.id === selectedProduct.id))
     : 0;
 
-  const handlePrev = () => {
-    sounds.playHangerSlide();
-    const newIdx = Math.max(0, currentIndex - 1);
-    const prod = filteredProducts[newIdx];
+  const selectByIndex = (idx: number) => {
+    if (filteredProducts.length === 0) return;
+    const clamped = Math.max(0, Math.min(filteredProducts.length - 1, idx));
+    const prod = filteredProducts[clamped];
     setSelectedProduct(prod);
-    setRailOffset((prev) => prev + 0.58);
+    setRailOffset(getOffsetForIndex(clamped, filteredProducts.length));
+  };
+
+  const handlePrev = () => {
+    if (currentIndex <= 0) return;
+    sounds.playHangerSlide();
+    selectByIndex(currentIndex - 1);
   };
 
   const handleNext = () => {
+    if (currentIndex >= filteredProducts.length - 1) return;
     sounds.playHangerSlide();
-    const newIdx = Math.min(filteredProducts.length - 1, currentIndex + 1);
-    const prod = filteredProducts[newIdx];
-    setSelectedProduct(prod);
-    setRailOffset((prev) => prev - 0.58);
+    selectByIndex(currentIndex + 1);
+  };
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (inspectingProduct) return;
+      if (e.key === "ArrowLeft") handlePrev();
+      if (e.key === "ArrowRight") handleNext();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [currentIndex, filteredProducts, inspectingProduct]);
+
+  // Touch gesture handlers for mobile swipe
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.touches[0].clientX);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX - touchEndX;
+    if (diff > 45) {
+      handleNext();
+    } else if (diff < -45) {
+      handlePrev();
+    }
+    setTouchStartX(null);
+  };
+
+  // Mouse drag & wheel handlers for smooth rail gliding
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (mode !== "rail") return;
+    setDragStartX(e.clientX);
+    setDragStartOffset(railOffset);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (mode !== "rail" || dragStartX === null) return;
+    const deltaPx = e.clientX - dragStartX;
+    if (Math.abs(deltaPx) > 5) {
+      const nextOffset = dragStartOffset + deltaPx * 0.0045;
+      setRailOffset(nextOffset);
+    }
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (mode !== "rail" || dragStartX === null) return;
+    const deltaPx = e.clientX - dragStartX;
+    setDragStartX(null);
+    if (Math.abs(deltaPx) > 15 && filteredProducts.length > 0) {
+      // Snap to nearest hanger index based on current railOffset
+      const total = filteredProducts.length;
+      const rawIdx = (total - 1) / 2 - railOffset / 0.58;
+      const nearestIdx = Math.round(rawIdx);
+      sounds.playHangerSlide();
+      selectByIndex(nearestIdx);
+    }
+  };
+
+  const handleWheel = (e: React.WheelEvent) => {
+    if (mode !== "rail" || inspectingProduct) return;
+    const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+    if (Math.abs(delta) > 25) {
+      if (delta > 0) handleNext();
+      else handlePrev();
+    }
   };
 
   const handleColorChange = (product: Product, color: Colorway) => {
@@ -92,12 +173,20 @@ export default function WardrobePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#070709] text-[#f5f4f0] flex flex-col relative overflow-hidden">
+    <div className="h-screen w-screen bg-[#070709] text-[#f5f4f0] flex flex-col overflow-hidden select-none relative">
       <Navbar />
       <CartDrawer />
 
       {/* Main 3D Interactive Wardrobe Stage */}
-      <main className="relative flex-1 w-full h-[88vh] min-h-[640px] pt-16 sm:pt-20">
+      <main
+        className="relative flex-1 w-full h-full overflow-hidden pt-16 sm:pt-20 touch-pan-y cursor-grab active:cursor-grabbing"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onWheel={handleWheel}
+      >
         {/* Background ambient lighting glows */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-[#c5a880]/5 rounded-full blur-[140px] pointer-events-none" />
 
@@ -107,8 +196,18 @@ export default function WardrobePage() {
             products={filteredProducts}
             selectedProduct={selectedProduct}
             onSelectProduct={(p) => {
-              setSelectedProduct(p);
-              sounds.playGarmentInspect();
+              const idx = filteredProducts.findIndex((item) => item.id === p.id);
+              if (selectedProduct?.id === p.id) {
+                // Clicking an already focused garment opens full 360° 3D inspection
+                setInspectingProduct(p);
+                sounds.playGarmentInspect();
+              } else if (idx !== -1) {
+                selectByIndex(idx);
+                sounds.playGarmentInspect();
+              } else {
+                setSelectedProduct(p);
+                sounds.playGarmentInspect();
+              }
             }}
             mode={mode}
             railOffset={railOffset}
@@ -212,12 +311,23 @@ export default function WardrobePage() {
               <div className="p-4 sm:p-5 rounded-2xl bg-[#101014]/90 backdrop-blur-xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col sm:flex-row items-center justify-between gap-4">
                 {/* Product Title & Fabric Info */}
                 <div className="flex items-center gap-4 text-left w-full sm:w-auto">
-                  <div className="w-12 h-14 rounded-lg overflow-hidden bg-[#1a1a20] flex-shrink-0 border border-white/10 hidden xs:block">
+                  <div
+                    className="w-12 h-14 rounded-lg overflow-hidden bg-[#1a1a20] shrink-0 border border-white/10 hidden sm:block relative"
+                    style={{
+                      width: "48px",
+                      height: "56px",
+                      minWidth: "48px",
+                      minHeight: "56px",
+                      maxWidth: "48px",
+                      maxHeight: "56px",
+                    }}
+                  >
                     {/* Thumbnail preview */}
                     <img
                       src={selectedProduct.images.hero}
                       alt={selectedProduct.name}
                       className="w-full h-full object-cover"
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     />
                   </div>
 
@@ -309,8 +419,6 @@ export default function WardrobePage() {
           initialColor={itemColors[inspectingProduct.id] || inspectingProduct.colorways[0]}
         />
       )}
-
-      <Footer />
     </div>
   );
 }

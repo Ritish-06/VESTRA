@@ -41,31 +41,31 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<"wardrobe" | "outfits" | "preferences">("wardrobe");
 
   return (
-    <div className="min-h-screen bg-[#070709] text-[#f5f4f0] flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-[#FAF8F5] text-[#1C1917] flex flex-col justify-between">
       <Navbar />
       <CartDrawer />
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 space-y-10">
         {/* Profile Card Header */}
-        <div className="p-8 sm:p-10 rounded-3xl bg-gradient-to-b from-[#111116] to-[#0a0a0d] border border-white/[0.08] shadow-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div className="p-8 sm:p-10 rounded-3xl atelier-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="flex items-center gap-5">
-            <div className="w-20 h-20 rounded-full border-2 border-[#c5a880] p-1 bg-[#181820] flex items-center justify-center text-[#c5a880] text-2xl font-serif">
+            <div className="w-20 h-20 rounded-full border-2 border-[#C5A880] p-1 bg-[#FAF8F5] flex items-center justify-center text-[#9A7B4F] text-2xl font-serif">
               {styleProfile.name[0]}
             </div>
 
             <div>
               <div className="flex items-center gap-2.5">
-                <h1 className="font-serif text-2xl sm:text-3xl text-white font-medium">
+                <h1 className="font-serif text-2xl sm:text-3xl text-[#1C1917] font-medium">
                   {styleProfile.name}
                 </h1>
-                <span className="text-[10px] uppercase font-mono px-2.5 py-0.5 rounded-full bg-[#c5a880]/15 text-[#c5a880] border border-[#c5a880]/30">
+                <span className="text-[10px] uppercase font-mono px-2.5 py-0.5 rounded-full bg-[#C5A880]/15 text-[#9A7B4F] border border-[#C5A880]/30 font-semibold">
                   {styleProfile.loyaltyTier}
                 </span>
               </div>
-              <p className="text-xs text-[#9ca3af] mt-1">
-                Aesthetic DNA: <span className="text-white">{styleProfile.aesthetic}</span>
+              <p className="text-xs text-[#78716C] mt-1">
+                Aesthetic DNA: <span className="text-[#1C1917] font-medium">{styleProfile.aesthetic}</span>
               </p>
-              <div className="flex items-center gap-4 text-xs text-[#6b7280] mt-2">
+              <div className="flex items-center gap-4 text-xs text-[#78716C] mt-2">
                 <span>Height: {styleProfile.heightCm} cm</span>
                 <span>•</span>
                 <span>Tailored Size: {styleProfile.typicalSize}</span>
@@ -76,16 +76,16 @@ export default function ProfilePage() {
           <div className="flex items-center gap-3">
             <NextLink
               href="/wardrobe"
-              className="px-4 py-2 rounded-full bg-[#c5a880] text-[#0b0b0c] text-xs font-semibold hover:bg-[#e6d5b8] transition-colors flex items-center gap-1.5"
+              className="px-5 py-2.5 rounded-full bg-[#1C1917] hover:bg-[#2A2725] text-white text-xs font-semibold transition-colors flex items-center gap-2 shadow-sm"
             >
-              <Sliders size={13} />
+              <Sliders size={13} className="text-[#C5A880]" />
               <span>Launch 3D Wardrobe</span>
             </NextLink>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex gap-4 border-b border-white/[0.08] pb-4">
+        <div className="flex gap-4 border-b border-[#1C1917]/[0.08] pb-4">
           <button
             onClick={() => {
               setActiveTab("wardrobe");
@@ -93,11 +93,11 @@ export default function ProfilePage() {
             }}
             className={`pb-2 text-sm font-medium transition-colors border-b-2 -mb-[18px] flex items-center gap-2 ${
               activeTab === "wardrobe"
-                ? "text-[#c5a880] border-[#c5a880]"
-                : "text-[#9ca3af] border-transparent hover:text-white"
+                ? "text-[#1C1917] border-[#C5A880] font-semibold"
+                : "text-[#78716C] border-transparent hover:text-[#1C1917]"
             }`}
           >
-            <Sliders size={15} />
+            <Sliders size={15} className={activeTab === "wardrobe" ? "text-[#9A7B4F]" : ""} />
             <span>My Virtual Wardrobe Rail ({wardrobeItems.length})</span>
           </button>
 
@@ -108,11 +108,11 @@ export default function ProfilePage() {
             }}
             className={`pb-2 text-sm font-medium transition-colors border-b-2 -mb-[18px] flex items-center gap-2 ${
               activeTab === "outfits"
-                ? "text-[#c5a880] border-[#c5a880]"
-                : "text-[#9ca3af] border-transparent hover:text-white"
+                ? "text-[#1C1917] border-[#C5A880] font-semibold"
+                : "text-[#78716C] border-transparent hover:text-[#1C1917]"
             }`}
           >
-            <BookmarkCheck size={15} />
+            <BookmarkCheck size={15} className={activeTab === "outfits" ? "text-[#9A7B4F]" : ""} />
             <span>Saved Custom Ensembles ({savedOutfits.length})</span>
           </button>
 
@@ -123,11 +123,11 @@ export default function ProfilePage() {
             }}
             className={`pb-2 text-sm font-medium transition-colors border-b-2 -mb-[18px] flex items-center gap-2 ${
               activeTab === "preferences"
-                ? "text-[#c5a880] border-[#c5a880]"
-                : "text-[#9ca3af] border-transparent hover:text-white"
+                ? "text-[#1C1917] border-[#C5A880] font-semibold"
+                : "text-[#78716C] border-transparent hover:text-[#1C1917]"
             }`}
           >
-            <Sparkles size={15} />
+            <Sparkles size={15} className={activeTab === "preferences" ? "text-[#9A7B4F]" : ""} />
             <span>Style DNA & Measurements</span>
           </button>
         </div>
@@ -136,9 +136,9 @@ export default function ProfilePage() {
         {activeTab === "wardrobe" && (
           <div>
             {wardrobeItems.length === 0 ? (
-              <div className="text-center py-20 rounded-3xl bg-white/[0.02] border border-white/5 space-y-3">
-                <p className="font-serif text-lg text-white">Your rail is empty</p>
-                <p className="text-xs text-[#9ca3af]">
+              <div className="text-center py-20 rounded-3xl atelier-card space-y-3">
+                <p className="font-serif text-lg text-[#1C1917]">Your rail is empty</p>
+                <p className="text-xs text-[#78716C]">
                   Inspect pieces in our 3D showroom and select &ldquo;Hang in Wardrobe&rdquo;.
                 </p>
               </div>
@@ -147,39 +147,43 @@ export default function ProfilePage() {
                 {wardrobeItems.map((item) => (
                   <div
                     key={item.id}
-                    className="p-5 rounded-2xl bg-[#0e0e12] border border-white/[0.06] hover:border-white/15 transition-all flex flex-col justify-between"
+                    className="p-5 rounded-2xl atelier-card flex flex-col justify-between"
                   >
                     <div className="flex gap-4">
-                      <div className="w-20 h-24 rounded-xl bg-[#18181e] overflow-hidden flex-shrink-0 relative">
+                      <div
+                        className="w-20 h-24 rounded-xl bg-white overflow-hidden shrink-0 relative border border-[#1C1917]/[0.08]"
+                        style={{ width: "80px", height: "96px" }}
+                      >
                         <img
                           src={item.product.images.hero}
                           alt={item.product.name}
                           className="w-full h-full object-cover"
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <span className="text-[9px] uppercase tracking-wider text-[#c5a880] font-mono">
+                        <span className="text-[9px] uppercase tracking-wider text-[#9A7B4F] font-mono">
                           Hanger #{item.hangerPosition + 1}
                         </span>
-                        <h3 className="font-serif text-base text-white font-medium truncate mt-0.5">
+                        <h3 className="font-serif text-base text-[#1C1917] font-medium truncate mt-0.5">
                           {item.product.name}
                         </h3>
-                        <p className="text-xs text-[#9ca3af] mt-0.5">
+                        <p className="text-xs text-[#78716C] mt-0.5">
                           Size: {item.selectedSize} • {item.selectedColor.name}
                         </p>
-                        <span className="text-xs font-serif text-[#c5a880] font-bold block mt-1">
+                        <span className="text-xs font-serif text-[#9A7B4F] font-bold block mt-1">
                           ${item.product.price.toLocaleString()}
                         </span>
                       </div>
                     </div>
 
-                    <div className="pt-4 mt-4 border-t border-white/[0.04] flex items-center justify-between">
+                    <div className="pt-4 mt-4 border-t border-[#1C1917]/[0.06] flex items-center justify-between">
                       <button
                         onClick={() => {
                           setInspectingProduct(item.product);
                           sounds.playGarmentInspect();
                         }}
-                        className="text-xs text-[#c5a880] hover:underline flex items-center gap-1"
+                        className="text-xs text-[#9A7B4F] hover:text-[#1C1917] font-medium flex items-center gap-1 transition-colors"
                       >
                         <Eye size={12} />
                         <span>Inspect in 3D</span>
@@ -190,13 +194,13 @@ export default function ProfilePage() {
                           onClick={() => {
                             addItem(item.product, item.selectedColor, item.selectedSize, 1);
                           }}
-                          className="px-3 py-1 rounded-full bg-white/[0.08] hover:bg-[#c5a880] hover:text-[#0b0b0c] text-white text-xs transition-colors"
+                          className="px-3 py-1 rounded-full bg-[#1C1917] hover:bg-[#2A2725] text-white text-xs transition-colors"
                         >
                           Acquire
                         </button>
                         <button
                           onClick={() => removeWardrobeItem(item.id)}
-                          className="text-[#9ca3af] hover:text-red-400 p-1"
+                          className="text-[#78716C] hover:text-red-600 p-1 transition-colors"
                           title="Remove from wardrobe rail"
                         >
                           <Trash2 size={13} />
@@ -214,17 +218,17 @@ export default function ProfilePage() {
         {activeTab === "outfits" && (
           <div className="space-y-6">
             {savedOutfits.length === 0 ? (
-              <div className="text-center py-20 rounded-3xl bg-white/[0.02] border border-white/5 space-y-3">
-                <p className="font-serif text-lg text-white">No custom ensembles saved yet</p>
-                <p className="text-xs text-[#9ca3af]">
+              <div className="text-center py-20 rounded-3xl atelier-card space-y-3">
+                <p className="font-serif text-lg text-[#1C1917]">No custom ensembles saved yet</p>
+                <p className="text-xs text-[#78716C]">
                   Visit the Virtual Try-On Studio to mix and match garments and save your favorite combinations.
                 </p>
                 <NextLink
                   href="/studio"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#c5a880] text-[#0b0b0c] text-xs font-semibold hover:bg-[#e6d5b8] transition-colors"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#1C1917] text-white text-xs font-semibold hover:bg-[#2A2725] transition-colors"
                 >
                   <span>Go to Virtual Studio</span>
-                  <ArrowRight size={14} />
+                  <ArrowRight size={14} className="text-[#C5A880]" />
                 </NextLink>
               </div>
             ) : (
@@ -232,38 +236,38 @@ export default function ProfilePage() {
                 {savedOutfits.map((outfit) => (
                   <div
                     key={outfit.id}
-                    className="p-6 rounded-2xl bg-[#0e0e12] border border-white/[0.06] space-y-4"
+                    className="p-6 rounded-2xl atelier-card space-y-4"
                   >
                     <div className="flex justify-between items-start">
                       <div>
-                        <span className="text-[10px] uppercase tracking-wider text-[#c5a880] font-mono">
+                        <span className="text-[10px] uppercase tracking-wider text-[#9A7B4F] font-mono">
                           {outfit.occasion}
                         </span>
-                        <h3 className="font-serif text-lg text-white font-medium mt-0.5">
+                        <h3 className="font-serif text-lg text-[#1C1917] font-medium mt-0.5">
                           {outfit.name}
                         </h3>
-                        <p className="text-xs text-[#9ca3af] mt-1">{outfit.description}</p>
+                        <p className="text-xs text-[#78716C] mt-1">{outfit.description}</p>
                       </div>
-                      <span className="font-serif text-base font-bold text-[#c5a880]">
+                      <span className="font-serif text-base font-bold text-[#9A7B4F]">
                         ${outfit.totalPrice.toLocaleString()}
                       </span>
                     </div>
 
-                    <div className="pt-2 flex items-center justify-between border-t border-white/[0.04]">
+                    <div className="pt-2 flex items-center justify-between border-t border-[#1C1917]/[0.06]">
                       <button
                         onClick={() => {
                           loadOutfitLook(outfit);
                           router.push("/studio");
                         }}
-                        className="px-4 py-1.5 rounded-full bg-[#c5a880] text-[#0b0b0c] text-xs font-semibold flex items-center gap-1.5 hover:bg-[#e6d5b8] transition-colors"
+                        className="px-4 py-1.5 rounded-full bg-[#1C1917] hover:bg-[#2A2725] text-white text-xs font-semibold flex items-center gap-1.5 transition-colors"
                       >
-                        <Sliders size={12} />
+                        <Sliders size={12} className="text-[#C5A880]" />
                         <span>Load on 3D Avatar</span>
                       </button>
 
                       <button
                         onClick={() => deleteOutfitLook(outfit.id)}
-                        className="text-xs text-[#9ca3af] hover:text-red-400 p-1 flex items-center gap-1"
+                        className="text-xs text-[#78716C] hover:text-red-600 p-1 flex items-center gap-1 transition-colors"
                       >
                         <Trash2 size={13} />
                         <span>Delete</span>
@@ -278,35 +282,35 @@ export default function ProfilePage() {
 
         {/* Tab 3: Style DNA & Measurements */}
         {activeTab === "preferences" && (
-          <div className="max-w-2xl mx-auto p-8 rounded-3xl bg-[#0e0e12] border border-white/[0.08] shadow-xl space-y-6">
-            <h3 className="font-serif text-xl text-white font-medium">
+          <div className="max-w-2xl mx-auto p-8 rounded-3xl atelier-card space-y-6">
+            <h3 className="font-serif text-xl text-[#1C1917] font-medium">
               Atelier Style DNA & Calibration
             </h3>
 
             <div className="space-y-4 text-xs">
-              <div className="flex justify-between py-2 border-b border-white/[0.04]">
-                <span className="text-[#9ca3af]">Aesthetic Silhouette Preference</span>
-                <span className="text-white font-medium">{styleProfile.aesthetic}</span>
+              <div className="flex justify-between py-2 border-b border-[#1C1917]/[0.06]">
+                <span className="text-[#78716C]">Aesthetic Silhouette Preference</span>
+                <span className="text-[#1C1917] font-medium">{styleProfile.aesthetic}</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-white/[0.04]">
-                <span className="text-[#9ca3af]">Height Specification</span>
-                <span className="text-white font-mono">{styleProfile.heightCm} cm</span>
+              <div className="flex justify-between py-2 border-b border-[#1C1917]/[0.06]">
+                <span className="text-[#78716C]">Height Specification</span>
+                <span className="text-[#1C1917] font-mono">{styleProfile.heightCm} cm</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-white/[0.04]">
-                <span className="text-[#9ca3af]">Typical Tailored Size</span>
-                <span className="text-white font-mono">{styleProfile.typicalSize}</span>
+              <div className="flex justify-between py-2 border-b border-[#1C1917]/[0.06]">
+                <span className="text-[#78716C]">Typical Tailored Size</span>
+                <span className="text-[#1C1917] font-mono">{styleProfile.typicalSize}</span>
               </div>
-              <div className="flex justify-between py-2 border-b border-white/[0.04]">
-                <span className="text-[#9ca3af]">Private Membership Tier</span>
-                <span className="text-[#c5a880] font-mono font-bold">{styleProfile.loyaltyTier}</span>
+              <div className="flex justify-between py-2 border-b border-[#1C1917]/[0.06]">
+                <span className="text-[#78716C]">Private Membership Tier</span>
+                <span className="text-[#9A7B4F] font-mono font-bold">{styleProfile.loyaltyTier}</span>
               </div>
               <div className="py-2">
-                <span className="text-[#9ca3af] block mb-2">Signature Palette:</span>
+                <span className="text-[#78716C] block mb-2">Signature Palette:</span>
                 <div className="flex items-center gap-2">
                   {styleProfile.favoritePalette.map((col, idx) => (
                     <span
                       key={idx}
-                      className="w-6 h-6 rounded-full border border-white/20"
+                      className="w-6 h-6 rounded-full border border-[#1C1917]/10"
                       style={{ backgroundColor: col }}
                     />
                   ))}

@@ -1,16 +1,23 @@
 @import "tailwindcss";
+@source "../**/*.{js,ts,jsx,tsx,mdx}";
+@source "../../src/**/*.{js,ts,jsx,tsx,mdx}";
 
 :root {
-  --background: #0b0b0c;
-  --foreground: #f5f4f0;
-  --card: #121214;
-  --card-foreground: #f5f4f0;
-  --border: rgba(255, 255, 255, 0.08);
-  --gold: #c5a880;
-  --gold-light: #e6d5b8;
-  --gold-dark: #8c734b;
-  --muted: #1c1c1f;
-  --muted-foreground: #9ca3af;
+  --background: #FAF8F5;
+  --foreground: #1C1917;
+  --card: #FFFFFF;
+  --card-foreground: #1C1917;
+  --border: rgba(28, 25, 23, 0.08);
+  --gold: #C5A880;
+  --gold-light: #E6D5B8;
+  --gold-dark: #8C734B;
+  --ivory: #FAF8F5;
+  --cream: #F4F0E8;
+  --sand: #EFECE4;
+  --charcoal: #1C1917;
+  --charcoal-light: #2A2725;
+  --muted: #F4F0E8;
+  --muted-foreground: #78716C;
   --font-serif: "Playfair Display", "Cinzel", "Didot", "Bodoni MT", Georgia, serif;
   --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-display: "Cinzel", "Playfair Display", serif;
@@ -25,6 +32,11 @@
   --color-gold: var(--gold);
   --color-gold-light: var(--gold-light);
   --color-gold-dark: var(--gold-dark);
+  --color-ivory: var(--ivory);
+  --color-cream: var(--cream);
+  --color-sand: var(--sand);
+  --color-charcoal: var(--charcoal);
+  --color-charcoal-light: var(--charcoal-light);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --font-serif: var(--font-serif);
@@ -33,10 +45,11 @@
 }
 
 body {
-  background-color: #0b0b0c;
-  color: #f5f4f0;
+  background-color: var(--background);
+  color: var(--foreground);
   font-family: var(--font-sans);
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
 
 /* Editorial Serif & Display Typography */
@@ -48,73 +61,65 @@ body {
   font-family: var(--font-display);
 }
 
-/* Luxury Glassmorphism */
-.glass-panel {
-  background: rgba(18, 18, 20, 0.65);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+/* Luxury Light Atelier Panels */
+.atelier-panel {
+  background: #FFFFFF;
+  border: 1px solid rgba(28, 25, 23, 0.08);
+  box-shadow: 0 10px 30px -10px rgba(28, 25, 23, 0.04);
 }
 
-.glass-panel-gold {
-  background: rgba(18, 18, 20, 0.75);
+.atelier-card {
+  background: #FFFFFF;
+  border: 1px solid rgba(28, 25, 23, 0.08);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.atelier-card:hover {
+  border-color: rgba(197, 168, 128, 0.5);
+  box-shadow: 0 16px 36px -12px rgba(28, 25, 23, 0.08);
+}
+
+.atelier-dock {
+  background: rgba(250, 248, 245, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(197, 168, 128, 0.2);
+  border: 1px solid rgba(28, 25, 23, 0.08);
+  box-shadow: 0 12px 32px -8px rgba(28, 25, 23, 0.08);
 }
 
-.glass-dock {
-  background: rgba(11, 11, 12, 0.85);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+/* Dark Showroom Viewport (Used for immersive 3D stage) */
+.dark-showroom {
+  background-color: #121110;
+  color: #FAF8F5;
 }
 
-/* Gold Gradient Text */
+/* Subtle Champagne Gold Typography */
+.gold-text {
+  color: #9A7B4F;
+}
+
 .gold-gradient-text {
-  background: linear-gradient(135deg, #f5f4f0 0%, #c5a880 50%, #8c734b 100%);
+  background: linear-gradient(135deg, #1C1917 0%, #9A7B4F 60%, #C5A880 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.gold-shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(197, 168, 128, 0) 0%,
-    rgba(197, 168, 128, 0.3) 50%,
-    rgba(197, 168, 128, 0) 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 4s infinite;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-/* Custom Scrollbar */
+/* Refined Minimalist Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #0b0b0c;
+  background: #FAF8F5;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: #DCD6CB;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #c5a880;
+  background: #C5A880;
 }
 
 /* 3D Canvas Container */
