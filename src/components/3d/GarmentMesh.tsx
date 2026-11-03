@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useRef } from "react";
+import React, { useRef, Suspense } from "react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
 import { GarmentGeometryType, Colorway } from "@/types/product";
 
 interface GarmentMeshProps {
   geometryType: GarmentGeometryType;
   colorway: Colorway;
+  modelUrl?: string | null;
   roughness?: number;
   metalness?: number;
   sheen?: number;
@@ -15,9 +17,16 @@ interface GarmentMeshProps {
   isSelected?: boolean;
 }
 
+function GlbGarmentModel({ url, color }: { url: string; color: THREE.Color }) {
+  const gltf = useGLTF(url);
+  const cloned = React.useMemo(() => gltf.scene.clone(true), [gltf.scene]);
+  return <primitive object={cloned} position={[0, -0.3, 0]} scale={0.8} />;
+}
+
 export default function GarmentMesh({
   geometryType,
   colorway,
+  modelUrl,
   roughness = 0.5,
   metalness = 0.1,
   sheen = 0.3,
@@ -264,6 +273,12 @@ export default function GarmentMesh({
             <meshStandardMaterial color="#1a1a1e" metalness={0.8} roughness={0.2} />
           </mesh>
         </group>
+      )}
+
+      {modelUrl && (
+        <Suspense fallback={null}>
+          <GlbGarmentModel url={modelUrl} color={color} />
+        </Suspense>
       )}
 
       {/* Selected Brass Halo Indicator */}

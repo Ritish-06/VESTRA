@@ -26,7 +26,9 @@ import { Product } from "@/types/product";
 import { AvatarModelType, OutfitLook } from "@/types/wardrobe";
 import { useWardrobeStore } from "@/store/useWardrobeStore";
 import { useCartStore } from "@/store/useCartStore";
+import { useCatalog } from "@/components/providers/CatalogProvider";
 import { sounds } from "@/utils/soundEffects";
+import { formatPrice } from "@/lib/commerce";
 import {
   Sparkles,
   ShoppingBag,
@@ -51,6 +53,7 @@ export default function StudioPage() {
   } = useWardrobeStore();
 
   const { addItem } = useCartStore();
+  const { products } = useCatalog();
 
   const [outfitName, setOutfitName] = useState("");
   const [occasionInput, setOccasionInput] = useState("");
@@ -64,13 +67,14 @@ export default function StudioPage() {
     { id: "minimalist_marble", label: "Minimalist Marble", desc: "Greek Alabaster Stone", color: "#e6e2da" },
   ];
 
-  const outerwearProducts = PRODUCTS.filter(
+  const sourceProducts = products.length ? products : PRODUCTS;
+  const outerwearProducts = sourceProducts.filter(
     (p) => p.category === "outerwear" || p.category === "tailoring"
   );
-  const topProducts = PRODUCTS.filter(
+  const topProducts = sourceProducts.filter(
     (p) => p.category === "tops" || p.category === "dresses"
   );
-  const trouserProducts = PRODUCTS.filter((p) => p.category === "trousers");
+  const trouserProducts = sourceProducts.filter((p) => p.category === "trousers");
 
   const currentPieces = [
     activeLook.outerwear,
@@ -322,7 +326,7 @@ export default function StudioPage() {
                 </p>
               </div>
               <span className="font-serif text-2xl font-bold text-[#c5a880]">
-                ${ensembleTotal.toLocaleString()}
+                {formatPrice(ensembleTotal)}
               </span>
             </div>
 

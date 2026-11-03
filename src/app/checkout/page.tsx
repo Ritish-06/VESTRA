@@ -7,6 +7,7 @@ import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
 import { useCartStore } from "@/store/useCartStore";
 import { sounds } from "@/utils/soundEffects";
+import { formatPrice, DELIVERY_OPTIONS, DeliveryMethodId } from "@/lib/commerce";
 import {
   ShieldCheck,
   Lock,
@@ -15,10 +16,8 @@ import {
   CheckCircle2,
   Sparkles,
   ArrowRight,
-  ArrowLeft,
-  Check,
-  Clock,
   PackageCheck,
+  AlertCircle,
 } from "lucide-react";
 
 type CheckoutStep = "shipping" | "delivery" | "payment" | "review";
@@ -27,12 +26,10 @@ export default function CheckoutPage() {
   const router = useRouter();
   const {
     items,
+    promoCode,
     getSubtotal,
     getDiscount,
-    getTax,
-    getShipping,
-    getTotal,
-    createOrder,
+    clearCart,
   } = useCartStore();
 
   const [step, setStep] = useState<CheckoutStep>("shipping");
@@ -40,69 +37,101 @@ export default function CheckoutPage() {
   // Step 1: Shipping Details
   const [fullName, setFullName] = useState("Alexandre De Vestra");
   const [email, setEmail] = useState("alexandre@vestra-atelier.com");
-  const [phone, setPhone] = useState("+33 1 42 68 55 00");
-  const [address, setAddress] = useState("14 Rue de la Paix");
-  const [city, setCity] = useState("Paris");
-  const [stateRegion, setStateRegion] = useState("Île-de-France");
-  const [postalCode, setPostalCode] = useState("75002");
-  const [country, setCountry] = useState("France");
+  const [phone, setPhone] = useState("+91 98765 43210");
+  const [address, setAddress] = useState("14, Nariman Point, Marine Drive");
+  const [city, setCity] = useState("Mumbai");
+  const [stateRegion, setStateRegion] = useState("Maharashtra");
+  const [postalCode, setPostalCode] = useState("400021");
+  const [country, setCountry] = useState("India");
 
   // Step 2: Delivery Option
-  const [deliveryMethod, setDeliveryMethod] = useState<"standard" | "express">("standard");
+  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethodId>("STANDARD");
 
-  // Step 3: Payment
-  const [paymentProvider, setPaymentProvider] = useState<"vault" | "card">("vault");
-  const [cardNumber, setCardNumber] = useState("•••• •••• •••• 8842");
-  const [cardExpiry, setCardExpiry] = useState("11/29");
-  const [cardCvc, setCardCvc] = useState("•••");
+  // Step 3: Payment Method
+  const [paymentProvider, setPaymentProvider] = useState<"RAZORPAY" | "TEST_MODE">("TEST_MODE");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const subtotal = getSubtotal();
   const discount = getDiscount();
-  const tax = getTax();
-  const baseShipping = getShipping();
-  const deliverySurcharge = deliveryMethod === "express" ? 75 : 0;
-  const shipping = baseShipping + deliverySurcharge;
-  const total = subtotal - discount + tax + shipping;
+  const discountedSubtotal = Math.max(0, subtotal - discount);
+
+  // Delivery calculation from commerce rules
+  const standardFee = discountedSubtotal >= 50000 ? 0 : DELIVERY_OPTIONS.STANDARD.fee;
+  const shipping = deliveryMethod === "EXPRESS" ? DELIVERY_OPTIONS.EXPRESS.fee : standardFee;
+  const total = discountedSubtotal + shipping;
 
   const handleNextStep = (e: React.FormEvent) => {
     e.preventDefault();
     sounds.playClick();
+    setErrorMessage(null);
     if (step === "shipping") setStep("delivery");
     else if (step === "delivery") setStep("payment");
     else if (step === "payment") setStep("review");
   };
 
-  const handleCompleteOrder = () => {
+  const handleCompleteOrder = async () => {
     if (items.length === 0) return;
     setIsProcessing(true);
+    setErrorMessage(null);
     sounds.playClick();
 
-    setTimeout(() => {
-      const order = createOrder({
-        fullName,
-        email,
-        address: `${address}, ${stateRegion}`,
-        city,
-        postalCode,
-        country,
+    try {
+      const payload = {
+        items: items.map((i) => ({
+          productId: i.product.id,
+          colorId: i.selectedColor.id,
+          size: i.selectedSize,
+          quantity: i.quantity,
+        })),
+        shippingAddress: {
+          fullName,
+          email,
+          phone,
+          address,
+          city,
+          state: stateRegion,
+          postalCode,
+          country,
+        },
+        deliveryMethod,
+        couponCode: promoCode?.code,
+        idempotencyKey: `ord_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`,
+        paymentMethod: paymentProvider,
+      };
+
+      const res = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
       });
 
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setErrorMessage(data.error || "Failed to authenticate order with atelier vault.");
+        setIsProcessing(false);
+        return;
+      }
+
+      clearCart();
       setIsProcessing(false);
 
-      // Gold celebratory shower
       try {
         confetti({
-          particleCount: 80,
-          spread: 70,
+          particleCount: 90,
+          spread: 75,
           origin: { y: 0.6 },
           colors: ["#C5A880", "#E6D5B8", "#1C1917", "#8C734B"],
         });
       } catch {}
 
       sounds.playChime();
-      router.push(`/order-confirmation/${order.orderNumber}`);
-    }, 1500);
+      const tokenQuery = data.order.accessToken ? `?token=${data.order.accessToken}` : "";
+      router.push(`/order-confirmation/${data.order.orderNumber}${tokenQuery}`);
+    } catch {
+      setErrorMessage("Network disruption while authorizing payment. Please retry.");
+      setIsProcessing(false);
+    }
   };
 
   const stepList: { id: CheckoutStep; label: string; number: number }[] = [
@@ -149,6 +178,13 @@ export default function CheckoutPage() {
             </div>
           </div>
         </div>
+
+        {errorMessage && (
+          <div className="mb-8 p-4 bg-red-50 border border-red-200 text-red-700 text-xs rounded-2xl flex items-center gap-3">
+            <AlertCircle size={18} className="text-red-600 shrink-0" />
+            <p className="font-medium">{errorMessage}</p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
           {/* Main Step Form Container */}
@@ -257,48 +293,50 @@ export default function CheckoutPage() {
 
                 <div className="space-y-4">
                   <label
-                    onClick={() => setDeliveryMethod("standard")}
+                    onClick={() => setDeliveryMethod("STANDARD")}
                     className={`block p-4 rounded-2xl border transition-all cursor-pointer ${
-                      deliveryMethod === "standard"
+                      deliveryMethod === "STANDARD"
                         ? "border-[#C5A880] bg-[#C5A880]/10 shadow-xs"
                         : "border-[#1C1917]/10 bg-[#FAF8F5]"
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${deliveryMethod === "standard" ? "border-[#C5A880]" : "border-stone-400"}`}>
-                          {deliveryMethod === "standard" && <div className="w-2 h-2 rounded-full bg-[#C5A880]" />}
+                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${deliveryMethod === "STANDARD" ? "border-[#C5A880]" : "border-stone-400"}`}>
+                          {deliveryMethod === "STANDARD" && <div className="w-2 h-2 rounded-full bg-[#C5A880]" />}
                         </div>
                         <div>
                           <h4 className="font-serif text-sm text-[#1C1917] font-medium">Standard White-Glove Courier</h4>
-                          <p className="text-xs text-[#78716C]">Estimated Delivery: 3 to 5 business days</p>
+                          <p className="text-xs text-[#78716C]">Estimated Delivery: 4 to 6 business days</p>
                         </div>
                       </div>
                       <span className="font-mono text-xs font-bold text-[#1C1917]">
-                        {baseShipping === 0 ? "Complimentary" : `$${baseShipping}`}
+                        {standardFee === 0 ? "Complimentary" : formatPrice(DELIVERY_OPTIONS.STANDARD.fee)}
                       </span>
                     </div>
                   </label>
 
                   <label
-                    onClick={() => setDeliveryMethod("express")}
+                    onClick={() => setDeliveryMethod("EXPRESS")}
                     className={`block p-4 rounded-2xl border transition-all cursor-pointer ${
-                      deliveryMethod === "express"
+                      deliveryMethod === "EXPRESS"
                         ? "border-[#C5A880] bg-[#C5A880]/10 shadow-xs"
                         : "border-[#1C1917]/10 bg-[#FAF8F5]"
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${deliveryMethod === "express" ? "border-[#C5A880]" : "border-stone-400"}`}>
-                          {deliveryMethod === "express" && <div className="w-2 h-2 rounded-full bg-[#C5A880]" />}
+                        <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${deliveryMethod === "EXPRESS" ? "border-[#C5A880]" : "border-stone-400"}`}>
+                          {deliveryMethod === "EXPRESS" && <div className="w-2 h-2 rounded-full bg-[#C5A880]" />}
                         </div>
                         <div>
-                          <h4 className="font-serif text-sm text-[#1C1917] font-medium">Express Climate-Controlled Flight</h4>
+                          <h4 className="font-serif text-sm text-[#1C1917] font-medium">Express Priority Air Flight</h4>
                           <p className="text-xs text-[#78716C]">Estimated Delivery: 24 to 48 hours guaranteed</p>
                         </div>
                       </div>
-                      <span className="font-mono text-xs font-bold text-[#9A7B4F]">+$75</span>
+                      <span className="font-mono text-xs font-bold text-[#9A7B4F]">
+                        {formatPrice(DELIVERY_OPTIONS.EXPRESS.fee)}
+                      </span>
                     </div>
                   </label>
                 </div>
@@ -326,49 +364,53 @@ export default function CheckoutPage() {
               <form onSubmit={handleNextStep} className="bg-white p-8 rounded-3xl border border-[#1C1917]/[0.08] shadow-sm space-y-6">
                 <div className="flex items-center gap-2 text-xs text-[#9A7B4F] font-mono uppercase tracking-wider">
                   <CreditCard size={15} />
-                  <span>Step 3 — Encrypted Payment Gateway</span>
+                  <span>Step 3 — Payment Authorization</span>
                 </div>
 
                 <div className="flex gap-3">
                   <button
                     type="button"
-                    onClick={() => setPaymentProvider("vault")}
-                    className={`flex-1 py-2.5 rounded-xl border text-xs font-medium transition-all ${
-                      paymentProvider === "vault"
+                    onClick={() => setPaymentProvider("TEST_MODE")}
+                    className={`flex-1 py-3 px-4 rounded-xl border text-xs font-medium transition-all ${
+                      paymentProvider === "TEST_MODE"
                         ? "bg-[#1C1917] text-white border-[#1C1917]"
                         : "bg-[#FAF8F5] text-[#78716C] border-[#1C1917]/10"
                     }`}
                   >
-                    VESTRA Vault Pass
+                    Atelier Test Mode (Zero charge)
                   </button>
                   <button
                     type="button"
-                    onClick={() => setPaymentProvider("card")}
-                    className={`flex-1 py-2.5 rounded-xl border text-xs font-medium transition-all ${
-                      paymentProvider === "card"
+                    onClick={() => setPaymentProvider("RAZORPAY")}
+                    className={`flex-1 py-3 px-4 rounded-xl border text-xs font-medium transition-all ${
+                      paymentProvider === "RAZORPAY"
                         ? "bg-[#1C1917] text-white border-[#1C1917]"
                         : "bg-[#FAF8F5] text-[#78716C] border-[#1C1917]/10"
                     }`}
                   >
-                    Credit / Debit Card
+                    Razorpay Gateway (INR)
                   </button>
                 </div>
 
-                {/* Vault Card Visual */}
+                {/* Vault Pass / Card Visual */}
                 <div className="p-6 rounded-2xl bg-gradient-to-br from-[#1C1917] to-[#121110] text-white border border-[#C5A880]/40 space-y-4 shadow-lg">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="font-serif tracking-widest text-[#C5A880] font-bold">VESTRA ATELIER PASS</span>
+                    <span className="font-serif tracking-widest text-[#C5A880] font-bold">
+                      {paymentProvider === "RAZORPAY" ? "RAZORPAY SECURE GATEWAY" : "ATELIER TEST VAULT"}
+                    </span>
                     <Lock size={13} className="text-[#C5A880]" />
                   </div>
 
                   <div>
-                    <span className="text-[10px] text-[#A8A29E] font-mono block">ENCRYPTED ACCOUNT</span>
-                    <p className="font-mono text-base tracking-widest text-white mt-1">{cardNumber}</p>
+                    <span className="text-[10px] text-[#A8A29E] font-mono block">AUTHORIZATION PROTOCOL</span>
+                    <p className="font-mono text-sm tracking-widest text-white mt-1">
+                      {paymentProvider === "RAZORPAY" ? "UPI • Cards • NetBanking • EMI" : "SANDBOX • 100% SECURE DEMO PASS"}
+                    </p>
                   </div>
 
                   <div className="flex justify-between text-xs text-[#A8A29E] font-mono pt-2 border-t border-white/10">
-                    <span>HOLDER: {fullName.toUpperCase()}</span>
-                    <span>EXP: {cardExpiry}</span>
+                    <span>CLIENT: {fullName.toUpperCase()}</span>
+                    <span>CURRENCY: INR (₹)</span>
                   </div>
                 </div>
 
@@ -410,12 +452,14 @@ export default function CheckoutPage() {
                   <div className="flex justify-between">
                     <span className="text-[#78716C]">Courier Method</span>
                     <span className="text-[#1C1917] font-medium">
-                      {deliveryMethod === "express" ? "Express Air Flight (24-48h)" : "Standard White-Glove (3-5d)"}
+                      {deliveryMethod === "EXPRESS" ? "Express Priority Air (24-48h)" : "Standard White-Glove (4-6d)"}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[#78716C]">Payment Authorization</span>
-                    <span className="text-[#9A7B4F] font-mono font-bold">VESTRA VAULT (•••• 8842)</span>
+                    <span className="text-[#78716C]">Payment Channel</span>
+                    <span className="text-[#9A7B4F] font-mono font-bold">
+                      {paymentProvider === "RAZORPAY" ? "Razorpay (Test Mode)" : "Atelier Test Mode (Zero charge)"}
+                    </span>
                   </div>
                 </div>
 
@@ -430,15 +474,15 @@ export default function CheckoutPage() {
                   <button
                     onClick={handleCompleteOrder}
                     disabled={isProcessing}
-                    className="flex-1 py-4 rounded-full bg-[#1C1917] hover:bg-[#2A2725] text-[#FAF8F5] font-semibold text-xs tracking-widest uppercase flex items-center justify-center gap-2 shadow-lg hover:shadow-xl cursor-pointer transition-all"
+                    className="flex-1 py-4 rounded-full bg-[#1C1917] hover:bg-[#2A2725] text-[#FAF8F5] font-semibold text-xs tracking-widest uppercase flex items-center justify-center gap-2 shadow-lg hover:shadow-xl cursor-pointer transition-all disabled:opacity-60"
                   >
                     {isProcessing ? (
                       <span className="flex items-center gap-2">
                         <Sparkles size={14} className="animate-spin text-[#C5A880]" />
-                        <span>Authorizing Transaction...</span>
+                        <span>Authorizing Transaction in Atelier Vault...</span>
                       </span>
                     ) : (
-                      <span>Complete Purchase • ${total.toLocaleString()}</span>
+                      <span>Complete Purchase • {formatPrice(total)}</span>
                     )}
                   </button>
                 </div>
@@ -470,7 +514,7 @@ export default function CheckoutPage() {
                       </p>
                     </div>
                     <span className="font-mono text-[#1C1917] font-medium">
-                      ${(item.product.price * item.quantity).toLocaleString()}
+                      {formatPrice(item.product.price * item.quantity)}
                     </span>
                   </div>
                 ))}
@@ -479,28 +523,24 @@ export default function CheckoutPage() {
               <div className="space-y-2 pt-4 border-t border-[#1C1917]/[0.08] text-xs text-[#78716C]">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span className="text-[#1C1917]">${subtotal.toLocaleString()}</span>
+                  <span className="text-[#1C1917]">{formatPrice(subtotal)}</span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-[#9A7B4F]">
                     <span>Privilege Benefit</span>
-                    <span>-${discount.toLocaleString()}</span>
+                    <span>-{formatPrice(discount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span>Apparel Duty (8%)</span>
-                  <span className="text-[#1C1917]">${tax.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between">
                   <span>Courier Service</span>
                   <span className="text-[#1C1917]">
-                    {shipping === 0 ? "Complimentary" : `$${shipping}`}
+                    {shipping === 0 ? "Complimentary" : formatPrice(shipping)}
                   </span>
                 </div>
                 <div className="flex justify-between text-base font-serif text-[#1C1917] pt-3 border-t border-[#1C1917]/[0.08]">
                   <span>Total Investment</span>
                   <span className="text-[#1C1917] font-bold">
-                    ${total.toLocaleString()}
+                    {formatPrice(total)}
                   </span>
                 </div>
               </div>

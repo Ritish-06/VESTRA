@@ -10,6 +10,7 @@ import { useCartStore } from "@/store/useCartStore";
 import { Order, OrderStatus } from "@/types/cart";
 import { Product } from "@/types/product";
 import { sounds } from "@/utils/soundEffects";
+import { formatPrice } from "@/lib/commerce";
 import {
   Package,
   Truck,
@@ -133,7 +134,7 @@ export default function OrdersPage() {
                     </span>
                   </div>
                   <p className="text-xs text-[#78716C] mt-1">
-                    Placed {order.createdAt ? order.createdAt.slice(0, 10) : "Nov 02, 2026"} • Total: ${order.total.toLocaleString()}
+                    Placed {order.createdAt ? order.createdAt.slice(0, 10) : "Nov 02, 2026"} • Total: {formatPrice(order.total)}
                   </p>
                 </div>
 

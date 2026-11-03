@@ -12,6 +12,8 @@ import { useCartStore } from "@/store/useCartStore";
 import { Product } from "@/types/product";
 import { OutfitLook } from "@/types/wardrobe";
 import { sounds } from "@/utils/soundEffects";
+import { formatPrice } from "@/lib/commerce";
+import { logoutAction } from "@/app/actions/auth";
 import {
   User,
   Sliders,
@@ -74,6 +76,16 @@ export default function ProfilePage() {
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={async () => {
+                await fetch("/api/auth", { method: "DELETE" });
+                router.push("/login");
+              }}
+              className="px-4 py-2.5 rounded-full text-xs font-medium border border-[#1C1917]/20 hover:border-red-400 text-[#78716C] hover:text-red-600 transition-colors cursor-pointer"
+            >
+              Sign Out
+            </button>
             <NextLink
               href="/wardrobe"
               className="px-5 py-2.5 rounded-full bg-[#1C1917] hover:bg-[#2A2725] text-white text-xs font-semibold transition-colors flex items-center gap-2 shadow-sm"
@@ -172,7 +184,7 @@ export default function ProfilePage() {
                           Size: {item.selectedSize} • {item.selectedColor.name}
                         </p>
                         <span className="text-xs font-serif text-[#9A7B4F] font-bold block mt-1">
-                          ${item.product.price.toLocaleString()}
+                          {formatPrice(item.product.price)}
                         </span>
                       </div>
                     </div>
@@ -249,7 +261,7 @@ export default function ProfilePage() {
                         <p className="text-xs text-[#78716C] mt-1">{outfit.description}</p>
                       </div>
                       <span className="font-serif text-base font-bold text-[#9A7B4F]">
-                        ${outfit.totalPrice.toLocaleString()}
+                        {formatPrice(outfit.totalPrice)}
                       </span>
                     </div>
 

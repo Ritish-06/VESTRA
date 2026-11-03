@@ -15,7 +15,8 @@ export type GarmentGeometryType =
   | "pleated_trouser"
   | "knit_sweater"
   | "leather_jacket"
-  | "minimalist_vest";
+  | "minimalist_vest"
+  | "tote_bag";
 
 export interface Colorway {
   id: string;
@@ -37,10 +38,22 @@ export interface FabricSpec {
   sheen?: number;
 }
 
+export type Audience = "WOMEN" | "MEN" | "UNISEX";
+
 export interface Product {
   id: string;
+  /** URL slug used by /product/[slug] */
+  slug: string;
   name: string;
   subtitle: string;
+  /** Who the garment is cut for (drives the Women / Men explore filters) */
+  audience: Audience;
+  /** Garment care guidance shown on the product page */
+  careInstructions: string[];
+  /** Optional GLB/GLTF model (public path or CDN URL). Falls back to procedural geometry. */
+  modelUrl?: string | null;
+  /** Units in stock keyed by `${colorId}|${size}` (populated from the database) */
+  stock?: Record<string, number>;
   collectionId: string;
   collectionName: string;
   category: ProductCategory;

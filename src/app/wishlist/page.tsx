@@ -10,15 +10,19 @@ import { PRODUCTS } from "@/data/products";
 import { Product } from "@/types/product";
 import { useWardrobeStore } from "@/store/useWardrobeStore";
 import { useCartStore } from "@/store/useCartStore";
+import { useCatalog } from "@/components/providers/CatalogProvider";
 import { sounds } from "@/utils/soundEffects";
+import { formatPrice } from "@/lib/commerce";
 import { Heart, Trash2, Eye, ShoppingBag, ArrowRight } from "lucide-react";
 
 export default function WishlistPage() {
   const { wishlistIds, toggleWishlist } = useWardrobeStore();
   const { addItem } = useCartStore();
+  const { products } = useCatalog();
   const [inspectingProduct, setInspectingProduct] = useState<Product | null>(null);
 
-  const savedProducts = PRODUCTS.filter((p) => wishlistIds.includes(p.id));
+  const sourceProducts = products.length ? products : PRODUCTS;
+  const savedProducts = sourceProducts.filter((p) => wishlistIds.includes(p.id));
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#1C1917] flex flex-col justify-between">
@@ -84,11 +88,13 @@ export default function WishlistPage() {
                     <span className="text-[9px] uppercase tracking-wider text-[#9A7B4F] font-mono">
                       {p.collectionName}
                     </span>
-                    <h3 className="font-serif text-base text-[#1C1917] font-medium mt-1">
-                      {p.name}
-                    </h3>
+                    <NextLink href={`/product/${p.slug || p.id}`}>
+                      <h3 className="font-serif text-base text-[#1C1917] font-medium mt-1 hover:text-[#9A7B4F] transition-colors">
+                        {p.name}
+                      </h3>
+                    </NextLink>
                     <p className="text-xs font-serif text-[#9A7B4F] font-bold mt-1">
-                      ${p.price.toLocaleString()}
+                      {formatPrice(p.price)}
                     </p>
                   </div>
 

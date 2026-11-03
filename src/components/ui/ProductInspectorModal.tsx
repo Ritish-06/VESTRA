@@ -35,6 +35,7 @@ const ProductInspectorCanvas = dynamic(
 import { useCartStore } from "@/store/useCartStore";
 import { useWardrobeStore } from "@/store/useWardrobeStore";
 import { sounds } from "@/utils/soundEffects";
+import { formatPrice } from "@/lib/commerce";
 
 interface ProductInspectorModalProps {
   product: Product | null;
@@ -191,11 +192,11 @@ export default function ProductInspectorModal({
               </p>
               <div className="flex items-baseline gap-3 mt-3">
                 <span className="text-xl font-serif text-[#c5a880] font-bold">
-                  ${product.price.toLocaleString()}
+                  {formatPrice(product.price)}
                 </span>
                 {product.originalPrice && (
                   <span className="text-xs text-[#6b7280] line-through">
-                    ${product.originalPrice.toLocaleString()}
+                    {formatPrice(product.originalPrice)}
                   </span>
                 )}
                 <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-950/60 text-emerald-400 border border-emerald-800/40 font-mono ml-auto">

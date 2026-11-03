@@ -45,6 +45,7 @@ function InspectorScene({
             <GarmentMesh
               geometryType={product.geometryType}
               colorway={activeColorway}
+              modelUrl={product.modelUrl}
               roughness={product.fabric.roughness}
               metalness={product.fabric.metalness}
               sheen={product.fabric.sheen}

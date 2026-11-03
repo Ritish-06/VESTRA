@@ -13,7 +13,9 @@ import { PRODUCTS, COLLECTIONS } from "@/data/products";
 import { Product } from "@/types/product";
 import { useCartStore } from "@/store/useCartStore";
 import { useWardrobeStore } from "@/store/useWardrobeStore";
+import { useCatalog } from "@/components/providers/CatalogProvider";
 import { sounds } from "@/utils/soundEffects";
+import { formatPrice } from "@/lib/commerce";
 import {
   Sliders,
   Sparkles,
@@ -47,14 +49,15 @@ export default function LandingPage() {
   const router = useRouter();
   const { addItem } = useCartStore();
   const { toggleWishlist, isInWishlist } = useWardrobeStore();
+  const { products } = useCatalog();
   const [inspectingProduct, setInspectingProduct] = useState<Product | null>(null);
   const [isEnteringStore, setIsEnteringStore] = useState(false);
 
   const heroContainerRef = useRef<HTMLDivElement>(null);
   const heroCenterpieceRef = useRef<HTMLDivElement>(null);
 
-  const heroProduct = PRODUCTS[0];
-  const featuredPieces = PRODUCTS.slice(0, 4);
+  const heroProduct = products[0] || PRODUCTS[0];
+  const featuredPieces = products.slice(0, 4);
 
   // Cinematic "Enter the Store" Transition Sequence
   const handleEnterStore = (e: React.MouseEvent) => {
@@ -380,7 +383,7 @@ export default function LandingPage() {
 
                   <div className="pt-3 mt-3 border-t border-[#1C1917]/[0.06] flex items-center justify-between">
                     <span className="font-serif text-sm font-bold text-[#1C1917]">
-                      ${p.price.toLocaleString()}
+                      {formatPrice(p.price)}
                     </span>
                     <span className="text-[10px] text-[#78716C] font-mono">
                       {p.fabric.weightGsm} GSM

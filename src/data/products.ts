@@ -1,4 +1,6 @@
-import { Product, Collection } from "@/types/product";
+import { Product, Collection, Audience } from "@/types/product";
+
+type BaseProduct = Omit<Product, "slug" | "audience" | "careInstructions">;
 
 export const COLLECTIONS: Collection[] = [
   {
@@ -33,7 +35,7 @@ export const COLLECTIONS: Collection[] = [
   },
 ];
 
-export const PRODUCTS: Product[] = [
+const BASE_PRODUCTS: BaseProduct[] = [
   {
     id: "vestra-trench-01",
     name: "Monolith Bonded Trench",
@@ -41,8 +43,8 @@ export const PRODUCTS: Product[] = [
     collectionId: "nocturne",
     collectionName: "The Nocturne Atelier",
     category: "outerwear",
-    price: 1850,
-    originalPrice: 2200,
+    price: 148000,
+    originalPrice: 176000,
     isNew: true,
     isBestseller: true,
     description:
@@ -93,7 +95,7 @@ export const PRODUCTS: Product[] = [
     collectionId: "sculptural",
     collectionName: "Sculptural Tailoring",
     category: "tailoring",
-    price: 1420,
+    price: 113500,
     isBestseller: true,
     description:
       "Engineered with floating horsehair canvas construction, peak lapels pitched at 45 degrees, and roped shoulders that frame the posture without stiffness.",
@@ -143,7 +145,7 @@ export const PRODUCTS: Product[] = [
     collectionId: "nocturne",
     collectionName: "The Nocturne Atelier",
     category: "tops",
-    price: 680,
+    price: 54500,
     isNew: true,
     description:
       "A fluid, drape-forward silk top with an asymmetric draped cowl neck, elongated French cuffs, and mother-of-pearl buttons. Cascades liquid-like over the torso.",
@@ -193,7 +195,7 @@ export const PRODUCTS: Product[] = [
     collectionId: "sculptural",
     collectionName: "Sculptural Tailoring",
     category: "trousers",
-    price: 790,
+    price: 63000,
     isBestseller: true,
     description:
       "Defined by deep double reverse pleats, a wide 28cm hem, and an elongated waistband with side adjusters. Falls in an unbroken vertical column.",
@@ -243,7 +245,7 @@ export const PRODUCTS: Product[] = [
     collectionId: "nocturne",
     collectionName: "The Nocturne Atelier",
     category: "dresses",
-    price: 2600,
+    price: 208000,
     isLimited: true,
     description:
       "A masterpiece of bias draping. Woven from 40-momme heavy silk charmeuse, this gown skims the contour of the body before pooling in a soft sweep train.",
@@ -293,7 +295,7 @@ export const PRODUCTS: Product[] = [
     collectionId: "cyber-minimal",
     collectionName: "Cyber-Minimalist",
     category: "outerwear",
-    price: 2450,
+    price: 196000,
     isNew: true,
     description:
       "Cut from 1.2mm Japanese washed calfskin with a matte oiled finish. Features oversized collar lapels, asymmetrical heavy gauge two-way zip, and articulated elbow darts.",
@@ -342,7 +344,7 @@ export const PRODUCTS: Product[] = [
     collectionId: "sculptural",
     collectionName: "Sculptural Tailoring",
     category: "tops",
-    price: 890,
+    price: 71000,
     isBestseller: true,
     description:
       "Spun from untreated inner fleece cashmere sourced from the Alashan region. Featherlight yet extraordinarily insulating, with a generous folded neck and seamless ribbing.",
@@ -392,7 +394,7 @@ export const PRODUCTS: Product[] = [
     collectionId: "cyber-minimal",
     collectionName: "Cyber-Minimalist",
     category: "outerwear",
-    price: 940,
+    price: 75000,
     isNew: true,
     description:
       "A futuristic modular vest engineered with aerodynamic storm flaps, concealed quick-release magnetic Fidlock buckles, and thermo-welded waterproof seams.",
@@ -434,5 +436,363 @@ export const PRODUCTS: Product[] = [
     reviewCount: 16,
     tags: ["Technical", "Modular", "Futuristic", "Layering"],
   },
+  {
+    id: "vestra-wrapcoat-09",
+    name: "Lumière Belted Cashmere Wrap Coat",
+    subtitle: "Double-Face Cashmere with Hand-Felled Seams",
+    collectionId: "nocturne",
+    collectionName: "The Nocturne Atelier",
+    category: "outerwear",
+    price: 162000,
+    isNew: true,
+    description:
+      "An unlined double-face cashmere wrap coat with dropped shoulders, a shawl collar and a self-tie belt. Every seam is hand-felled so the coat reads identically inside and out.",
+    editorialQuote:
+      "Softness with posture. The wrap gathers at the waist and releases into a long, unbroken line that moves like a held breath.",
+    details: [
+      "Double-face cashmere, hand-felled edges, no lining",
+      "Generous shawl collar that stands or folds flat",
+      "Detachable self-tie belt with hidden inner tie",
+      "Deep inseam pockets",
+      "Made in Biella, Italy",
+    ],
+    fabric: {
+      name: "Double-Face Pure Cashmere",
+      composition: "100% Cashmere",
+      origin: "Biella, Italy",
+      weightGsm: 520,
+      textureDescription: "Dense, velvety face with a soft brushed reverse and a gentle natural lustre.",
+      weave: "Double-face satin",
+      roughness: 0.78,
+      metalness: 0.02,
+      sheen: 0.2,
+    },
+    colorways: [
+      { id: "camel", name: "Classic Camel", hex: "#b08a5f", threeColor: "#b08a5f" },
+      { id: "ivory", name: "Winter Ivory", hex: "#ece6da", threeColor: "#ece6da" },
+      { id: "noir", name: "Noir", hex: "#141416", threeColor: "#141416" },
+    ],
+    sizes: ["XS", "S", "M", "L"],
+    images: {
+      hero: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1200&q=80",
+      modelFront: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1000&q=80",
+      modelBack: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=1000&q=80",
+      fabricDetail: "https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?auto=format&fit=crop&w=1000&q=80",
+      hangerView: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1000&q=80",
+    },
+    geometryType: "trench_coat",
+    threeDimensions: { width: 0.7, height: 1.3, depth: 0.34 },
+    rating: 4.9,
+    reviewCount: 21,
+    tags: ["Outerwear", "Cashmere", "Seasonal"],
+  },
+  {
+    id: "vestra-slip-10",
+    name: "Sillage Bias Slip Midi Dress",
+    subtitle: "Sand-Washed Silk Satin with Adjustable Straps",
+    collectionId: "cyber-minimal",
+    collectionName: "Cyber-Minimalist",
+    category: "dresses",
+    price: 68000,
+    isNew: true,
+    description:
+      "A bias-cut midi slip in sand-washed silk satin with a cowl front, adjustable spaghetti straps and a softly flared hem. Layers under knitwear or stands alone after dark.",
+    editorialQuote:
+      "The simplest line in the wardrobe, and the hardest to cut. It falls the way water would, if water had a hemline.",
+    details: [
+      "True bias cut for natural stretch and drape",
+      "Weighted cowl neckline",
+      "Adjustable silk-covered straps",
+      "French seams throughout",
+      "Made in Como, Italy",
+    ],
+    fabric: {
+      name: "Sand-Washed Silk Satin",
+      composition: "100% Mulberry Silk",
+      origin: "Como, Italy",
+      weightGsm: 120,
+      textureDescription: "Peach-skin softness with a muted, pearly sheen from the sand-washing process.",
+      weave: "Satin",
+      roughness: 0.3,
+      metalness: 0.08,
+      sheen: 0.8,
+    },
+    colorways: [
+      { id: "champagne", name: "Champagne", hex: "#dfd2be", threeColor: "#dfd2be" },
+      { id: "moss", name: "Olive Moss", hex: "#4b4d36", threeColor: "#4b4d36" },
+      { id: "onyx", name: "Onyx", hex: "#151517", threeColor: "#151517" },
+    ],
+    sizes: ["XS", "S", "M", "L"],
+    images: {
+      hero: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=1200&q=80",
+      modelFront: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1000&q=80",
+      modelBack: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1000&q=80",
+      fabricDetail: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=1000&q=80",
+      hangerView: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=1000&q=80",
+    },
+    geometryType: "evening_gown",
+    threeDimensions: { width: 0.56, height: 1.2, depth: 0.26 },
+    rating: 4.8,
+    reviewCount: 34,
+    tags: ["Silk", "Evening", "Essential"],
+  },
+  {
+    id: "vestra-hoodie-11",
+    name: "Atelier Heavyweight Loopback Hoodie",
+    subtitle: "520 GSM Japanese Loopback Cotton",
+    collectionId: "cyber-minimal",
+    collectionName: "Cyber-Minimalist",
+    category: "tops",
+    price: 24500,
+    isNew: true,
+    description:
+      "A boxy, dropped-shoulder hoodie knitted on vintage loopback machines in Wakayama. Double-layer hood, tonal flatlock seams and a garment dye that softens with every wash.",
+    editorialQuote:
+      "Streetwear with a tailor's patience. The weight gives it structure; the dye gives it a past.",
+    details: [
+      "520 GSM loopback cotton knitted in Wakayama, Japan",
+      "Double-layer hood without drawcords",
+      "Flatlock seams and ribbed cuffs",
+      "Garment-dyed for a lived-in tone",
+      "Relaxed, boxy fit — size down for a closer cut",
+    ],
+    fabric: {
+      name: "Wakayama Loopback Fleece",
+      composition: "100% Organic Cotton",
+      origin: "Wakayama, Japan",
+      weightGsm: 520,
+      textureDescription: "Dense, springy face with a looped reverse that breathes and holds shape.",
+      weave: "Loopback jersey",
+      roughness: 0.85,
+      metalness: 0.01,
+      sheen: 0.05,
+    },
+    colorways: [
+      { id: "ash", name: "Washed Ash", hex: "#6e6c69", threeColor: "#6e6c69" },
+      { id: "bone", name: "Bone", hex: "#e6e0d4", threeColor: "#e6e0d4" },
+      { id: "ink", name: "Ink Black", hex: "#17171a", threeColor: "#17171a" },
+    ],
+    sizes: ["S", "M", "L", "XL"],
+    images: {
+      hero: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=1200&q=80",
+      modelFront: "https://images.unsplash.com/photo-1520975916090-3105956dac38?auto=format&fit=crop&w=1000&q=80",
+      modelBack: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=1000&q=80",
+      fabricDetail: "https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?auto=format&fit=crop&w=1000&q=80",
+      hangerView: "https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=1000&q=80",
+    },
+    geometryType: "knit_sweater",
+    threeDimensions: { width: 0.64, height: 0.78, depth: 0.28 },
+    rating: 4.9,
+    reviewCount: 88,
+    tags: ["Streetwear", "Essential", "Cotton"],
+  },
+  {
+    id: "vestra-cargo-12",
+    name: "Field Utility Cargo Trouser",
+    subtitle: "Garment-Washed Cotton Ripstop",
+    collectionId: "cyber-minimal",
+    collectionName: "Cyber-Minimalist",
+    category: "trousers",
+    price: 29500,
+    description:
+      "A relaxed straight-leg cargo in garment-washed ripstop with articulated knees, bellow pockets and a drawcord hem that converts the leg from straight to tapered.",
+    editorialQuote:
+      "Utility, edited. Every pocket earns its place, and the hem changes the silhouette with one pull.",
+    details: [
+      "Cotton ripstop, garment-washed for softness",
+      "Articulated knees and gusseted crotch",
+      "Two bellow cargo pockets with hidden snaps",
+      "Drawcord hem: straight or tapered",
+      "Relaxed fit, mid rise",
+    ],
+    fabric: {
+      name: "Washed Cotton Ripstop",
+      composition: "100% Cotton",
+      origin: "Okayama, Japan",
+      weightGsm: 280,
+      textureDescription: "Crisp micro-grid with a broken-in, chalky hand after washing.",
+      weave: "Ripstop",
+      roughness: 0.7,
+      metalness: 0.02,
+      sheen: 0.1,
+    },
+    colorways: [
+      { id: "olive", name: "Field Olive", hex: "#545a3e", threeColor: "#545a3e" },
+      { id: "sand", name: "Desert Sand", hex: "#bfae8e", threeColor: "#bfae8e" },
+      { id: "black", name: "Black", hex: "#141416", threeColor: "#141416" },
+    ],
+    sizes: ["28", "30", "32", "34", "36"],
+    images: {
+      hero: "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1200&q=80",
+      modelFront: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=1000&q=80",
+      modelBack: "https://images.unsplash.com/photo-1520975916090-3105956dac38?auto=format&fit=crop&w=1000&q=80",
+      fabricDetail: "https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?auto=format&fit=crop&w=1000&q=80",
+      hangerView: "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=1000&q=80",
+    },
+    geometryType: "pleated_trouser",
+    threeDimensions: { width: 0.44, height: 1.1, depth: 0.22 },
+    rating: 4.7,
+    reviewCount: 46,
+    tags: ["Streetwear", "Utility"],
+  },
+  {
+    id: "vestra-tee-13",
+    name: "Essential Supima Crew Tee",
+    subtitle: "220 GSM Long-Staple Supima Cotton",
+    collectionId: "sculptural",
+    collectionName: "Sculptural Tailoring",
+    category: "tops",
+    price: 7900,
+    isBestseller: true,
+    description:
+      "The tee we build every outfit on. Compact-knit Supima jersey with a rib collar that holds its shape, a slightly lowered shoulder and a clean, straight hem.",
+    editorialQuote:
+      "Quiet foundations. The best basic is the one you stop noticing — until you wear anything else.",
+    details: [
+      "220 GSM compact-knit Supima cotton",
+      "Bound rib collar that keeps its shape",
+      "Side-seamed for a straight hang",
+      "Pre-shrunk",
+      "Made in Tiruppur, India",
+    ],
+    fabric: {
+      name: "Compact Supima Jersey",
+      composition: "100% Supima Cotton",
+      origin: "Tiruppur, India",
+      weightGsm: 220,
+      textureDescription: "Smooth, dense jersey with a cool, dry hand and a soft matte surface.",
+      weave: "Single jersey",
+      roughness: 0.75,
+      metalness: 0.01,
+      sheen: 0.1,
+    },
+    colorways: [
+      { id: "white", name: "Optic White", hex: "#f5f3ef", threeColor: "#f5f3ef" },
+      { id: "black", name: "Black", hex: "#141416", threeColor: "#141416" },
+      { id: "stone", name: "Stone", hex: "#b9b1a4", threeColor: "#b9b1a4" },
+    ],
+    sizes: ["XS", "S", "M", "L", "XL"],
+    images: {
+      hero: "https://images.unsplash.com/photo-1598554747436-c9293d6a588f?auto=format&fit=crop&w=1200&q=80",
+      modelFront: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=1000&q=80",
+      modelBack: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=1000&q=80",
+      fabricDetail: "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=1000&q=80",
+      hangerView: "https://images.unsplash.com/photo-1598554747436-c9293d6a588f?auto=format&fit=crop&w=1000&q=80",
+    },
+    geometryType: "silk_shirt",
+    threeDimensions: { width: 0.56, height: 0.72, depth: 0.2 },
+    rating: 4.8,
+    reviewCount: 212,
+    tags: ["Essential", "Cotton"],
+  },
+  {
+    id: "vestra-tote-14",
+    name: "Monogram-Free Structured Tote",
+    subtitle: "Vegetable-Tanned Calf with Suede Lining",
+    collectionId: "sculptural",
+    collectionName: "Sculptural Tailoring",
+    category: "accessories",
+    price: 89000,
+    isLimited: true,
+    description:
+      "A rigid, architectural tote in vegetable-tanned calf with painted edges, a suede-lined interior and a detachable zip pouch. Fits a 14-inch laptop.",
+    editorialQuote:
+      "No logo, no noise. Just leather that will tell its own story in ten years.",
+    details: [
+      "Vegetable-tanned Italian calf leather",
+      "Hand-painted edges, saddle-stitched handles",
+      "Suede-lined interior with detachable zip pouch",
+      "Fits a 14\" laptop",
+      "Made in Florence, Italy",
+    ],
+    fabric: {
+      name: "Vegetable-Tanned Calf",
+      composition: "100% Calf Leather, Suede Lining",
+      origin: "Florence, Italy",
+      weightGsm: 1100,
+      textureDescription: "Firm, smooth grain with a warm, waxy surface that deepens with use.",
+      weave: "Full-grain leather",
+      roughness: 0.45,
+      metalness: 0.1,
+      sheen: 0.35,
+    },
+    colorways: [
+      { id: "cognac", name: "Cognac", hex: "#8a4f2a", threeColor: "#8a4f2a" },
+      { id: "black", name: "Black", hex: "#141416", threeColor: "#141416" },
+      { id: "taupe", name: "Taupe", hex: "#8e8072", threeColor: "#8e8072" },
+    ],
+    sizes: ["One Size"],
+    images: {
+      hero: "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1200&q=80",
+      modelFront: "https://images.unsplash.com/photo-1520975916090-3105956dac38?auto=format&fit=crop&w=1000&q=80",
+      modelBack: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=1000&q=80",
+      fabricDetail: "https://images.unsplash.com/photo-1528459801416-a9e53bbf4e17?auto=format&fit=crop&w=1000&q=80",
+      hangerView: "https://images.unsplash.com/photo-1551028719-00167b16eac5?auto=format&fit=crop&w=1000&q=80",
+    },
+    geometryType: "tote_bag",
+    threeDimensions: { width: 0.42, height: 0.36, depth: 0.16 },
+    rating: 4.9,
+    reviewCount: 17,
+    tags: ["Accessories", "Leather", "Limited"],
+  },
 ];
+
+const CARE: Record<string, string[]> = {
+  wool: ["Dry clean only", "Steam to refresh — do not iron directly", "Hang on a broad-shouldered hanger", "Store in a breathable garment bag"],
+  silk: ["Dry clean recommended", "Or hand wash cold with silk detergent", "Do not wring — roll in a towel to dry", "Cool iron on the reverse"],
+  leather: ["Professional leather clean only", "Condition twice a year", "Keep away from direct heat and sunlight", "Store stuffed, in a dust bag"],
+  cotton: ["Machine wash cold, inside out", "Wash with similar colours", "Line dry in shade", "Warm iron if needed"],
+  cashmere: ["Hand wash cold or dry clean", "Dry flat on a towel", "Fold, never hang", "De-pill gently with a cashmere comb"],
+  technical: ["Machine wash cold, gentle cycle", "No fabric softener", "Tumble dry low to reactivate water repellency", "Do not dry clean"],
+};
+
+const EXTRAS: Record<string, { audience: Audience; care: keyof typeof CARE }> = {
+  "vestra-trench-01": { audience: "UNISEX", care: "technical" },
+  "vestra-blazer-02": { audience: "MEN", care: "wool" },
+  "vestra-shirt-03": { audience: "WOMEN", care: "silk" },
+  "vestra-trouser-04": { audience: "MEN", care: "wool" },
+  "vestra-gown-05": { audience: "WOMEN", care: "silk" },
+  "vestra-leather-06": { audience: "MEN", care: "leather" },
+  "vestra-knit-07": { audience: "UNISEX", care: "cashmere" },
+  "vestra-vest-08": { audience: "MEN", care: "technical" },
+  "vestra-wrapcoat-09": { audience: "WOMEN", care: "cashmere" },
+  "vestra-slip-10": { audience: "WOMEN", care: "silk" },
+  "vestra-hoodie-11": { audience: "UNISEX", care: "cotton" },
+  "vestra-cargo-12": { audience: "MEN", care: "cotton" },
+  "vestra-tee-13": { audience: "UNISEX", care: "cotton" },
+  "vestra-tote-14": { audience: "WOMEN", care: "leather" },
+};
+
+export function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+/**
+ * Seed catalog. The database (seeded from this file by `npm run db:seed`) is the
+ * source of truth at runtime; this array is used for seeding and as an offline
+ * fallback if the database is unreachable.
+ */
+export const PRODUCTS: Product[] = BASE_PRODUCTS.map((p) => ({
+  ...p,
+  slug: slugify(p.name),
+  audience: EXTRAS[p.id]?.audience ?? "UNISEX",
+  careInstructions: CARE[EXTRAS[p.id]?.care ?? "cotton"],
+  modelUrl: null,
+}));
+
+/** Explore page discovery categories (curated views over the catalog). */
+export const DISCOVERY_CATEGORIES = [
+  { id: "new", label: "New Arrivals", test: (p: Product) => !!p.isNew },
+  { id: "women", label: "Women", test: (p: Product) => p.audience === "WOMEN" || p.audience === "UNISEX" },
+  { id: "men", label: "Men", test: (p: Product) => p.audience === "MEN" || p.audience === "UNISEX" },
+  { id: "streetwear", label: "Streetwear", test: (p: Product) => p.tags.includes("Streetwear") },
+  { id: "essentials", label: "Essentials", test: (p: Product) => p.tags.includes("Essential") },
+  { id: "accessories", label: "Accessories", test: (p: Product) => p.category === "accessories" },
+  { id: "seasonal", label: "Seasonal Collections", test: (p: Product) => p.tags.includes("Seasonal") || p.collectionId === "nocturne" },
+] as const;
 

@@ -7,6 +7,25 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
 import CartDrawer from "@/components/navigation/CartDrawer";
+import { Product, Colorway } from "@/types/product";
+import { useCartStore } from "@/store/useCartStore";
+import { useWardrobeStore } from "@/store/useWardrobeStore";
+import { useCatalog } from "@/components/providers/CatalogProvider";
+import { sounds } from "@/utils/soundEffects";
+import { formatPrice } from "@/lib/commerce";
+import {
+  RotateCw,
+  ZoomIn,
+  ShoppingBag,
+  Sliders,
+  Sparkles,
+  Heart,
+  ArrowLeft,
+  Check,
+  ShieldCheck,
+  Truck,
+  Sparkle,
+} from "lucide-react";
 
 const ProductInspectorCanvas = dynamic(
   () => import("@/components/3d/ProductInspectorCanvas"),
@@ -22,26 +41,12 @@ const ProductInspectorCanvas = dynamic(
     ),
   }
 );
-import { PRODUCTS } from "@/data/products";
-import { Product, Colorway } from "@/types/product";
-import { useCartStore } from "@/store/useCartStore";
-import { useWardrobeStore } from "@/store/useWardrobeStore";
-import { sounds } from "@/utils/soundEffects";
-import {
-  RotateCw,
-  ZoomIn,
-  ShoppingBag,
-  Sliders,
-  Sparkles,
-  Heart,
-  ArrowLeft,
-  Check,
-} from "lucide-react";
 
 export default function ProductDetailClient({ product }: { product: Product }) {
   const router = useRouter();
   const { addItem } = useCartStore();
   const { addWardrobeItem, toggleWishlist, isInWishlist, setLookPiece } = useWardrobeStore();
+  const { products } = useCatalog();
 
   const [selectedColor, setSelectedColor] = useState<Colorway>(product.colorways[0]);
   const [selectedSize, setSelectedSize] = useState<string>(product.sizes[0]);
@@ -50,9 +55,9 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   const [hungSuccess, setHungSuccess] = useState(false);
 
   const isWishlisted = isInWishlist(product.id);
-  const complimentaryProducts = PRODUCTS.filter(
-    (p) => p.collectionId === product.collectionId && p.id !== product.id
-  ).slice(0, 3);
+  const complimentaryProducts = products
+    .filter((p) => p.collectionId === product.collectionId && p.id !== product.id)
+    .slice(0, 3);
 
   const handleTryOnAvatar = () => {
     sounds.playClick();
@@ -89,10 +94,11 @@ export default function ProductDetailClient({ product }: { product: Product }) {
           <div className="lg:col-span-7 h-[480px] sm:h-[580px] lg:h-[680px] rounded-3xl bg-gradient-to-b from-[#111116] to-[#09090c] border border-[#1C1917]/10 relative overflow-hidden flex flex-col shadow-xl">
             <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
               <span className="text-[10px] uppercase tracking-[0.2em] text-[#c5a880] px-3 py-1 rounded-full bg-black/50 border border-[#c5a880]/30 font-mono">
-                3D Product Turntable
+                3D Garment Inspection
               </span>
 
               <button
+                type="button"
                 onClick={() => {
                   setAutoRotate(!autoRotate);
                   sounds.playClick();
@@ -108,6 +114,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
               </button>
 
               <button
+                type="button"
                 onClick={() => {
                   setMacroZoom(!macroZoom);
                   sounds.playClick();
@@ -133,7 +140,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
             </div>
 
             <div className="p-3 bg-black/40 text-center text-[10px] text-[#9ca3af] border-t border-white/[0.04]">
-              Drag to orbit 360° • Scroll / Pinch to zoom into weave
+              Drag to orbit 360° • Scroll / Pinch to zoom into fabric texture
             </div>
           </div>
 
@@ -151,11 +158,11 @@ export default function ProductDetailClient({ product }: { product: Product }) {
 
                 <div className="flex items-baseline gap-3 mt-4">
                   <span className="font-serif text-2xl font-bold text-[#9A7B4F]">
-                    ${product.price.toLocaleString()}
+                    {formatPrice(product.price)}
                   </span>
                   {product.originalPrice && (
                     <span className="text-xs text-[#78716C] line-through">
-                      ${product.originalPrice.toLocaleString()}
+                      {formatPrice(product.originalPrice)}
                     </span>
                   )}
                 </div>
@@ -176,6 +183,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                   {product.colorways.map((c) => (
                     <button
                       key={c.id}
+                      type="button"
                       onClick={() => {
                         setSelectedColor(c);
                         sounds.playClick();
@@ -201,6 +209,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                   {product.sizes.map((s) => (
                     <button
                       key={s}
+                      type="button"
                       onClick={() => {
                         setSelectedSize(s);
                         sounds.playClick();
@@ -231,27 +240,45 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                   <span>Weight</span>
                   <span className="text-[#1C1917] font-mono">{product.fabric.weightGsm} GSM</span>
                 </div>
-                <div className="flex justify-between py-1">
+                <div className="flex justify-between py-1 border-b border-[#1C1917]/[0.05]">
                   <span>Weave</span>
                   <span className="text-[#1C1917] font-medium">{product.fabric.weave}</span>
                 </div>
+                {product.careInstructions && product.careInstructions.length > 0 && (
+                  <div className="pt-2">
+                    <span className="font-mono text-[10px] uppercase tracking-wider text-[#9A7B4F] block mb-1">
+                      Care Guidance
+                    </span>
+                    <p className="text-[11px] text-[#78716C] leading-snug">
+                      {product.careInstructions.join(" • ")}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Delivery Estimate */}
+              <div className="flex items-center gap-2.5 p-3 rounded-xl bg-white border border-[#1C1917]/[0.06] text-xs text-[#78716C]">
+                <Truck size={15} className="text-[#9A7B4F] shrink-0" />
+                <span>Complimentary insured courier dispatch within 24 hours of tailoring validation.</span>
               </div>
             </div>
 
             {/* CTAs */}
             <div className="space-y-3 pt-4">
               <button
+                type="button"
                 onClick={() => {
                   addItem(product, selectedColor, selectedSize, 1);
                 }}
                 className="w-full py-4 rounded-full bg-[#1C1917] hover:bg-[#2A2725] text-white font-semibold text-xs tracking-widest uppercase flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer"
               >
                 <ShoppingBag size={15} className="text-[#C5A880]" />
-                <span>Acquire Piece • ${product.price.toLocaleString()}</span>
+                <span>Acquire Piece • {formatPrice(product.price)}</span>
               </button>
 
               <div className="grid grid-cols-2 gap-2">
                 <button
+                  type="button"
                   onClick={() => {
                     addWardrobeItem(product, selectedColor, selectedSize);
                     setHungSuccess(true);
@@ -273,6 +300,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                 </button>
 
                 <button
+                  type="button"
                   onClick={handleTryOnAvatar}
                   className="py-2.5 rounded-full bg-white border border-[#1C1917]/15 hover:border-[#C5A880] text-[#1C1917] text-xs font-medium flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer"
                 >
@@ -282,6 +310,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
               </div>
 
               <button
+                type="button"
                 onClick={() => toggleWishlist(product.id)}
                 className="w-full py-1 text-xs text-[#78716C] hover:text-[#1C1917] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
               >
@@ -302,19 +331,19 @@ export default function ProductDetailClient({ product }: { product: Product }) {
               {complimentaryProducts.map((comp) => (
                 <NextLink
                   key={comp.id}
-                  href={`/product/${comp.id}`}
+                  href={`/product/${comp.slug || comp.id}`}
                   className="group rounded-2xl atelier-card p-4 transition-all"
                 >
                   <div className="aspect-[3/4] w-full rounded-xl bg-[#FAF8F5] overflow-hidden mb-3 border border-[#1C1917]/[0.04]">
                     <img
-                      src={comp.images.hero}
+                      src={comp.images.hero || comp.images.modelFront}
                       alt={comp.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
                   <h3 className="font-serif text-sm text-[#1C1917] font-medium truncate">{comp.name}</h3>
                   <span className="text-xs font-serif text-[#9A7B4F] font-bold block mt-1">
-                    ${comp.price.toLocaleString()}
+                    {formatPrice(comp.price)}
                   </span>
                 </NextLink>
               ))}
@@ -327,4 +356,3 @@ export default function ProductDetailClient({ product }: { product: Product }) {
     </div>
   );
 }
-

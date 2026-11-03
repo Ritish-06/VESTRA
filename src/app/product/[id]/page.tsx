@@ -1,12 +1,18 @@
 import { PRODUCTS } from "@/data/products";
+import { getProductBySlug } from "@/lib/catalog";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import ProductDetailClient from "./ProductDetailClient";
 
 export function generateStaticParams() {
-  return PRODUCTS.map((product) => ({
-    id: product.id,
-  }));
+  const params: { id: string }[] = [];
+  for (const product of PRODUCTS) {
+    params.push({ id: product.id });
+    if (product.slug && product.slug !== product.id) {
+      params.push({ id: product.slug });
+    }
+  }
+  return params;
 }
 
 export default async function ProductPage({
@@ -15,7 +21,7 @@ export default async function ProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = PRODUCTS.find((p) => p.id === id);
+  const product = (await getProductBySlug(id)) || PRODUCTS.find((p) => p.id === id || p.slug === id);
 
   if (!product) {
     notFound();
@@ -24,8 +30,8 @@ export default async function ProductPage({
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#070709] flex items-center justify-center">
-          <div className="w-8 h-8 rounded-full border border-[#c5a880] animate-spin" />
+        <div className="min-h-screen bg-[#FAF8F5] flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full border-2 border-[#C5A880]/30 border-t-[#C5A880] animate-spin" />
         </div>
       }
     >

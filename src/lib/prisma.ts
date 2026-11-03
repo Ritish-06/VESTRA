@@ -1,46 +1,23 @@
-// Pragmatic typed database connector for VESTRA Atelier
-// Compatible with Prisma ORM 7 & Next.js App Router
+import "server-only";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "@/generated/prisma/client";
 
-export interface DatabaseClient {
-  product: {
-    findMany: (args?: any) => Promise<any[]>;
-    findUnique: (args: any) => Promise<any | null>;
-    create: (args: any) => Promise<any>;
-  };
-  order: {
-    findMany: (args?: any) => Promise<any[]>;
-    findUnique: (args: any) => Promise<any | null>;
-    create: (args: any) => Promise<any>;
-  };
-  user: {
-    findUnique: (args: any) => Promise<any | null>;
-    create: (args: any) => Promise<any>;
-  };
+/**
+ * Singleton Prisma client (PostgreSQL via the node-postgres driver adapter).
+ * Reused across hot reloads in development to avoid exhausting connections.
+ */
+function createClient() {
+  const connectionString = process.env.DATABASE_URL;
+  if (!connectionString) {
+    throw new Error("DATABASE_URL is not set. Copy .env.example to .env and configure PostgreSQL.");
+  }
+  const adapter = new PrismaPg({ connectionString });
+  return new PrismaClient({ adapter });
 }
 
-class MockPrismaClient implements DatabaseClient {
-  product = {
-    findMany: async () => [],
-    findUnique: async () => null,
-    create: async ({ data }: any) => data,
-  };
-  order = {
-    findMany: async () => [],
-    findUnique: async () => null,
-    create: async ({ data }: any) => data,
-  };
-  user = {
-    findUnique: async () => null,
-    create: async ({ data }: any) => data,
-  };
-}
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient };
 
-const globalForPrisma = globalThis as unknown as {
-  prisma: DatabaseClient | undefined;
-};
-
-export const prisma: DatabaseClient =
-  globalForPrisma.prisma ?? new MockPrismaClient();
+export const prisma: PrismaClient = globalForPrisma.prisma ?? createClient();
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 

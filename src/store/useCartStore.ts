@@ -3,9 +3,11 @@ import { persist } from "zustand/middleware";
 import { Product, Colorway } from "@/types/product";
 import { CartItem, PromoCode, Order } from "@/types/cart";
 import { sounds } from "@/utils/soundEffects";
+import { shippingFeeFor } from "@/lib/commerce";
 
 interface CartState {
   items: CartItem[];
+  savedForLater: CartItem[];
   isOpen: boolean;
   promoCode: PromoCode | null;
   orders: Order[];
@@ -13,6 +15,8 @@ interface CartState {
   // Actions
   addItem: (product: Product, selectedColor: Colorway, selectedSize: string, quantity?: number) => void;
   removeItem: (itemId: string) => void;
+  saveItemForLater: (itemId: string) => void;
+  moveToCart: (itemId: string) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
   setIsOpen: (isOpen: boolean) => void;
@@ -38,6 +42,7 @@ export const useCartStore = create<CartState>()(
   persist(
     (set, get) => ({
       items: [],
+      savedForLater: [],
       isOpen: false,
       promoCode: null,
       orders: [],
@@ -77,6 +82,26 @@ export const useCartStore = create<CartState>()(
           items: state.items.filter((item) => item.id !== itemId),
         }));
         sounds.playClick();
+      },
+
+      saveItemForLater: (itemId) => {
+        const item = get().items.find((i) => i.id === itemId);
+        if (!item) return;
+        set((state) => ({
+          items: state.items.filter((i) => i.id !== itemId),
+          savedForLater: [...state.savedForLater, item],
+        }));
+        sounds.playClick();
+      },
+
+      moveToCart: (itemId) => {
+        const item = get().savedForLater.find((i) => i.id === itemId);
+        if (!item) return;
+        set((state) => ({
+          savedForLater: state.savedForLater.filter((i) => i.id !== itemId),
+          items: [...state.items, item],
+        }));
+        sounds.playChime();
       },
 
       updateQuantity: (itemId, quantity) => {
@@ -202,25 +227,25 @@ export const useCartStore = create<CartState>()(
         const subtotal = get().getSubtotal();
         const promo = get().promoCode;
         if (!promo) return 0;
-        return (subtotal * promo.discountPercentage) / 100;
+        return Math.round((subtotal * promo.discountPercentage) / 100);
       },
 
       getTax: () => {
-        const subtotal = get().getSubtotal() - get().getDiscount();
-        return Math.round(subtotal * 0.08); // 8% luxury apparel tax
+        // GST is included in the garment price for luxury retail in India
+        return 0;
       },
 
       getShipping: () => {
         const subtotal = get().getSubtotal();
-        return subtotal > 1500 || subtotal === 0 ? 0 : 50; // Complimentary courier over $1500
+        const disc = get().getDiscount();
+        return shippingFeeFor("STANDARD", subtotal - disc);
       },
 
       getTotal: () => {
         const sub = get().getSubtotal();
         const disc = get().getDiscount();
-        const tax = get().getTax();
         const ship = get().getShipping();
-        return sub - disc + tax + ship;
+        return Math.max(0, sub - disc + ship);
       },
 
       getItemCount: () => {

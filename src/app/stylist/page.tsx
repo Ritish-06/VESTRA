@@ -12,6 +12,7 @@ import { Product } from "@/types/product";
 import { useWardrobeStore } from "@/store/useWardrobeStore";
 import { useCartStore } from "@/store/useCartStore";
 import { sounds } from "@/utils/soundEffects";
+import { formatPrice } from "@/lib/commerce";
 import {
   Sparkles,
   Send,
@@ -202,7 +203,7 @@ export default function StylistPage() {
                           </p>
                         </div>
                         <span className="text-sm font-serif font-bold text-[#9A7B4F]">
-                          ${msg.recommendedLook.totalPrice.toLocaleString()}
+                          {formatPrice(msg.recommendedLook.totalPrice)}
                         </span>
                       </div>
 
@@ -237,7 +238,7 @@ export default function StylistPage() {
                                     {p.name}
                                   </p>
                                   <p className="text-[10px] text-[#9A7B4F] font-semibold">
-                                    ${p.price.toLocaleString()}
+                                    {formatPrice(p.price)}
                                   </p>
                                 </div>
                               </div>

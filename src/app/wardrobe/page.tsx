@@ -22,7 +22,9 @@ import { PRODUCTS } from "@/data/products";
 import { Product, ProductCategory, Colorway } from "@/types/product";
 import { useCartStore } from "@/store/useCartStore";
 import { useWardrobeStore } from "@/store/useWardrobeStore";
+import { useCatalog } from "@/components/providers/CatalogProvider";
 import { sounds } from "@/utils/soundEffects";
+import { formatPrice } from "@/lib/commerce";
 import {
   Sliders,
   Sparkles,
@@ -34,16 +36,18 @@ import {
   Layers,
   ArrowRight,
   Maximize2,
+  List,
 } from "lucide-react";
 
 export default function WardrobePage() {
   const { addItem } = useCartStore();
   const { toggleWishlist, isInWishlist, addWardrobeItem } = useWardrobeStore();
+  const { products } = useCatalog();
 
   const [mode, setMode] = useState<"rail" | "boutique">("rail");
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | "all">("all");
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(PRODUCTS);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(PRODUCTS[0]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products.length ? products : PRODUCTS);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(products[0] || PRODUCTS[0]);
   const [inspectingProduct, setInspectingProduct] = useState<Product | null>(null);
   const [railOffset, setRailOffset] = useState(() => -((0 - (PRODUCTS.length - 1) / 2) * 0.58));
   const [itemColors, setItemColors] = useState<Record<string, Colorway>>({});
@@ -348,7 +352,7 @@ export default function WardrobePage() {
 
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-sm font-serif text-[#c5a880] font-bold">
-                        ${selectedProduct.price.toLocaleString()}
+                        {formatPrice(selectedProduct.price)}
                       </span>
                       <span className="text-[11px] text-[#9ca3af] hidden sm:inline">
                         — {selectedProduct.fabric.composition.split(",")[0]}

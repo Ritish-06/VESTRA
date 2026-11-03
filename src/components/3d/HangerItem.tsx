@@ -89,6 +89,7 @@ export default function HangerItem({
       <GarmentMesh
         geometryType={product.geometryType}
         colorway={activeColor}
+        modelUrl={product.modelUrl}
         roughness={product.fabric.roughness}
         metalness={product.fabric.metalness}
         sheen={product.fabric.sheen}

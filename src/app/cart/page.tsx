@@ -8,25 +8,28 @@ import Footer from "@/components/navigation/Footer";
 import CartDrawer from "@/components/navigation/CartDrawer";
 import { useCartStore } from "@/store/useCartStore";
 import { sounds } from "@/utils/soundEffects";
+import { formatPrice } from "@/lib/commerce";
 import {
   Trash2,
   Plus,
   Minus,
   ArrowRight,
   ShieldCheck,
-  Sparkles,
   ShoppingBag,
+  Bookmark,
 } from "lucide-react";
 
 export default function CartPage() {
   const router = useRouter();
   const {
     items,
+    savedForLater,
     removeItem,
+    saveItemForLater,
+    moveToCart,
     updateQuantity,
     getSubtotal,
     getDiscount,
-    getTax,
     getShipping,
     getTotal,
     promoCode,
@@ -39,7 +42,6 @@ export default function CartPage() {
 
   const subtotal = getSubtotal();
   const discount = getDiscount();
-  const tax = getTax();
   const shipping = getShipping();
   const total = getTotal();
 
@@ -107,7 +109,7 @@ export default function CartPage() {
                       style={{ width: "80px", height: "96px" }}
                     >
                       <img
-                        src={item.product.images.hero}
+                        src={item.product.images?.hero || item.product.images?.modelFront}
                         alt={item.product.name}
                         className="w-full h-full object-cover"
                         style={{ width: "100%", height: "100%", objectFit: "cover" }}
@@ -117,22 +119,25 @@ export default function CartPage() {
                       <span className="text-[9px] uppercase tracking-wider text-[#9A7B4F] font-mono">
                         {item.product.collectionName}
                       </span>
-                      <h3 className="font-serif text-base sm:text-lg text-[#1C1917] font-medium">
-                        {item.product.name}
-                      </h3>
+                      <NextLink href={`/product/${item.product.slug || item.product.id}`}>
+                        <h3 className="font-serif text-base sm:text-lg text-[#1C1917] font-medium hover:text-[#9A7B4F] transition-colors">
+                          {item.product.name}
+                        </h3>
+                      </NextLink>
                       <p className="text-xs text-[#78716C] mt-0.5">
                         Size: {item.selectedSize} • Tone: {item.selectedColor.name}
                       </p>
                       <span className="text-xs font-serif text-[#9A7B4F] font-bold mt-1 block">
-                        ${item.product.price.toLocaleString()} each
+                        {formatPrice(item.product.price)} each
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-[#1C1917]/[0.06]">
+                  <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-3 sm:pt-0 border-[#1C1917]/[0.06]">
                     {/* Quantity Selector */}
                     <div className="flex items-center gap-2 border border-[#1C1917]/15 rounded-full px-3 py-1 bg-[#FAF8F5]">
                       <button
+                        type="button"
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         className="text-[#78716C] hover:text-[#1C1917]"
                         aria-label="Decrease quantity"
@@ -143,6 +148,7 @@ export default function CartPage() {
                         {item.quantity}
                       </span>
                       <button
+                        type="button"
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         className="text-[#78716C] hover:text-[#1C1917]"
                         aria-label="Increase quantity"
@@ -151,22 +157,76 @@ export default function CartPage() {
                       </button>
                     </div>
 
-                    <div className="text-right">
+                    <div className="text-right min-w-[90px]">
                       <span className="font-serif text-base font-bold text-[#1C1917] block">
-                        ${(item.product.price * item.quantity).toLocaleString()}
+                        {formatPrice(item.product.price * item.quantity)}
                       </span>
                     </div>
 
-                    <button
-                      onClick={() => removeItem(item.id)}
-                      className="text-[#78716C] hover:text-red-600 p-1.5 transition-colors"
-                      title="Remove item"
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => saveItemForLater(item.id)}
+                        className="text-[#78716C] hover:text-[#9A7B4F] p-1.5 transition-colors"
+                        title="Save for later"
+                        aria-label="Save for later"
+                      >
+                        <Bookmark size={15} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeItem(item.id)}
+                        className="text-[#78716C] hover:text-red-600 p-1.5 transition-colors"
+                        title="Remove item"
+                        aria-label="Remove item"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}
+
+              {/* Saved For Later Section */}
+              {savedForLater && savedForLater.length > 0 && (
+                <div className="mt-8 pt-6 border-t border-[#1C1917]/[0.08]">
+                  <h3 className="font-serif text-base font-medium text-[#1C1917] mb-3">
+                    Saved for Later ({savedForLater.length})
+                  </h3>
+                  <div className="space-y-3">
+                    {savedForLater.map((item) => (
+                      <div
+                        key={item.id}
+                        className="p-4 rounded-xl bg-white border border-[#1C1917]/[0.06] flex items-center justify-between gap-4"
+                      >
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={item.product.images?.hero}
+                            alt={item.product.name}
+                            className="w-12 h-14 rounded-lg object-cover"
+                          />
+                          <div>
+                            <h4 className="font-serif text-sm font-medium text-[#1C1917]">
+                              {item.product.name}
+                            </h4>
+                            <span className="text-xs text-[#9A7B4F] font-serif font-bold">
+                              {formatPrice(item.product.price)}
+                            </span>
+                          </div>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => moveToCart(item.id)}
+                          className="px-4 py-1.5 rounded-full border border-[#1C1917]/15 hover:border-[#9A7B4F] text-xs font-medium text-[#1C1917]"
+                        >
+                          Move to Bag
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Summary & Checkout Column */}
@@ -205,7 +265,7 @@ export default function CartPage() {
               {promoCode && (
                 <div className="flex items-center justify-between bg-[#C5A880]/15 border border-[#C5A880]/30 rounded-xl px-3.5 py-2 text-xs text-[#9A7B4F]">
                   <span>{promoCode.description}</span>
-                  <button onClick={removePromo} className="underline hover:text-[#1C1917]">
+                  <button type="button" onClick={removePromo} className="underline hover:text-[#1C1917]">
                     Remove
                   </button>
                 </div>
@@ -215,34 +275,31 @@ export default function CartPage() {
               <div className="space-y-2 text-xs text-[#78716C] pt-4 border-t border-[#1C1917]/[0.06]">
                 <div className="flex justify-between">
                   <span>Subtotal</span>
-                  <span className="text-[#1C1917] font-mono">${subtotal.toLocaleString()}</span>
+                  <span className="text-[#1C1917] font-mono">{formatPrice(subtotal)}</span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-[#9A7B4F]">
                     <span>Privilege Benefit</span>
-                    <span className="font-mono">-${discount.toLocaleString()}</span>
+                    <span className="font-mono">-{formatPrice(discount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span>Duty & Luxury Apparel Tax (8%)</span>
-                  <span className="text-[#1C1917] font-mono">${tax.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>White-Glove Courier Service</span>
+                  <span>White-Glove Courier</span>
                   <span className="text-[#1C1917] font-mono">
-                    {shipping === 0 ? "Complimentary" : `$${shipping}`}
+                    {shipping === 0 ? "Complimentary" : formatPrice(shipping)}
                   </span>
                 </div>
                 <div className="flex justify-between text-base font-serif text-[#1C1917] pt-3 border-t border-[#1C1917]/[0.08] font-bold">
                   <span>Total Investment</span>
                   <span className="text-[#9A7B4F]">
-                    ${total.toLocaleString()}
+                    {formatPrice(total)}
                   </span>
                 </div>
               </div>
 
               {/* Checkout CTA */}
               <button
+                type="button"
                 onClick={() => {
                   sounds.playClick();
                   router.push("/checkout");
@@ -266,4 +323,3 @@ export default function CartPage() {
     </div>
   );
 }
-

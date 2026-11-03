@@ -1,17 +1,20 @@
 "use client";
 
 import React, { useState } from "react";
+import NextLink from "next/link";
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
 import CartDrawer from "@/components/navigation/CartDrawer";
 import ProductInspectorModal from "@/components/ui/ProductInspectorModal";
-import { COLLECTIONS, PRODUCTS } from "@/data/products";
+import { useCatalog } from "@/components/providers/CatalogProvider";
 import { Product } from "@/types/product";
 import { useCartStore } from "@/store/useCartStore";
 import { sounds } from "@/utils/soundEffects";
-import { Eye, ShoppingBag, ArrowRight, Sparkles } from "lucide-react";
+import { formatPrice } from "@/lib/commerce";
+import { Eye, ShoppingBag, ArrowRight } from "lucide-react";
 
 export default function CollectionsPage() {
+  const { products, collections } = useCatalog();
   const { addItem } = useCartStore();
   const [inspectingProduct, setInspectingProduct] = useState<Product | null>(null);
 
@@ -35,8 +38,8 @@ export default function CollectionsPage() {
         </div>
 
         {/* Collections Stack */}
-        {COLLECTIONS.map((collection, idx) => {
-          const collectionProducts = PRODUCTS.filter(
+        {collections.map((collection, idx) => {
+          const collectionProducts = products.filter(
             (p) => p.collectionId === collection.id
           );
 
@@ -129,14 +132,16 @@ export default function CollectionsPage() {
                         </button>
                       </div>
 
-                      <div>
-                        <h4 className="font-serif text-sm text-[#1C1917] font-medium truncate">
-                          {p.name}
-                        </h4>
-                        <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#1C1917]/[0.06]">
-                          <span className="text-xs font-serif text-[#9A7B4F] font-bold">
-                            ${p.price.toLocaleString()}
-                          </span>
+                        <div>
+                          <NextLink href={`/product/${p.slug || p.id}`}>
+                            <h4 className="font-serif text-sm text-[#1C1917] font-medium truncate hover:text-[#9A7B4F] transition-colors">
+                              {p.name}
+                            </h4>
+                          </NextLink>
+                          <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#1C1917]/[0.06]">
+                            <span className="text-xs font-serif text-[#9A7B4F] font-bold">
+                              {formatPrice(p.price)}
+                            </span>
                           <button
                             onClick={() => {
                               addItem(p, p.colorways[0], p.sizes[0], 1);

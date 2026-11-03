@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { getCatalog } from "@/lib/catalog";
+import { CatalogProvider } from "@/components/providers/CatalogProvider";
 
 export const metadata: Metadata = {
   title: "VESTRA — The Future of Digital Fashion | 3D Wardrobe & Atelier",
@@ -16,11 +18,13 @@ export const metadata: Metadata = {
   ],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { products, collections } = await getCatalog();
+
   return (
     <html lang="en" className="h-full antialiased selection:bg-[#c5a880]/30 selection:text-[#1c1917]">
       <head>
@@ -32,7 +36,9 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-[#FAF8F5] text-[#1C1917] font-sans overflow-x-hidden">
-        {children}
+        <CatalogProvider products={products} collections={collections}>
+          {children}
+        </CatalogProvider>
       </body>
     </html>
   );

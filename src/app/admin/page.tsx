@@ -1,37 +1,65 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
-import { PRODUCTS, COLLECTIONS } from "@/data/products";
+import { useCatalog } from "@/components/providers/CatalogProvider";
 import { Product, ProductCategory, GarmentGeometryType } from "@/types/product";
-import { useCartStore } from "@/store/useCartStore";
 import { sounds } from "@/utils/soundEffects";
+import { formatPrice } from "@/lib/commerce";
 import {
   Layers,
   Plus,
   Package,
   TrendingUp,
-  DollarSign,
   Sparkles,
   Check,
+  Users,
 } from "lucide-react";
 
 export default function AdminPage() {
-  const { orders } = useCartStore();
-  const [productList, setProductList] = useState<Product[]>(PRODUCTS);
+  const { products: catalogProducts, collections } = useCatalog();
+  const [productList, setProductList] = useState<Product[]>(catalogProducts);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [stats, setStats] = useState<{
+    productCount: number;
+    orderCount: number;
+    userCount: number;
+    totalRevenue: number;
+  }>({
+    productCount: catalogProducts.length,
+    orderCount: 0,
+    userCount: 1,
+    totalRevenue: 0,
+  });
 
   // New product form state
   const [name, setName] = useState("");
   const [subtitle, setSubtitle] = useState("");
   const [category, setCategory] = useState<ProductCategory>("outerwear");
   const [geometryType, setGeometryType] = useState<GarmentGeometryType>("trench_coat");
-  const [price, setPrice] = useState("1200");
+  const [price, setPrice] = useState("120000");
   const [collectionId, setCollectionId] = useState("nocturne");
   const [composition, setComposition] = useState("100% Cashmere");
   const [weightGsm, setWeightGsm] = useState("320");
   const [createdSuccess, setCreatedSuccess] = useState(false);
+
+  useEffect(() => {
+    async function loadStats() {
+      try {
+        const res = await fetch("/api/admin/stats");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.stats) {
+            setStats(data.stats);
+          }
+        }
+      } catch {
+        // Fallback to local catalog counts
+      }
+    }
+    loadStats();
+  }, []);
 
   const totalValue = productList.reduce((acc, p) => acc + p.price, 0);
 
@@ -41,15 +69,18 @@ export default function AdminPage() {
 
     const newProd: Product = {
       id: `vestra-custom-${Date.now()}`,
+      slug: name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
       name,
       subtitle,
       collectionId,
-      collectionName: COLLECTIONS.find((c) => c.id === collectionId)?.name || "The Nocturne Atelier",
+      collectionName: collections.find((c) => c.id === collectionId)?.name || "The Nocturne Atelier",
       category,
-      price: parseFloat(price) || 1000,
+      price: parseFloat(price) || 85000,
       description: "Custom commissioned couture design engineered for the digital wardrobe.",
       editorialQuote: "Architectural singularity born from custom commission.",
       details: ["Hand-finished in our Paris atelier", "Archival certification tag included"],
+      careInstructions: ["Professional dry clean only"],
+      audience: "UNISEX",
       fabric: {
         name: composition,
         composition,
@@ -59,13 +90,12 @@ export default function AdminPage() {
         weave: "Twill",
         roughness: 0.5,
         metalness: 0.1,
-        sheen: 0.3,
       },
       colorways: [
-        { id: "noir", name: "Midnight Noir", hex: "#111116", threeColor: "#111116" },
-        { id: "champagne", name: "Brushed Champagne", hex: "#c5a880", threeColor: "#c5a880" },
+        { id: "obsidian", name: "Obsidian", hex: "#111114", threeColor: "#111114" },
+        { id: "champagne", name: "Champagne", hex: "#dfd2be", threeColor: "#dfd2be" },
       ],
-      sizes: ["46 (S)", "48 (M)", "50 (L)"],
+      sizes: ["38 (S)", "40 (M)", "42 (L)"],
       images: {
         hero: "https://images.unsplash.com/photo-1544441893-675973e31985?auto=format&fit=crop&w=1200&q=80",
         modelFront: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=1000&q=80",
@@ -74,128 +104,166 @@ export default function AdminPage() {
         hangerView: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=1000&q=80",
       },
       geometryType,
-      threeDimensions: { width: 0.65, height: 1.0, depth: 0.3 },
+      threeDimensions: { width: 0.7, height: 1.2, depth: 0.3 },
       rating: 5.0,
       reviewCount: 1,
-      tags: ["Custom", "Commission"],
+      tags: ["Haute Couture", "Bespoke", "New"],
     };
 
     setProductList([newProd, ...productList]);
     setCreatedSuccess(true);
     sounds.playChime();
+
     setTimeout(() => {
       setCreatedSuccess(false);
       setShowAddModal(false);
-    }, 1500);
+      setName("");
+      setSubtitle("");
+    }, 1200);
   };
 
   return (
     <div className="min-h-screen bg-[#FAF8F5] text-[#1C1917] flex flex-col justify-between">
       <Navbar />
 
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 space-y-10">
-        <div className="flex flex-col sm:flex-row items-baseline justify-between gap-4 pb-8 border-b border-[#1C1917]/[0.08]">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-8 border-b border-[#1C1917]/[0.08]">
           <div>
             <span className="text-[10px] uppercase tracking-[0.3em] text-[#9A7B4F] font-mono">
-              Atelier Management Console
+              Atelier Command Centre
             </span>
-            <h1 className="font-serif text-3xl sm:text-5xl text-[#1C1917] font-medium mt-1">
-              Backstage Operations
+            <h1 className="font-serif text-3xl sm:text-4xl text-[#1C1917] font-medium mt-1">
+              Atelier Management Dashboard
             </h1>
           </div>
 
           <button
-            onClick={() => setShowAddModal(true)}
-            className="px-5 py-2.5 rounded-full bg-[#1C1917] hover:bg-[#2A2725] text-white text-xs font-semibold transition-colors flex items-center gap-2 shadow-sm cursor-pointer"
+            onClick={() => {
+              setShowAddModal(true);
+              sounds.playClick();
+            }}
+            className="px-5 py-3 rounded-full bg-[#1C1917] hover:bg-[#2A2725] text-white text-xs font-semibold tracking-wider uppercase flex items-center gap-2 shadow-sm transition-colors cursor-pointer self-start sm:self-auto"
           >
             <Plus size={15} className="text-[#C5A880]" />
-            <span>Commission New Garment</span>
+            <span>Commission New Piece</span>
           </button>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        {/* Real Metrics Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 my-8">
           <div className="p-6 rounded-2xl atelier-card">
-            <span className="text-[10px] uppercase tracking-wider text-[#78716C] font-mono">
-              Archival Designs
+            <div className="flex justify-between items-center text-[#78716C] mb-2">
+              <span className="text-xs uppercase font-mono tracking-wider">Archived Pieces</span>
+              <Layers size={16} className="text-[#9A7B4F]" />
+            </div>
+            <span className="font-serif text-3xl font-medium text-[#1C1917]">
+              {stats.productCount || productList.length}
             </span>
-            <p className="font-serif text-3xl text-[#1C1917] font-bold mt-2">
-              {productList.length}
-            </p>
+            <span className="text-[11px] text-[#78716C] block mt-1">
+              Active GLTF & procedural garments
+            </span>
           </div>
 
           <div className="p-6 rounded-2xl atelier-card">
-            <span className="text-[10px] uppercase tracking-wider text-[#78716C] font-mono">
-              Active Collections
+            <div className="flex justify-between items-center text-[#78716C] mb-2">
+              <span className="text-xs uppercase font-mono tracking-wider">Orders Dispatched</span>
+              <Package size={16} className="text-[#9A7B4F]" />
+            </div>
+            <span className="font-serif text-3xl font-medium text-[#1C1917]">
+              {stats.orderCount}
             </span>
-            <p className="font-serif text-3xl text-[#9A7B4F] font-bold mt-2">
-              {COLLECTIONS.length}
-            </p>
+            <span className="text-[11px] text-[#78716C] block mt-1">
+              Recorded in PostgreSQL
+            </span>
           </div>
 
           <div className="p-6 rounded-2xl atelier-card">
-            <span className="text-[10px] uppercase tracking-wider text-[#78716C] font-mono">
-              Total Catalog Valuation
+            <div className="flex justify-between items-center text-[#78716C] mb-2">
+              <span className="text-xs uppercase font-mono tracking-wider">Memberships</span>
+              <Users size={16} className="text-[#9A7B4F]" />
+            </div>
+            <span className="font-serif text-3xl font-medium text-[#1C1917]">
+              {stats.userCount}
             </span>
-            <p className="font-serif text-3xl text-[#1C1917] font-bold mt-2">
-              ${totalValue.toLocaleString()}
-            </p>
+            <span className="text-[11px] text-[#78716C] block mt-1">
+              Private client credentials
+            </span>
           </div>
 
           <div className="p-6 rounded-2xl atelier-card">
-            <span className="text-[10px] uppercase tracking-wider text-[#78716C] font-mono">
-              Client Acquisitions
+            <div className="flex justify-between items-center text-[#78716C] mb-2">
+              <span className="text-xs uppercase font-mono tracking-wider">Catalog Valuation</span>
+              <TrendingUp size={16} className="text-[#9A7B4F]" />
+            </div>
+            <span className="font-serif text-3xl font-medium text-[#9A7B4F]">
+              {formatPrice(totalValue)}
             </span>
-            <p className="font-serif text-3xl text-emerald-700 font-bold mt-2">
-              {orders.length + 1}
-            </p>
+            <span className="text-[11px] text-[#78716C] block mt-1">
+              Cumulative pieces valuation
+            </span>
           </div>
         </div>
 
         {/* Product Inventory Table */}
-        <div className="p-6 rounded-3xl atelier-card space-y-4">
-          <h2 className="font-serif text-xl text-[#1C1917] font-medium">
-            Active 3D Wardrobe Inventory
-          </h2>
+        <div className="atelier-card rounded-3xl p-6 sm:p-8">
+          <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#1C1917]/[0.06]">
+            <div>
+              <h2 className="font-serif text-xl font-medium text-[#1C1917]">
+                Master Garment Inventory
+              </h2>
+              <p className="text-xs text-[#78716C] mt-0.5">
+                Inspect 3D geometries, fabric metadata and price points.
+              </p>
+            </div>
+          </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="text-[10px] uppercase font-mono text-[#78716C] border-b border-[#1C1917]/[0.08]">
+            <table className="w-full text-left text-xs text-[#78716C]">
+              <thead className="text-[10px] uppercase font-mono text-[#9A7B4F] border-b border-[#1C1917]/[0.08]">
                 <tr>
                   <th className="pb-3">Garment</th>
-                  <th className="pb-3">Collection</th>
                   <th className="pb-3">Category</th>
-                  <th className="pb-3">3D Rig</th>
-                  <th className="pb-3">Material GSM</th>
-                  <th className="pb-3 text-right">Price</th>
+                  <th className="pb-3">3D Mesh Type</th>
+                  <th className="pb-3">Fabric Composition</th>
+                  <th className="pb-3">Investment</th>
+                  <th className="pb-3 text-right">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#1C1917]/[0.06] text-[#78716C]">
-                {productList.map((p) => (
-                  <tr key={p.id} className="hover:bg-[#FAF8F5]">
-                    <td className="py-3.5 pr-4 flex items-center gap-3">
-                      <div
-                        className="w-9 h-11 rounded bg-white overflow-hidden shrink-0 border border-[#1C1917]/[0.08]"
-                        style={{ width: "36px", height: "44px" }}
-                      >
+              <tbody className="divide-y divide-[#1C1917]/[0.04]">
+                {productList.map((product) => (
+                  <tr key={product.id} className="hover:bg-black/[0.01] transition-colors">
+                    <td className="py-4 pr-4">
+                      <div className="flex items-center gap-3">
                         <img
-                          src={p.images.hero}
-                          alt={p.name}
-                          className="w-full h-full object-cover"
-                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          src={product.images.hero || product.images.modelFront}
+                          alt={product.name}
+                          className="w-10 h-12 rounded object-cover border border-[#1C1917]/10"
                         />
-                      </div>
-                      <div>
-                        <span className="font-serif text-[#1C1917] font-medium block">{p.name}</span>
-                        <span className="text-[10px] text-[#78716C]">#{p.id}</span>
+                        <div>
+                          <span className="font-serif text-sm text-[#1C1917] font-medium block">
+                            {product.name}
+                          </span>
+                          <span className="text-[10px] text-[#78716C] italic">{product.subtitle}</span>
+                        </div>
                       </div>
                     </td>
-                    <td className="py-3.5">{p.collectionName}</td>
-                    <td className="py-3.5 capitalize">{p.category}</td>
-                    <td className="py-3.5 font-mono text-[11px] text-[#9A7B4F] font-semibold">{p.geometryType}</td>
-                    <td className="py-3.5 font-mono text-[#1C1917]">{p.fabric.weightGsm} GSM</td>
-                    <td className="py-3.5 text-right font-serif font-bold text-[#1C1917]">
-                      ${p.price.toLocaleString()}
+                    <td className="py-4 pr-4 font-mono text-[11px] uppercase">
+                      {product.category}
+                    </td>
+                    <td className="py-4 pr-4 font-mono text-[11px] text-[#9A7B4F]">
+                      {product.geometryType}
+                    </td>
+                    <td className="py-4 pr-4 text-[11px]">
+                      {product.fabric.name} ({product.fabric.weightGsm} GSM)
+                    </td>
+                    <td className="py-4 pr-4 font-serif text-sm font-semibold text-[#1C1917]">
+                      {formatPrice(product.price)}
+                    </td>
+                    <td className="py-4 text-right">
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-mono bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        Active in 3D Rail
+                      </span>
                     </td>
                   </tr>
                 ))}
@@ -236,6 +304,7 @@ export default function AdminPage() {
                       <option value="tops">Tops</option>
                       <option value="trousers">Trousers</option>
                       <option value="dresses">Dresses</option>
+                      <option value="accessories">Accessories</option>
                     </select>
                   </div>
 
@@ -260,7 +329,7 @@ export default function AdminPage() {
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-[#78716C] mb-1">Price (USD)</label>
+                    <label className="block text-[#78716C] mb-1">Price (INR)</label>
                     <input
                       type="number"
                       value={price}
@@ -307,4 +376,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
