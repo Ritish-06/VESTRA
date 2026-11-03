@@ -15,6 +15,7 @@ import { sounds } from "@/utils/soundEffects";
 import { formatPrice } from "@/lib/commerce";
 import {
   RotateCw,
+  RotateCcw,
   ZoomIn,
   ShoppingBag,
   Sliders,
@@ -52,6 +53,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
   const [selectedSize, setSelectedSize] = useState<string>(product.sizes[0]);
   const [autoRotate, setAutoRotate] = useState(false);
   const [macroZoom, setMacroZoom] = useState(false);
+  const [resetTrigger, setResetTrigger] = useState(0);
   const [hungSuccess, setHungSuccess] = useState(false);
 
   const isWishlisted = isInWishlist(product.id);
@@ -128,6 +130,20 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                 <ZoomIn size={12} />
                 <span className="text-[10px]">Macro</span>
               </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setMacroZoom(false);
+                  setResetTrigger((prev) => prev + 1);
+                  sounds.playClick();
+                }}
+                className="text-xs px-2.5 py-1 rounded-full border bg-black/30 border-white/10 text-[#9ca3af] hover:text-white hover:border-[#c5a880]/50 backdrop-blur-sm flex items-center gap-1 transition-colors cursor-pointer"
+                title="Reset Camera View"
+              >
+                <RotateCcw size={12} />
+                <span className="text-[10px]">Reset</span>
+              </button>
             </div>
 
             <div className="flex-1 w-full h-full">
@@ -136,6 +152,7 @@ export default function ProductDetailClient({ product }: { product: Product }) {
                 activeColorway={selectedColor}
                 autoRotate={autoRotate}
                 macroZoom={macroZoom}
+                resetTrigger={resetTrigger}
               />
             </div>
 

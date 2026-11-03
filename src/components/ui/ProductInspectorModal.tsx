@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   X,
   RotateCw,
+  RotateCcw,
   ZoomIn,
   Heart,
   ShoppingBag,
@@ -60,6 +61,7 @@ export default function ProductInspectorModal({
   );
   const [autoRotate, setAutoRotate] = useState(false);
   const [macroZoom, setMacroZoom] = useState(false);
+  const [resetTrigger, setResetTrigger] = useState(0);
   const [addedToWardrobe, setAddedToWardrobe] = useState(false);
   const [activeTab, setActiveTab] = useState<"fabric" | "craftsmanship">("fabric");
 
@@ -155,6 +157,20 @@ export default function ProductInspectorModal({
               <ZoomIn size={12} />
               <span className="text-[10px]">Macro</span>
             </button>
+
+            {/* Reset Camera Button */}
+            <button
+              onClick={() => {
+                setMacroZoom(false);
+                setResetTrigger((prev) => prev + 1);
+                sounds.playClick();
+              }}
+              className="text-xs px-2.5 py-1 rounded-full border bg-black/30 border-white/10 text-[#9ca3af] hover:text-white hover:border-[#c5a880]/50 backdrop-blur-sm flex items-center gap-1 transition-colors"
+              title="Reset Camera Framing"
+            >
+              <RotateCcw size={12} />
+              <span className="text-[10px]">Reset</span>
+            </button>
           </div>
 
           {/* 3D Canvas */}
@@ -164,6 +180,7 @@ export default function ProductInspectorModal({
               activeColorway={selectedColor}
               autoRotate={autoRotate}
               macroZoom={macroZoom}
+              resetTrigger={resetTrigger}
             />
           </div>
 

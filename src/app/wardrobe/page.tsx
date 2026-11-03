@@ -37,6 +37,9 @@ import {
   ArrowRight,
   Maximize2,
   List,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
 } from "lucide-react";
 
 export default function WardrobePage() {
@@ -54,6 +57,8 @@ export default function WardrobePage() {
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [dragStartX, setDragStartX] = useState<number | null>(null);
   const [dragStartOffset, setDragStartOffset] = useState<number>(0);
+  const [zoomOffset, setZoomOffset] = useState<number>(0);
+  const [resetTrigger, setResetTrigger] = useState<number>(0);
 
   const getOffsetForIndex = (idx: number, total: number) => {
     if (total <= 1) return 0;
@@ -216,43 +221,89 @@ export default function WardrobePage() {
             mode={mode}
             railOffset={railOffset}
             itemColors={itemColors}
+            zoomOffset={zoomOffset}
+            resetTrigger={resetTrigger}
           />
         </div>
 
         {/* --- Top Controls Dock --- */}
         <div className="absolute top-20 sm:top-24 left-0 right-0 z-20 pointer-events-none">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            {/* Mode Switcher Pill */}
-            <div className="pointer-events-auto flex items-center p-1 rounded-full bg-[#121216]/80 backdrop-blur-md border border-white/10 shadow-xl">
-              <button
-                onClick={() => {
-                  setMode("rail");
-                  sounds.playClick();
-                }}
-                className={`px-4 py-1.5 rounded-full text-xs font-medium tracking-wider transition-all flex items-center gap-1.5 ${
-                  mode === "rail"
-                    ? "bg-[#c5a880] text-[#0b0b0c] font-semibold shadow-md"
-                    : "text-[#9ca3af] hover:text-white"
-                }`}
-              >
-                <Sliders size={13} />
-                <span>The Clothing Rail</span>
-              </button>
+            {/* Mode Switcher Pill & Camera Framing Controls */}
+            <div className="pointer-events-auto flex items-center gap-2">
+              <div className="flex items-center p-1 rounded-full bg-[#121216]/80 backdrop-blur-md border border-white/10 shadow-xl">
+                <button
+                  onClick={() => {
+                    setMode("rail");
+                    sounds.playClick();
+                  }}
+                  className={`px-4 py-1.5 rounded-full text-xs font-medium tracking-wider transition-all flex items-center gap-1.5 ${
+                    mode === "rail"
+                      ? "bg-[#c5a880] text-[#0b0b0c] font-semibold shadow-md"
+                      : "text-[#9ca3af] hover:text-white"
+                  }`}
+                >
+                  <Sliders size={13} />
+                  <span>The Clothing Rail</span>
+                </button>
 
-              <button
-                onClick={() => {
-                  setMode("boutique");
-                  sounds.playClick();
-                }}
-                className={`px-4 py-1.5 rounded-full text-xs font-medium tracking-wider transition-all flex items-center gap-1.5 ${
-                  mode === "boutique"
-                    ? "bg-[#c5a880] text-[#0b0b0c] font-semibold shadow-md"
-                    : "text-[#9ca3af] hover:text-white"
-                }`}
-              >
-                <Layers size={13} />
-                <span>Walk-in Boutique</span>
-              </button>
+                <button
+                  onClick={() => {
+                    setMode("boutique");
+                    sounds.playClick();
+                  }}
+                  className={`px-4 py-1.5 rounded-full text-xs font-medium tracking-wider transition-all flex items-center gap-1.5 ${
+                    mode === "boutique"
+                      ? "bg-[#c5a880] text-[#0b0b0c] font-semibold shadow-md"
+                      : "text-[#9ca3af] hover:text-white"
+                  }`}
+                >
+                  <Layers size={13} />
+                  <span>Walk-in Boutique</span>
+                </button>
+              </div>
+
+              {/* Camera Zoom & Auto-Fit Reset Controls */}
+              <div className="flex items-center p-1 rounded-full bg-[#121216]/80 backdrop-blur-md border border-white/10 shadow-xl">
+                <button
+                  onClick={() => {
+                    setZoomOffset((z) => Math.max(-1.0, +(z - 0.35).toFixed(2)));
+                    sounds.playClick();
+                  }}
+                  className="p-1.5 rounded-full text-[#9ca3af] hover:text-white hover:bg-white/10 transition-colors"
+                  title="Zoom In"
+                  aria-label="Zoom In"
+                >
+                  <ZoomIn size={14} />
+                </button>
+                <button
+                  onClick={() => {
+                    setZoomOffset((z) => Math.min(1.6, +(z + 0.35).toFixed(2)));
+                    sounds.playClick();
+                  }}
+                  className="p-1.5 rounded-full text-[#9ca3af] hover:text-white hover:bg-white/10 transition-colors"
+                  title="Zoom Out"
+                  aria-label="Zoom Out"
+                >
+                  <ZoomOut size={14} />
+                </button>
+                <button
+                  onClick={() => {
+                    setZoomOffset(0);
+                    setResetTrigger((r) => r + 1);
+                    if (selectedProduct) {
+                      const idx = filteredProducts.findIndex((item) => item.id === selectedProduct.id);
+                      if (idx !== -1) selectByIndex(idx);
+                    }
+                    sounds.playClick();
+                  }}
+                  className="px-2.5 py-1 rounded-full text-[11px] font-medium text-[#c5a880] hover:bg-[#c5a880]/15 transition-colors flex items-center gap-1"
+                  title="Reset Camera Framing"
+                >
+                  <RotateCcw size={12} />
+                  <span className="hidden sm:inline">Fit View</span>
+                </button>
+              </div>
             </div>
 
             {/* Category Filter Pills */}
