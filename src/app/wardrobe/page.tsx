@@ -39,19 +39,29 @@ import {
   ZoomOut,
   RotateCcw,
   Check,
+  Sparkles,
+  Grid,
 } from "lucide-react";
 
 export default function WardrobePage() {
   const { addItem } = useCartStore();
-  const { toggleWishlist, isInWishlist, recordProductView } = useWardrobeStore();
+  const {
+    toggleWishlist,
+    isInWishlist,
+    recordProductView,
+    wardrobeItems,
+    addWardrobeItem,
+    removeWardrobeItem,
+  } = useWardrobeStore();
   const { products, collections } = useCatalog();
 
   const catalogList = products.length ? products : PRODUCTS;
   const collectionList = collections.length ? collections : COLLECTIONS;
 
-  const [mode, setMode] = useState<"rail" | "boutique">("rail");
-  const [selectedCategory, setSelectedCategory] = useState<ProductCategory | "all">("all");
+  const [mode, setMode] = useState<"rail" | "boutique" | "studio">("rail");
+  const [selectedCategory, setSelectedCategory] = useState<ProductCategory | "all" | "saved">("all");
   const [selectedCollection, setSelectedCollection] = useState<string>("all");
+  const [selectedSize, setSelectedSize] = useState<string>("");
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(catalogList);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(catalogList[0]);
   const [inspectingProduct, setInspectingProduct] = useState<Product | null>(null);
@@ -71,7 +81,10 @@ export default function WardrobePage() {
 
   useEffect(() => {
     let nextList = catalogList;
-    if (selectedCategory !== "all") {
+    if (selectedCategory === "saved") {
+      const savedProductIds = new Set(wardrobeItems.map((item) => item.productId));
+      nextList = nextList.filter((p) => savedProductIds.has(p.id));
+    } else if (selectedCategory !== "all") {
       nextList = nextList.filter((p) => p.category === selectedCategory);
     }
     if (selectedCollection !== "all") {
@@ -80,8 +93,11 @@ export default function WardrobePage() {
     setFilteredProducts(nextList);
     const first = nextList[0] || null;
     setSelectedProduct(first);
+    if (first) {
+      setSelectedSize(first.sizes[1] || first.sizes[0] || "M");
+    }
     setRailOffset(getOffsetForIndex(0, nextList.length));
-  }, [selectedCategory, selectedCollection, catalogList]);
+  }, [selectedCategory, selectedCollection, catalogList, wardrobeItems]);
 
   const currentIndex = selectedProduct
     ? Math.max(0, filteredProducts.findIndex((p) => p.id === selectedProduct.id))
@@ -176,8 +192,9 @@ export default function WardrobePage() {
     sounds.playClick();
   };
 
-  const categories: { id: ProductCategory | "all"; label: string }[] = [
+  const categories: { id: ProductCategory | "all" | "saved"; label: string }[] = [
     { id: "all", label: "All Pieces" },
+    { id: "saved", label: `Saved Wardrobe (${wardrobeItems.length})` },
     { id: "outerwear", label: "Outerwear" },
     { id: "tailoring", label: "Tailoring" },
     { id: "tops", label: "Tops & Knitwear" },
@@ -187,13 +204,17 @@ export default function WardrobePage() {
   ];
 
   const isSelectedWishlisted = selectedProduct ? isInWishlist(selectedProduct.id) : false;
+  const savedWardrobeEntry = selectedProduct
+    ? wardrobeItems.find((w) => w.productId === selectedProduct.id)
+    : undefined;
+  const isSelectedInWardrobe = Boolean(savedWardrobeEntry);
 
   return (
-    <div className="h-screen w-screen bg-[#F8F6F1] text-[#25241F] flex flex-col overflow-hidden select-none relative">
+    <div className="h-dvh w-full bg-[#F8F6F1] text-[#25241F] flex flex-col overflow-hidden select-none relative">
       <Navbar />
       <CartDrawer />
 
-      {/* Main 3D Interactive Wardrobe Stage */}
+      {/* Main 3D / Studio Interactive Wardrobe Stage */}
       <main
         className="relative flex-1 w-full h-full overflow-hidden pt-16 sm:pt-20 touch-pan-y cursor-grab active:cursor-grabbing bright-showroom"
         onTouchStart={handleTouchStart}
@@ -206,31 +227,114 @@ export default function WardrobePage() {
         {/* Subtle Warm Studio Daylight Diffusion */}
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[780px] h-[420px] bg-white/70 rounded-full blur-[120px] pointer-events-none" />
 
-        {/* 3D Scene Viewport */}
-        <div className="w-full h-full">
-          <WardrobeCanvas
-            products={filteredProducts}
-            selectedProduct={selectedProduct}
-            onSelectProduct={(p) => {
-              const idx = filteredProducts.findIndex((item) => item.id === p.id);
-              if (selectedProduct?.id === p.id) {
-                setInspectingProduct(p);
-                sounds.playGarmentInspect();
-              } else if (idx !== -1) {
-                selectByIndex(idx);
-                sounds.playGarmentInspect();
-              } else {
-                setSelectedProduct(p);
-                sounds.playGarmentInspect();
-              }
-            }}
-            mode={mode}
-            railOffset={railOffset}
-            itemColors={itemColors}
-            zoomOffset={zoomOffset}
-            resetTrigger={resetTrigger}
-          />
-        </div>
+        {/* 3D Scene Viewport or Studio Rack Mode */}
+        {mode === "studio" ? (
+          <div className="w-full h-full flex flex-col justify-center px-4 sm:px-8 lg:px-12 pb-24 pt-14 overflow-y-auto">
+            <div className="max-w-7xl mx-auto w-full">
+              {/* Architectural Brushed Champagne Rail Line */}
+              <div className="relative mb-6 hidden sm:flex items-center">
+                <div className="w-3 h-3 rounded-full bg-[#B49A75] border-2 border-white shadow-xs" />
+                <div className="flex-1 h-[3px] bg-gradient-to-r from-[#B49A75]/60 via-[#8C7352] to-[#B49A75]/60 rounded-full" />
+                <div className="w-3 h-3 rounded-full bg-[#B49A75] border-2 border-white shadow-xs" />
+              </div>
+
+              {filteredProducts.length === 0 ? (
+                <div className="py-16 text-center bg-white/80 rounded-3xl border border-[#E5E0D7] p-8 max-w-lg mx-auto">
+                  <p className="font-serif text-2xl text-[#25241F] mb-2">
+                    Your Personal Wardrobe Rail is Empty
+                  </p>
+                  <p className="text-xs text-[#77736C] mb-5">
+                    Save garments from the Fashion Orbit or Editorial Archive to curate your private rack.
+                  </p>
+                  <button
+                    onClick={() => setSelectedCategory("all")}
+                    className="px-5 py-2.5 rounded-full bg-[#25241F] text-[#F8F6F1] text-xs uppercase tracking-[0.2em] font-semibold cursor-pointer"
+                  >
+                    Browse All Archive Pieces
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-5 overflow-x-auto pb-4 pt-2 snap-x snap-mandatory no-scrollbar">
+                  {filteredProducts.map((item, idx) => {
+                    const isFocused = selectedProduct?.id === item.id;
+                    const activeCol = itemColors[item.id] || item.colorways[0];
+                    return (
+                      <div
+                        key={item.id}
+                        onClick={() => {
+                          selectByIndex(idx);
+                          setSelectedSize(item.sizes[1] || item.sizes[0] || "M");
+                          sounds.playHangerSlide();
+                        }}
+                        className={`snap-center shrink-0 w-[250px] sm:w-[290px] rounded-3xl overflow-hidden border transition-all duration-500 cursor-pointer group bg-white ${
+                          isFocused
+                            ? "border-[#25241F] shadow-[0_24px_48px_-14px_rgba(37,36,31,0.18)] scale-[1.02]"
+                            : "border-[#E5E0D7] opacity-75 hover:opacity-100"
+                        }`}
+                      >
+                        <div className="relative aspect-[3/4] bg-[#EEEAE2] overflow-hidden">
+                          <img
+                            src={item.images.hero}
+                            alt={item.name}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          />
+                          <div className="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md border border-[#E5E0D7] text-[9px] font-mono uppercase tracking-[0.18em] text-[#25241F]">
+                            0{idx + 1} • {item.category}
+                          </div>
+                          <div
+                            className="absolute top-3 right-3 w-4 h-4 rounded-full border border-white shadow-xs"
+                            style={{ backgroundColor: activeCol.hex }}
+                            title={activeCol.name}
+                          />
+                        </div>
+                        <div className="p-4">
+                          <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-[#8C7352] block">
+                            {item.collectionName}
+                          </span>
+                          <div className="flex items-baseline justify-between gap-2 mt-1">
+                            <h4 className="font-serif text-base text-[#25241F] truncate">
+                              {item.name}
+                            </h4>
+                            <span className="font-serif text-sm font-semibold text-[#25241F] shrink-0">
+                              {formatPrice(item.price)}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div className="w-full h-full">
+            <WardrobeCanvas
+              products={filteredProducts}
+              selectedProduct={selectedProduct}
+              onSelectProduct={(p) => {
+                const idx = filteredProducts.findIndex((item) => item.id === p.id);
+                if (selectedProduct?.id === p.id) {
+                  setInspectingProduct(p);
+                  sounds.playGarmentInspect();
+                } else if (idx !== -1) {
+                  selectByIndex(idx);
+                  setSelectedSize(p.sizes[1] || p.sizes[0] || "M");
+                  sounds.playGarmentInspect();
+                } else {
+                  setSelectedProduct(p);
+                  setSelectedSize(p.sizes[1] || p.sizes[0] || "M");
+                  sounds.playGarmentInspect();
+                }
+              }}
+              mode={mode}
+              railOffset={railOffset}
+              itemColors={itemColors}
+              zoomOffset={zoomOffset}
+              resetTrigger={resetTrigger}
+            />
+          </div>
+        )}
 
         {/* --- Top Controls Dock --- */}
         <div className="absolute top-20 sm:top-22 left-0 right-0 z-20 pointer-events-none">
@@ -250,7 +354,7 @@ export default function WardrobePage() {
                   }`}
                 >
                   <Sliders size={13} />
-                  <span>The Clothing Rail</span>
+                  <span>3D Clothing Rail</span>
                 </button>
 
                 <button
@@ -266,6 +370,21 @@ export default function WardrobePage() {
                 >
                   <Layers size={13} />
                   <span>Walk-in Boutique</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setMode("studio");
+                    sounds.playClick();
+                  }}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
+                    mode === "studio"
+                      ? "bg-[#25241F] text-white font-semibold shadow-xs"
+                      : "text-[#77736C] hover:text-[#25241F]"
+                  }`}
+                >
+                  <Grid size={13} />
+                  <span>Studio Rack</span>
                 </button>
               </div>
 
@@ -445,8 +564,8 @@ export default function WardrobePage() {
                   </div>
                 </div>
 
-                {/* Color Swatches & Action Buttons */}
-                <div className="flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto justify-end">
+                {/* Color Swatches, Size Pills & Action Buttons */}
+                <div className="flex flex-wrap items-center gap-2 sm:gap-2.5 w-full sm:w-auto justify-end">
                   {/* Color dots switcher */}
                   <div className="flex items-center gap-1.5 mr-1">
                     {selectedProduct.colorways.map((col) => {
@@ -469,6 +588,53 @@ export default function WardrobePage() {
                       );
                     })}
                   </div>
+
+                  {/* Compact Size Selector */}
+                  <div className="hidden md:flex items-center gap-1 bg-[#F8F6F1] p-0.5 rounded-full border border-[#E5E0D7]">
+                    {selectedProduct.sizes.slice(0, 4).map((sz) => {
+                      const activeSz = (selectedSize || selectedProduct.sizes[0]) === sz;
+                      return (
+                        <button
+                          key={sz}
+                          onClick={() => {
+                            setSelectedSize(sz);
+                            sounds.playClick();
+                          }}
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-mono transition-colors cursor-pointer ${
+                            activeSz
+                              ? "bg-[#25241F] text-[#F8F6F1] font-semibold"
+                              : "text-[#77736C] hover:text-[#25241F]"
+                          }`}
+                        >
+                          {sz}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Save to Personal Wardrobe Toggle */}
+                  <button
+                    onClick={() => {
+                      if (savedWardrobeEntry) {
+                        removeWardrobeItem(savedWardrobeEntry.id);
+                      } else {
+                        const col = itemColors[selectedProduct.id] || selectedProduct.colorways[0];
+                        const sz = selectedSize || selectedProduct.sizes[0];
+                        addWardrobeItem(selectedProduct, col, sz);
+                      }
+                    }}
+                    className={`px-3 py-2 rounded-full border text-[11px] font-medium tracking-wider flex items-center gap-1 transition-colors cursor-pointer ${
+                      isSelectedInWardrobe
+                        ? "bg-[#F0EDE6] border-[#B49A75] text-[#8C7352]"
+                        : "bg-[#F8F6F1] border-[#E5E0D7] text-[#5C5850] hover:text-[#25241F]"
+                    }`}
+                    title={isSelectedInWardrobe ? "Remove from Wardrobe" : "Save to Personal Wardrobe"}
+                  >
+                    <Sparkles size={12} className="text-[#8C7352]" />
+                    <span className="hidden lg:inline">
+                      {isSelectedInWardrobe ? "In Wardrobe" : "+ Wardrobe"}
+                    </span>
+                  </button>
 
                   {/* Wishlist Toggle */}
                   <button
@@ -500,7 +666,8 @@ export default function WardrobePage() {
                   <button
                     onClick={() => {
                       const col = itemColors[selectedProduct.id] || selectedProduct.colorways[0];
-                      addItem(selectedProduct, col, selectedProduct.sizes[0], 1, false);
+                      const sz = selectedSize || selectedProduct.sizes[0];
+                      addItem(selectedProduct, col, sz, 1, false);
                       setAddedRailConfirm(true);
                       setTimeout(() => setAddedRailConfirm(false), 1800);
                     }}

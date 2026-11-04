@@ -1,36 +1,38 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from "react";
-import NextLink from "next/link";
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
 import CartDrawer from "@/components/navigation/CartDrawer";
 import ProductInspectorModal from "@/components/ui/ProductInspectorModal";
+import AsymmetricalEditorialShowcase from "@/components/ui/AsymmetricalEditorialShowcase";
 import FashionProductCard from "@/components/ui/FashionProductCard";
 import InteractiveSlider from "@/components/ui/InteractiveSlider";
+import { ORBIT_CAPSULES } from "@/components/ui/FashionOrbitExperience";
 import { useCatalog } from "@/components/providers/CatalogProvider";
 import { Product } from "@/types/product";
 import { useWardrobeStore } from "@/store/useWardrobeStore";
 import { sounds } from "@/utils/soundEffects";
 import {
   Search,
-  ArrowRight,
   SlidersHorizontal,
   RotateCcw,
   X,
+  LayoutGrid,
+  Columns,
 } from "lucide-react";
 
 const DISCOVERY_FILTERS = [
-  { id: "all", label: "All Works" },
-  { id: "new", label: "New Arrivals" },
-  { id: "women", label: "Women & Dresses" },
-  { id: "men", label: "Men" },
+  { id: "all", label: "All Exhibition Works" },
+  { id: "essential-forms", label: "01 / Essential Forms" },
+  { id: "after-hours", label: "02 / After Hours" },
+  { id: "modern-heritage", label: "03 / Modern Heritage" },
+  { id: "future-classics", label: "04 / Future Classics" },
   { id: "outerwear", label: "Outerwear" },
   { id: "tailoring", label: "Tailoring" },
   { id: "tops", label: "Tops & Silks" },
   { id: "trousers", label: "Trousers" },
   { id: "accessories", label: "Accessories" },
-  { id: "seasonal", label: "Seasonal" },
 ];
 
 export default function ExplorePage() {
@@ -41,11 +43,11 @@ export default function ExplorePage() {
   const [selectedFilter, setSelectedFilter] = useState<string>("all");
   const [selectedCollection, setSelectedCollection] = useState<string>("all");
   const [sortBy, setSortBy] = useState<"featured" | "price-asc" | "price-desc">("featured");
+  const [layoutMode, setLayoutMode] = useState<"editorial" | "index">("editorial");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [maxPriceFilter, setMaxPriceFilter] = useState<number>(500000);
   const [inspectingProduct, setInspectingProduct] = useState<Product | null>(null);
 
-  // Sync initial filter from query string if navigated from category slider
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
@@ -61,7 +63,7 @@ export default function ExplorePage() {
 
   const filteredProducts = useMemo(() => {
     return products
-      .filter((p) => {
+      .filter((p, idx) => {
         const query = searchQuery.toLowerCase().trim();
         const matchesSearch =
           !query ||
@@ -72,12 +74,9 @@ export default function ExplorePage() {
           p.tags.some((t) => t.toLowerCase().includes(query));
 
         let matchesCategory = true;
-        if (selectedFilter === "new") {
-          matchesCategory = Boolean(p.isNew);
-        } else if (selectedFilter === "women") {
-          matchesCategory = p.audience === "WOMEN" || p.audience === "UNISEX";
-        } else if (selectedFilter === "men") {
-          matchesCategory = p.audience === "MEN" || p.audience === "UNISEX";
+        const capsuleMatch = ORBIT_CAPSULES.find((c) => c.id === selectedFilter);
+        if (capsuleMatch) {
+          matchesCategory = capsuleMatch.matchFn(p, idx);
         } else if (selectedFilter === "outerwear") {
           matchesCategory = p.category === "outerwear";
         } else if (selectedFilter === "tailoring") {
@@ -88,8 +87,6 @@ export default function ExplorePage() {
           matchesCategory = p.category === "trousers";
         } else if (selectedFilter === "accessories") {
           matchesCategory = p.category === "accessories" || p.category === "footwear";
-        } else if (selectedFilter === "seasonal") {
-          matchesCategory = p.tags.includes("Seasonal") || p.collectionId === "nocturne";
         }
 
         const matchesCollection =
@@ -132,78 +129,67 @@ export default function ExplorePage() {
       <Navbar />
       <CartDrawer />
 
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 space-y-10">
-        {/* Editorial Heading */}
-        <div className="flex flex-col md:flex-row items-baseline justify-between gap-4 pb-8 border-b border-[#E5E0D7]">
-          <div>
-            <span className="text-[10px] uppercase tracking-[0.3em] text-[#8C7352] font-mono">
-              Haute Couture Discovery
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 space-y-12">
+        {/* Architectural Exhibition Header */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-8 border-b border-[#E5E0D7]">
+          <div className="space-y-2 max-w-2xl">
+            <span className="text-[10px] uppercase tracking-[0.3em] text-[#8C7352] font-mono block">
+              CURATORIAL ARCHIVE // PRODUCT DISCOVERY
             </span>
-            <h1 className="font-serif text-3xl sm:text-5xl text-[#25241F] font-medium mt-1">
-              Explore Collections
+            <h1 className="text-exhibition-display text-[#25241F] font-normal">
+              Asymmetrical Archive
             </h1>
-          </div>
-          <p className="text-xs text-[#77736C] max-w-md leading-relaxed">
-            Every garment in the VESTRA atelier is engineered with precision architectural tailoring, physical fabric textures, and interactive 3D spatial rails.
-          </p>
-        </div>
-
-        {/* Horizontal Collections Banner Row */}
-        <div className="pb-6 border-b border-[#E5E0D7]">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] uppercase font-mono tracking-widest text-[#8C7352]">
-              Current Atelier Drops
-            </span>
-            <NextLink
-              href="/collections"
-              className="text-[11px] text-[#77736C] hover:text-[#25241F] flex items-center gap-1 transition-colors"
-            >
-              <span>View Lookbooks</span>
-              <ArrowRight size={12} />
-            </NextLink>
+            <p className="text-xs sm:text-sm text-[#77736C] prose-measure">
+              Explore garments as large-format editorial plates with dual-angle hover transitions, live colorway and size selection, and instant 3D studio inspection.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {collections.map((col) => {
-              const isSelected = selectedCollection === col.id;
-              return (
-                <button
-                  key={col.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedCollection(isSelected ? "all" : col.id);
-                    sounds.playClick();
-                  }}
-                  aria-pressed={isSelected}
-                  className={`p-4 rounded-2xl text-left border transition-all duration-200 cursor-pointer relative overflow-hidden group ${
-                    isSelected
-                      ? "border-[#B49A75] bg-[#F0EDE6] shadow-xs"
-                      : "border-[#E5E0D7] bg-white hover:border-[#B49A75]"
-                  }`}
-                >
-                  <div className="relative z-10">
-                    <span className="text-[9px] font-mono uppercase tracking-widest text-[#8C7352]">
-                      {col.season}
-                    </span>
-                    <h2 className="font-serif text-base font-medium text-[#25241F] mt-0.5">
-                      {col.name}
-                    </h2>
-                    <p className="text-[11px] text-[#77736C] line-clamp-1 mt-1">
-                      {col.tagline}
-                    </p>
-                  </div>
-                </button>
-              );
-            })}
+          {/* Layout Mode Switcher (Asymmetrical Editorial vs Compact Index) */}
+          <div className="flex items-center gap-2 self-start lg:self-end">
+            <div className="inline-flex items-center p-1 rounded-full bg-white border border-[#E5E0D7] shadow-2xs">
+              <button
+                type="button"
+                onClick={() => {
+                  setLayoutMode("editorial");
+                  sounds.playClick();
+                }}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
+                  layoutMode === "editorial"
+                    ? "bg-[#25241F] text-white"
+                    : "text-[#77736C] hover:text-[#25241F]"
+                }`}
+              >
+                <Columns size={13} />
+                <span>Editorial Plates</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setLayoutMode("index");
+                  sounds.playClick();
+                }}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
+                  layoutMode === "index"
+                    ? "bg-[#25241F] text-white"
+                    : "text-[#77736C] hover:text-[#25241F]"
+                }`}
+              >
+                <LayoutGrid size={13} />
+                <span>Archive Index</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Filter and Search Bar Dock */}
+        {/* Discovery Controls: Search, World Filters, Sort & Expandable Refine */}
         <div className="space-y-4">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4">
             {/* Search Input */}
             <div className="relative w-full lg:w-80">
-              <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#77736C]" />
+              <Search
+                size={15}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#77736C]"
+              />
               <input
                 type="text"
                 placeholder="Search silk, gabardine, cashmere..."
@@ -223,7 +209,7 @@ export default function ExplorePage() {
               )}
             </div>
 
-            {/* Discovery Category Filter Pills */}
+            {/* Curatorial World & Category Filter Pills */}
             <div className="flex items-center gap-1.5 overflow-x-auto w-full lg:w-auto pb-2 lg:pb-0 vestra-carousel">
               {DISCOVERY_FILTERS.map((cat) => (
                 <button
@@ -245,7 +231,7 @@ export default function ExplorePage() {
               ))}
             </div>
 
-            {/* Expandable Filter Drawer Toggle & Sort */}
+            {/* Expandable Refine & Sort */}
             <div className="flex items-center gap-2 w-full lg:w-auto justify-end">
               <button
                 type="button"
@@ -266,18 +252,20 @@ export default function ExplorePage() {
 
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as "featured" | "price-asc" | "price-desc")}
+                onChange={(e) =>
+                  setSortBy(e.target.value as "featured" | "price-asc" | "price-desc")
+                }
                 aria-label="Sort products"
                 className="bg-white border border-[#E5E0D7] rounded-full px-3.5 py-2 text-xs text-[#25241F] focus:outline-none focus:border-[#B49A75] shadow-2xs cursor-pointer"
               >
-                <option value="featured">Featured Archive</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
+                <option value="featured">Curatorial Order</option>
+                <option value="price-asc">Investment: Low to High</option>
+                <option value="price-desc">Investment: High to Low</option>
               </select>
             </div>
           </div>
 
-          {/* Smooth Animated Filter Drawer (animate-to-intrinsic-sizes) */}
+          {/* Smooth Animated Refine Drawer */}
           <div
             className={`expandable-container ${filtersOpen ? "is-expanded" : ""}`}
             aria-hidden={!filtersOpen}
@@ -304,7 +292,7 @@ export default function ExplorePage() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <label
-                    htmlFor="max-price-slider"
+                    htmlFor="explore-max-price"
                     className="text-[10px] font-mono uppercase tracking-wider text-[#8C7352]"
                   >
                     Maximum Investment
@@ -314,7 +302,7 @@ export default function ExplorePage() {
                   </span>
                 </div>
                 <input
-                  id="max-price-slider"
+                  id="explore-max-price"
                   type="range"
                   min={50000}
                   max={500000}
@@ -327,7 +315,7 @@ export default function ExplorePage() {
 
               <div className="flex items-end justify-between sm:justify-end gap-3">
                 <span className="text-xs text-[#77736C] font-mono tabular-nums">
-                  Showing {filteredProducts.length} of {products.length} pieces
+                  {filteredProducts.length} of {products.length} works
                 </span>
                 {hasActiveFilters && (
                   <button
@@ -336,7 +324,7 @@ export default function ExplorePage() {
                     className="px-3.5 py-2 rounded-full bg-[#F0EDE6] hover:bg-[#E5E0D7] text-[#25241F] text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
                     <RotateCcw size={12} />
-                    <span>Reset All</span>
+                    <span>Reset</span>
                   </button>
                 )}
               </div>
@@ -344,12 +332,14 @@ export default function ExplorePage() {
           </div>
         </div>
 
-        {/* Product Grid */}
+        {/* Discovery Showcase: Asymmetrical Editorial Plates vs Compact Archive Index */}
         {filteredProducts.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-3xl border border-[#E5E0D7] shadow-2xs space-y-3">
-            <p className="font-serif text-lg text-[#25241F]">No archival pieces match this selection</p>
+            <p className="font-serif text-lg text-[#25241F]">
+              No exhibition works match this selection
+            </p>
             <p className="text-xs text-[#77736C]">
-              Try adjusting your search criteria or resetting active filters.
+              Try adjusting your search query or resetting active curatorial filters.
             </p>
             <button
               type="button"
@@ -359,6 +349,11 @@ export default function ExplorePage() {
               Reset All Filters
             </button>
           </div>
+        ) : layoutMode === "editorial" ? (
+          <AsymmetricalEditorialShowcase
+            products={filteredProducts}
+            onInspectProduct={(p) => setInspectingProduct(p)}
+          />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredProducts.map((product, idx) => (
@@ -372,13 +367,13 @@ export default function ExplorePage() {
           </div>
         )}
 
-        {/* Recently Viewed Slider */}
+        {/* Recently Viewed Dossier */}
         {recentlyViewedProducts.length > 0 && (
           <div className="pt-14 border-t border-[#E5E0D7]">
             <InteractiveSlider
               eyebrow="Your Viewing Dossier"
-              title="Recently Viewed Creations"
-              subtitle="Revisit garments you have inspected across the showroom."
+              title="Recently Inspected Creations"
+              subtitle="Revisit silhouettes from your personal exploration."
             >
               {recentlyViewedProducts.map((product) => (
                 <FashionProductCard
@@ -393,7 +388,6 @@ export default function ExplorePage() {
         )}
       </main>
 
-      {/* Product Inspector Modal */}
       {inspectingProduct && (
         <ProductInspectorModal
           product={inspectingProduct}

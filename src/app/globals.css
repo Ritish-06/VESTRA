@@ -253,7 +253,34 @@ li {
   transform: scaleX(1);
 }
 
-/* 3D Canvas Container */
+/* 3D Canvas & Replaced Media Block Display (css-layout) */
+img,
+canvas,
+svg,
+video {
+  display: block;
+}
+
 .r3f-container {
   touch-action: none;
+}
+
+/* Fluid Exhibition Display Typography (typography guide) */
+.text-exhibition-display {
+  font-family: var(--font-serif);
+  font-size: clamp(2.6rem, 1.45rem + 4.4vw, 5.75rem);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+
+.text-exhibition-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.85rem, 1.2rem + 2.4vw, 3.5rem);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+
+.prose-measure {
+  max-inline-size: 68ch;
+  line-height: 1.65;
 }

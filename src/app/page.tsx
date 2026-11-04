@@ -9,9 +9,12 @@ import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
 import CartDrawer from "@/components/navigation/CartDrawer";
 import ProductInspectorModal from "@/components/ui/ProductInspectorModal";
-import FashionProductCard from "@/components/ui/FashionProductCard";
-import InteractiveSlider from "@/components/ui/InteractiveSlider";
+import FashionOrbitExperience from "@/components/ui/FashionOrbitExperience";
+import AsymmetricalEditorialShowcase from "@/components/ui/AsymmetricalEditorialShowcase";
+import FabricExplorerSection from "@/components/ui/FabricExplorerSection";
 import LookbookHotspotSlider from "@/components/ui/LookbookHotspotSlider";
+import InteractiveSlider from "@/components/ui/InteractiveSlider";
+import FashionProductCard from "@/components/ui/FashionProductCard";
 import { PRODUCTS } from "@/data/products";
 import { Product } from "@/types/product";
 import { useCartStore } from "@/store/useCartStore";
@@ -26,14 +29,14 @@ import {
   ArrowRight,
   Eye,
   ShoppingBag,
-  Compass,
-  CheckCircle2,
+  Orbit,
   DoorOpen,
   ChevronLeft,
   ChevronRight,
   Pause,
   Play,
   Check,
+  ArrowDownRight,
 } from "lucide-react";
 
 const ProductInspectorCanvas = dynamic(
@@ -41,10 +44,10 @@ const ProductInspectorCanvas = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-full flex flex-col items-center justify-center text-[#B49A75] gap-3">
-        <div className="w-10 h-10 rounded-full border-2 border-[#B49A75]/30 border-t-[#B49A75] animate-spin" />
-        <span className="text-[10px] uppercase tracking-[0.2em] font-mono text-[#77736C]">
-          Calibrating 3D Centerpiece...
+      <div className="w-full h-full flex flex-col items-center justify-center text-[#8C7352] gap-3">
+        <div className="w-9 h-9 rounded-full border-2 border-[#B49A75]/30 border-t-[#B49A75] animate-spin" />
+        <span className="text-[10px] uppercase tracking-[0.22em] font-mono text-[#77736C]">
+          Initializing Spatial Atelier...
         </span>
       </div>
     ),
@@ -54,7 +57,7 @@ const ProductInspectorCanvas = dynamic(
 export default function LandingPage() {
   const router = useRouter();
   const { addItem } = useCartStore();
-  const { recentlyViewedIds, recordProductView } = useWardrobeStore();
+  const { recentlyViewedIds, recordProductView, wardrobeItems } = useWardrobeStore();
   const { products } = useCatalog();
 
   const [inspectingProduct, setInspectingProduct] = useState<Product | null>(null);
@@ -63,58 +66,56 @@ export default function LandingPage() {
   const [heroPaused, setHeroPaused] = useState(false);
   const [heroAdded, setHeroAdded] = useState(false);
 
-  const heroContainerRef = useRef<HTMLDivElement>(null);
-  const heroCenterpieceRef = useRef<HTMLDivElement>(null);
-  const heroTouchStartX = useRef<number | null>(null);
+  const entranceRef = useRef<HTMLDivElement>(null);
+  const entranceStageRef = useRef<HTMLDivElement>(null);
 
   const catalogList = products.length > 0 ? products : PRODUCTS;
 
-  // Hero Campaign Slides paired with live 3D garments
-  const heroCampaigns = useMemo(() => {
+  const entranceInstallations = useMemo(() => {
     const p0 = catalogList[0] || PRODUCTS[0];
     const p1 = catalogList[4] || catalogList[1] || p0;
     const p2 = catalogList[1] || catalogList[2] || p0;
     return [
       {
-        id: "campaign-01",
-        eyebrow: "CAMPAIGN 01 • AUTUMN / WINTER ATELIER",
-        headlineTop: "The Future of",
-        headlineAccent: "Digital Fashion",
-        tagline: "Your Wardrobe. Your World. Your Style.",
-        description:
-          "Step beyond flat catalog grids into an authentic spatial fashion house. Browse garments hanging on sculpted oak and champagne rails, inspect tactile micro-weaves under studio illumination, and explore bespoke silhouettes.",
-        backdropImage: p0.images.hero,
+        id: "installation-01",
+        code: "EXHIBITION 01 // ESSENTIAL FORMS",
+        headlineTop: "Beyond the",
+        headlineAccent: "Digital Wardrobe",
+        subtitle: "Your Wardrobe. Your World. Your Style.",
+        curatorNote:
+          "An interactive digital fashion house where garments exist inside a tactile 3D studio, collections unfold as architectural exhibitions, and every silhouette is inspected in 360°.",
+        editorialImage: p0.images.hero,
         product: p0,
       },
       {
-        id: "campaign-02",
-        eyebrow: "CAMPAIGN 02 • LIQUID SILK & EVENING COUTURE",
-        headlineTop: "Sculpted Drape &",
-        headlineAccent: "Luminous Silk",
-        tagline: "Hand-Finished Bias Silhouettes in 360°",
-        description:
-          "Experience organic 6A-grade mulberry charmeuse and architectural evening gowns framed from shoulder to floor hem with calibrated studio lighting.",
-        backdropImage: p1.images.hero,
+        id: "installation-02",
+        code: "EXHIBITION 02 // AFTER HOURS",
+        headlineTop: "Sculpted Silk &",
+        headlineAccent: "Spatial Couture",
+        subtitle: "Luminous 6A Mulberry Charmeuse in Motion",
+        curatorNote:
+          "Explore fluid evening drapery engineered for both physical presence and spatial inspection under calibrated daylight illumination.",
+        editorialImage: p1.images.hero,
         product: p1,
       },
       {
-        id: "campaign-03",
-        eyebrow: "CAMPAIGN 03 • MONOLITH BESPOKE TAILORING",
+        id: "installation-03",
+        code: "EXHIBITION 03 // MODERN HERITAGE",
         headlineTop: "Architectural",
         headlineAccent: "Haute Tailoring",
-        tagline: "Precision Canvas Construction & Tactile Weight",
-        description:
-          "Every lapel, pleat, and double-bonded seam is engineered for spatial inspection. Rotate, zoom into fabric grain, or try pieces onto our 3D atelier mannequin.",
-        backdropImage: p2.images.hero,
+        subtitle: "Precision Canvas Structure & Material Provenance",
+        curatorNote:
+          "Step inside our 3D wardrobe rail, compose layered ensembles on a virtual atelier mannequin, or orbit through seasonal capsules.",
+        editorialImage: p2.images.hero,
         product: p2,
       },
     ];
   }, [catalogList]);
 
-  const activeCampaign = heroCampaigns[heroSlideIndex] || heroCampaigns[0];
-  const heroProduct = activeCampaign.product;
+  const activeInstallation =
+    entranceInstallations[heroSlideIndex] || entranceInstallations[0];
+  const heroProduct = activeInstallation.product;
 
-  // Auto-advance hero campaign slider unless paused or reduced-motion preferred
   useEffect(() => {
     if (heroPaused) return;
     if (
@@ -124,90 +125,22 @@ export default function LandingPage() {
       return;
     }
     const timer = setInterval(() => {
-      setHeroSlideIndex((prev) => (prev + 1) % heroCampaigns.length);
-    }, 6500);
+      setHeroSlideIndex((prev) => (prev + 1) % entranceInstallations.length);
+    }, 6800);
     return () => clearInterval(timer);
-  }, [heroPaused, heroCampaigns.length]);
+  }, [heroPaused, entranceInstallations.length]);
 
-  const changeHeroSlide = (nextIdx: number) => {
-    const normalized = (nextIdx + heroCampaigns.length) % heroCampaigns.length;
+  const changeInstallation = (nextIdx: number) => {
+    const normalized =
+      (nextIdx + entranceInstallations.length) % entranceInstallations.length;
     setHeroSlideIndex(normalized);
     sounds.playClick();
   };
 
-  // Category Slider Cards
-  const categoryCards = useMemo(() => {
-    return [
-      {
-        id: "dresses",
-        title: "Dresses & Gowns",
-        subtitle: "Bias-cut silk & evening silhouettes",
-        count: catalogList.filter(
-          (p) =>
-            p.name.toLowerCase().includes("gown") ||
-            p.name.toLowerCase().includes("dress") ||
-            p.audience === "WOMEN"
-        ).length,
-        image: (catalogList[4] || catalogList[0]).images.hero,
-        href: "/explore?filter=women",
-      },
-      {
-        id: "outerwear",
-        title: "Outerwear & Trench",
-        subtitle: "Storm-bonded gabardine & wool coats",
-        count: catalogList.filter((p) => p.category === "outerwear").length,
-        image: catalogList[0].images.hero,
-        href: "/explore?filter=outerwear",
-      },
-      {
-        id: "tailoring",
-        title: "Architectural Tailoring",
-        subtitle: "Structured blazers & pleated form",
-        count: catalogList.filter((p) => p.category === "tailoring").length,
-        image: (catalogList[1] || catalogList[0]).images.hero,
-        href: "/explore?filter=tailoring",
-      },
-      {
-        id: "tops",
-        title: "Tops & Fine Knitwear",
-        subtitle: "Mulberry silk shirting & cashmere",
-        count: catalogList.filter((p) => p.category === "tops").length,
-        image: (catalogList[2] || catalogList[0]).images.hero,
-        href: "/explore?filter=tops",
-      },
-      {
-        id: "trousers",
-        title: "Tailored Trousers",
-        subtitle: "Wide-leg wool & elongated drape",
-        count: catalogList.filter((p) => p.category === "trousers").length,
-        image: (catalogList[3] || catalogList[0]).images.hero,
-        href: "/explore?filter=trousers",
-      },
-      {
-        id: "accessories",
-        title: "Artisanal Accessories",
-        subtitle: "Sculpted leather & brushed brass",
-        count: catalogList.filter((p) => p.category === "accessories" || p.category === "footwear").length,
-        image: (catalogList[5] || catalogList[0]).images.hero,
-        href: "/explore?filter=accessories",
-      },
-      {
-        id: "seasonal",
-        title: "Seasonal Collections",
-        subtitle: "Nocturne Monolith & Aether Silk drops",
-        count: catalogList.length,
-        image: (catalogList[6] || catalogList[0]).images.hero,
-        href: "/collections",
-      },
-    ];
-  }, [catalogList]);
-
-  const featuredProducts = useMemo(() => catalogList.slice(0, 8), [catalogList]);
-
-  const newArrivalsProducts = useMemo(() => {
-    const flagged = catalogList.filter((p) => p.isNew);
-    return flagged.length >= 4 ? flagged : [...flagged, ...catalogList.slice(0, 6)].slice(0, 7);
-  }, [catalogList]);
+  const curatedExhibitionPieces = useMemo(
+    () => catalogList.slice(0, 4),
+    [catalogList]
+  );
 
   const recentlyViewedProducts = useMemo(() => {
     const mapped = (recentlyViewedIds || [])
@@ -216,8 +149,7 @@ export default function LandingPage() {
     return mapped.length > 0 ? mapped : catalogList.slice(0, 4);
   }, [recentlyViewedIds, catalogList]);
 
-  // Cinematic "Enter the Store" Transition Sequence
-  const handleEnterStore = (e: React.MouseEvent) => {
+  const handleEnterWardrobe = (e: React.MouseEvent) => {
     e.preventDefault();
     if (isEnteringStore) return;
     setIsEnteringStore(true);
@@ -229,25 +161,33 @@ export default function LandingPage() {
       },
     });
 
-    if (heroContainerRef.current && heroCenterpieceRef.current) {
-      tl.to(heroContainerRef.current, {
+    if (entranceRef.current && entranceStageRef.current) {
+      tl.to(entranceRef.current, {
         opacity: 0,
-        y: -24,
-        duration: 0.45,
+        y: -20,
+        duration: 0.42,
         ease: "power2.out",
       });
       tl.to(
-        heroCenterpieceRef.current,
+        entranceStageRef.current,
         {
-          scale: 1.15,
+          scale: 1.08,
           opacity: 0,
-          duration: 0.5,
+          duration: 0.46,
           ease: "power3.inOut",
         },
-        "-=0.35"
+        "-=0.32"
       );
     } else {
       router.push("/wardrobe");
+    }
+  };
+
+  const scrollToOrbit = () => {
+    sounds.playClick();
+    const el = document.getElementById("fashion-orbit");
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -256,134 +196,116 @@ export default function LandingPage() {
       <Navbar />
       <CartDrawer />
 
-      {/* --- Section 1: Interactive Hero Campaign Slider + 3D Showroom Centerpiece --- */}
+      {/* =====================================================================
+          ACT I — THE DIGITAL FASHION ENTRANCE (Architectural Studio Portal)
+      ===================================================================== */}
       <section
-        aria-label="Featured Fashion Campaigns"
-        onPointerDown={(e) => {
-          heroTouchStartX.current = e.clientX;
-        }}
-        onPointerUp={(e) => {
-          if (heroTouchStartX.current === null) return;
-          const dx = e.clientX - heroTouchStartX.current;
-          if (Math.abs(dx) > 60) {
-            changeHeroSlide(dx < 0 ? heroSlideIndex + 1 : heroSlideIndex - 1);
-          }
-          heroTouchStartX.current = null;
-        }}
-        className="relative min-h-[90vh] flex items-center justify-center pt-28 pb-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#F0EDE6] via-[#F8F6F1] to-[#F8F6F1] border-b border-[#E5E0D7]"
+        aria-label="VESTRA Digital Fashion Studio Entrance"
+        className="relative min-h-[94dvh] flex flex-col justify-between pt-24 pb-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-[#F0EDE6] via-[#F8F6F1] to-[#F8F6F1] border-b border-[#E5E0D7]"
       >
-        {/* Subtle Editorial Campaign Photography Backdrop */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {heroCampaigns.map((camp, idx) => {
-            const isCurrent = idx === heroSlideIndex;
-            return (
-              <img
-                key={camp.id}
-                src={camp.backdropImage}
-                alt={camp.headlineAccent}
-                width={1600}
-                height={1000}
-                {...(idx === 0
-                  ? { fetchPriority: "high" as const }
-                  : { fetchPriority: "low" as const, loading: "lazy" as const })}
-                className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out ${
-                  isCurrent ? "opacity-[0.09] scale-100" : "opacity-0 scale-105"
-                }`}
-              />
-            );
-          })}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#F8F6F1] via-[#F8F6F1]/92 to-[#F8F6F1]/80" />
+        {/* Top Architectural Studio Coordinates Bar */}
+        <div className="max-w-7xl mx-auto w-full flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-[#E5E0D7] text-[10px] font-mono uppercase tracking-[0.25em] text-[#77736C]">
+          <span>VESTRA DIGITAL FASHION STUDIO // ARCHIVE EDITION</span>
+          <span className="hidden sm:inline text-[#8C7352]">
+            PARIS • TOKYO • MILAN • SPATIAL ATELIER
+          </span>
+          <span className="tabular-nums">
+            WARDROBE VAULT: {wardrobeItems.length} PIECES HUNG
+          </span>
         </div>
 
-        <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center z-10">
-          {/* Left Hero Campaign Narrative */}
-          <div
-            ref={heroContainerRef}
-            className="lg:col-span-7 space-y-6 text-center lg:text-left"
-          >
-            <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-white border border-[#E5E0D7] text-[#8C7352] text-[11px] font-mono tracking-widest uppercase shadow-2xs">
+        {/* Main Asymmetrical Entrance Composition */}
+        <div className="max-w-7xl mx-auto w-full my-auto py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+          {/* Left 6 Columns: Oversized Editorial Typography & Entrance Actions */}
+          <div ref={entranceRef} className="lg:col-span-6 space-y-6">
+            <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white border border-[#E5E0D7] text-[#8C7352] text-[10px] font-mono tracking-[0.22em] uppercase shadow-2xs">
               <Sparkles size={12} className="text-[#B49A75]" />
-              <span>{activeCampaign.eyebrow}</span>
+              <span>{activeInstallation.code}</span>
             </div>
 
-            <div key={activeCampaign.id} className="space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-500">
-              <h1 className="font-serif text-4xl sm:text-6xl xl:text-7xl font-normal tracking-tight text-[#25241F] leading-[1.08]">
-                {activeCampaign.headlineTop} <br />
-                <span className="italic font-serif gold-gradient-text font-medium">
-                  {activeCampaign.headlineAccent}
+            <div
+              key={activeInstallation.id}
+              className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-500"
+            >
+              <h1 className="text-exhibition-display font-normal text-[#25241F]">
+                {activeInstallation.headlineTop} <br />
+                <span className="italic gold-gradient-text font-medium">
+                  {activeInstallation.headlineAccent}
                 </span>
               </h1>
 
-              <p className="font-serif text-lg sm:text-xl text-[#8C7352] tracking-wide italic">
-                {activeCampaign.tagline}
+              <p className="font-serif text-lg sm:text-xl text-[#8C7352] italic">
+                {activeInstallation.subtitle}
               </p>
 
-              <p className="text-xs sm:text-sm text-[#77736C] max-w-xl mx-auto lg:mx-0 leading-relaxed font-sans">
-                {activeCampaign.description}
+              <p className="text-xs sm:text-sm text-[#77736C] prose-measure">
+                {activeInstallation.curatorNote}
               </p>
             </div>
 
-            {/* Primary CTAs */}
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3.5">
+            {/* Primary Entrance Interactions */}
+            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
               <button
                 type="button"
-                onClick={handleEnterStore}
+                onClick={handleEnterWardrobe}
                 disabled={isEnteringStore}
-                className="w-full sm:w-auto px-8 py-4 rounded-full bg-[#25241F] hover:bg-[#38362F] active:scale-[0.99] text-white font-semibold text-xs tracking-widest uppercase flex items-center justify-center gap-3 shadow-md hover:shadow-lg transition-all cursor-pointer"
+                className="px-8 py-4 rounded-full bg-[#25241F] hover:bg-[#38362F] active:scale-[0.99] text-white font-semibold text-xs tracking-[0.2em] uppercase flex items-center justify-center gap-3 shadow-md hover:shadow-lg transition-all cursor-pointer"
               >
                 <DoorOpen size={16} className="text-[#B49A75]" />
-                <span>{isEnteringStore ? "Entering Showroom..." : "Enter 3D Fashion Store"}</span>
+                <span>{isEnteringStore ? "Entering Studio..." : "Enter VESTRA 3D Wardrobe"}</span>
                 <ArrowRight size={14} className="text-[#B49A75]" />
               </button>
 
-              <NextLink
-                href="/explore"
-                onClick={() => sounds.playClick()}
-                className="w-full sm:w-auto px-7 py-4 rounded-full bg-white hover:bg-[#F0EDE6] text-[#25241F] border border-[#E5E0D7] font-medium text-xs tracking-widest uppercase flex items-center justify-center gap-2 transition-all shadow-2xs"
+              <button
+                type="button"
+                onClick={scrollToOrbit}
+                className="px-7 py-4 rounded-full bg-white hover:bg-[#F0EDE6] text-[#25241F] border border-[#E5E0D7] hover:border-[#B49A75] font-medium text-xs tracking-[0.18em] uppercase flex items-center justify-center gap-2 transition-all shadow-2xs cursor-pointer"
               >
-                <Compass size={15} className="text-[#8C7352]" />
-                <span>Explore Collections</span>
-              </NextLink>
+                <Orbit size={15} className="text-[#8C7352]" />
+                <span>Launch Fashion Orbit</span>
+                <ArrowDownRight size={14} className="text-[#B49A75]" />
+              </button>
             </div>
 
-            {/* Hero Campaign Slider Controls & Indicators */}
-            <div className="pt-6 border-t border-[#E5E0D7] flex flex-wrap items-center justify-center lg:justify-between gap-4">
+            {/* Installation Switcher & Pause Controls */}
+            <div className="pt-6 border-t border-[#E5E0D7] flex flex-wrap items-center justify-between gap-4">
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => changeHeroSlide(heroSlideIndex - 1)}
-                  aria-label="Previous campaign slide"
-                  className="w-9 h-9 rounded-full bg-white hover:bg-[#F0EDE6] border border-[#E5E0D7] text-[#25241F] flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
+                  onClick={() => changeInstallation(heroSlideIndex - 1)}
+                  aria-label="Previous exhibition installation"
+                  className="w-9 h-9 rounded-full bg-white hover:bg-[#F0EDE6] border border-[#E5E0D7] text-[#25241F] flex items-center justify-center transition-colors cursor-pointer"
                 >
-                  <ChevronLeft size={16} />
+                  <ChevronLeft size={15} />
                 </button>
                 <button
                   type="button"
-                  onClick={() => changeHeroSlide(heroSlideIndex + 1)}
-                  aria-label="Next campaign slide"
-                  className="w-9 h-9 rounded-full bg-white hover:bg-[#F0EDE6] border border-[#E5E0D7] text-[#25241F] flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
+                  onClick={() => changeInstallation(heroSlideIndex + 1)}
+                  aria-label="Next exhibition installation"
+                  className="w-9 h-9 rounded-full bg-white hover:bg-[#F0EDE6] border border-[#E5E0D7] text-[#25241F] flex items-center justify-center transition-colors cursor-pointer"
                 >
-                  <ChevronRight size={16} />
+                  <ChevronRight size={15} />
                 </button>
                 <button
                   type="button"
                   onClick={() => setHeroPaused((p) => !p)}
-                  aria-label={heroPaused ? "Resume campaign slideshow" : "Pause campaign slideshow"}
-                  className="w-9 h-9 rounded-full bg-white hover:bg-[#F0EDE6] border border-[#E5E0D7] text-[#77736C] hover:text-[#25241F] flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
-                  title={heroPaused ? "Resume Slideshow" : "Pause Slideshow"}
+                  aria-label={
+                    heroPaused ? "Resume installation cycle" : "Pause installation cycle"
+                  }
+                  className="w-9 h-9 rounded-full bg-white hover:bg-[#F0EDE6] border border-[#E5E0D7] text-[#77736C] hover:text-[#25241F] flex items-center justify-center transition-colors cursor-pointer"
                 >
                   {heroPaused ? <Play size={13} /> : <Pause size={13} />}
                 </button>
 
-                <div className="flex items-center gap-1.5 ml-2" role="tablist" aria-label="Campaign slides">
-                  {heroCampaigns.map((c, idx) => (
+                <div className="flex items-center gap-1.5 ml-2" role="tablist" aria-label="Exhibition installations">
+                  {entranceInstallations.map((inst, idx) => (
                     <button
-                      key={c.id}
+                      key={inst.id}
                       type="button"
                       role="tab"
                       aria-selected={idx === heroSlideIndex}
-                      aria-label={`Campaign slide ${idx + 1}`}
-                      onClick={() => changeHeroSlide(idx)}
+                      aria-label={`Installation ${idx + 1}`}
+                      onClick={() => changeInstallation(idx)}
                       className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
                         idx === heroSlideIndex
                           ? "w-8 bg-[#25241F]"
@@ -394,201 +316,199 @@ export default function LandingPage() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-4 text-[11px] text-[#77736C] font-mono">
-                <span className="flex items-center gap-1.5">
-                  <CheckCircle2 size={13} className="text-[#8C7352]" /> 3D Rail Physics
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <CheckCircle2 size={13} className="text-[#8C7352]" /> Full Garment Framing
-                </span>
-              </div>
+              <NextLink
+                href="/collections"
+                className="text-[11px] font-mono uppercase tracking-widest text-[#8C7352] hover:text-[#25241F] flex items-center gap-1.5"
+              >
+                <span>Exhibition Index</span>
+                <ArrowRight size={12} />
+              </NextLink>
             </div>
           </div>
 
-          {/* Right Hero Interactive 3D Turntable Card */}
+          {/* Right 6 Columns: Dual Architectural Stage (Editorial Portrait + Live 3D Turntable) */}
           <div
-            ref={heroCenterpieceRef}
-            onPointerDown={(e) => e.stopPropagation()}
-            className="lg:col-span-5 h-[480px] sm:h-[530px] rounded-3xl bright-showroom border border-[#E5E0D7] relative overflow-hidden shadow-[0_18px_45px_-18px_rgba(37,36,31,0.12)] flex flex-col group text-[#25241F]"
+            ref={entranceStageRef}
+            className="lg:col-span-6 grid grid-cols-1 sm:grid-cols-12 gap-4 items-stretch"
           >
-            {/* Viewport Badge */}
-            <div className="absolute top-4 left-4 right-4 z-10 flex items-center justify-between gap-2 pointer-events-none">
-              <span className="text-[10px] uppercase tracking-[0.22em] text-[#8C7352] px-3 py-1 rounded-full bg-white/92 border border-[#E5E0D7] font-mono backdrop-blur-md shadow-2xs">
-                Interactive 3D Showroom
-              </span>
-              <span className="text-[10px] font-mono text-[#77736C] px-2.5 py-1 rounded-full bg-white/85 border border-[#E5E0D7]">
-                0{heroSlideIndex + 1} / 0{heroCampaigns.length}
-              </span>
-            </div>
-
-            {/* 3D Canvas */}
-            <div className="flex-1 w-full h-full">
-              <ProductInspectorCanvas
-                product={heroProduct}
-                activeColorway={heroProduct.colorways[0]}
-                autoRotate={true}
-              />
-            </div>
-
-            {/* Bottom Card Footer */}
-            <div className="p-5 bg-white/95 backdrop-blur-md border-t border-[#E5E0D7] flex items-center justify-between gap-3">
-              <div className="min-w-0">
-                <span className="text-[9px] uppercase tracking-wider text-[#8C7352] font-mono block">
-                  {heroProduct.collectionName}
+            {/* Editorial Campaign Plate (5 cols) */}
+            <div className="sm:col-span-5 h-[360px] sm:h-[510px] rounded-3xl overflow-hidden border border-[#E5E0D7] bg-[#F0EDE6] relative group shadow-sm">
+              {entranceInstallations.map((inst, idx) => {
+                const isCurrent = idx === heroSlideIndex;
+                return (
+                  <img
+                    key={inst.id}
+                    src={inst.editorialImage}
+                    alt={inst.product.name}
+                    width={600}
+                    height={850}
+                    {...(idx === 0
+                      ? { fetchPriority: "high" as const }
+                      : { fetchPriority: "low" as const, loading: "lazy" as const })}
+                    className={`absolute inset-0 w-full h-full object-cover transition-all duration-700 ease-out ${
+                      isCurrent ? "opacity-100 scale-100" : "opacity-0 scale-105"
+                    }`}
+                  />
+                );
+              })}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#25241F]/70 via-transparent to-transparent flex flex-col justify-between p-4">
+                <span className="self-start px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-[9px] font-mono uppercase tracking-widest text-[#25241F] border border-[#E5E0D7]">
+                  Editorial Plate
                 </span>
-                <NextLink
-                  href={`/product/${heroProduct.slug || heroProduct.id}`}
-                  onClick={() => recordProductView(heroProduct.id)}
-                >
-                  <h2 className="font-serif text-base text-[#25241F] font-medium truncate hover:text-[#8C7352] transition-colors">
-                    {heroProduct.name}
-                  </h2>
-                </NextLink>
-                <span className="font-serif text-xs text-[#25241F] font-bold tabular-nums">
-                  {formatPrice(heroProduct.price)}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                <button
-                  type="button"
-                  onClick={() => {
-                    recordProductView(heroProduct.id);
-                    setInspectingProduct(heroProduct);
-                    sounds.playGarmentInspect();
-                  }}
-                  className="px-4 py-2 rounded-full bg-[#F8F6F1] hover:bg-[#F0EDE6] border border-[#E5E0D7] text-[#25241F] text-xs font-medium tracking-wider transition-all flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Eye size={12} className="text-[#B49A75]" />
-                  <span>Inspect 3D</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    addItem(heroProduct, heroProduct.colorways[0], heroProduct.sizes[0], 1, false);
-                    setHeroAdded(true);
-                    setTimeout(() => setHeroAdded(false), 1800);
-                  }}
-                  className={`px-3.5 h-9 rounded-full text-xs font-medium flex items-center justify-center gap-1 transition-colors shadow-xs cursor-pointer ${
-                    heroAdded
-                      ? "bg-[#607B60] text-white"
-                      : "bg-[#25241F] hover:bg-[#38362F] text-white"
-                  }`}
-                  title="Quick Add to Bag"
-                >
-                  {heroAdded ? (
-                    <>
-                      <Check size={13} />
-                      <span>Added</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingBag size={13} className="text-[#B49A75]" />
-                      <span>Add</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* --- Section 2: Category Discovery Slider --- */}
-      <section className="py-20 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
-        <InteractiveSlider
-          eyebrow="Curated Departments"
-          title="Browse by Silhouette & Category"
-          subtitle="Drag, swipe, or use arrow controls to explore dresses, tailoring, outerwear, silk tops, and seasonal capsules."
-          itemWidthClass="w-[240px] sm:w-[265px] lg:w-[280px]"
-          headerAction={
-            <NextLink
-              href="/explore"
-              className="text-xs text-[#25241F] hover:text-[#8C7352] font-medium flex items-center gap-1.5 transition-colors"
-            >
-              <span>All Categories</span>
-              <ArrowRight size={13} className="text-[#B49A75]" />
-            </NextLink>
-          }
-        >
-          {categoryCards.map((cat) => (
-            <NextLink
-              key={cat.id}
-              href={cat.href}
-              onClick={() => sounds.playClick()}
-              className="group block rounded-2xl bg-white border border-[#E5E0D7] hover:border-[#B49A75] overflow-hidden shadow-2xs hover:shadow-md transition-all duration-300 hover:-translate-y-1"
-            >
-              <div className="aspect-[4/5] w-full bg-[#F0EDE6] relative overflow-hidden">
-                <img
-                  src={cat.image}
-                  alt={cat.title}
-                  loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#25241F]/70 via-[#25241F]/15 to-transparent" />
-                <span className="absolute top-3 right-3 px-2.5 py-0.5 rounded-full bg-white/90 backdrop-blur-md text-[10px] font-mono text-[#25241F] border border-[#E5E0D7]">
-                  {cat.count} {cat.count === 1 ? "Piece" : "Pieces"}
-                </span>
-                <div className="absolute inset-x-4 bottom-4 text-white">
-                  <h3 className="font-serif text-lg font-medium">{cat.title}</h3>
-                  <p className="text-[11px] text-white/85 mt-0.5 line-clamp-1">
-                    {cat.subtitle}
+                <div className="text-white">
+                  <span className="text-[9px] font-mono uppercase tracking-widest text-[#DFD3C0] block">
+                    {heroProduct.fabric.weave}
+                  </span>
+                  <p className="font-serif text-sm font-medium mt-0.5">
+                    {heroProduct.collectionName}
                   </p>
                 </div>
               </div>
-            </NextLink>
-          ))}
-        </InteractiveSlider>
-      </section>
+            </div>
 
-      {/* --- Section 3: Featured Collection Slider --- */}
-      <section className="py-20 bg-[#F0EDE6]/60 border-y border-[#E5E0D7]">
-        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
-          <InteractiveSlider
-            eyebrow="The Permanent Archive"
-            title="Featured Atelier Collection"
-            subtitle="Hover any creation to inspect alternate views, select colorways, preview in 3D, or add directly to your shopping bag."
-            headerAction={
-              <NextLink
-                href="/explore"
-                className="text-xs text-[#25241F] hover:text-[#8C7352] font-medium flex items-center gap-1.5 transition-colors"
-              >
-                <span>View Full Archive ({catalogList.length})</span>
-                <ArrowRight size={13} className="text-[#B49A75]" />
-              </NextLink>
-            }
-          >
-            {featuredProducts.map((product) => (
-              <FashionProductCard
-                key={product.id}
-                product={product}
-                onInspect={(p) => setInspectingProduct(p)}
-              />
-            ))}
-          </InteractiveSlider>
+            {/* Interactive 3D Showroom Centerpiece (7 cols) */}
+            <div className="sm:col-span-7 h-[440px] sm:h-[510px] rounded-3xl bright-showroom border border-[#E5E0D7] relative overflow-hidden shadow-[0_18px_45px_-18px_rgba(37,36,31,0.12)] flex flex-col">
+              <div className="absolute top-4 left-4 right-4 z-10 flex items-center justify-between gap-2 pointer-events-none">
+                <span className="text-[9px] uppercase tracking-[0.22em] text-[#8C7352] px-3 py-1 rounded-full bg-white/92 border border-[#E5E0D7] font-mono backdrop-blur-md">
+                  3D Spatial Stage
+                </span>
+                <span className="text-[10px] font-mono text-[#77736C] px-2.5 py-0.5 rounded-full bg-white/85 border border-[#E5E0D7]">
+                  360° Interactive
+                </span>
+              </div>
+
+              <div className="flex-1 w-full h-full">
+                <ProductInspectorCanvas
+                  product={heroProduct}
+                  activeColorway={heroProduct.colorways[0]}
+                  autoRotate={true}
+                />
+              </div>
+
+              <div className="p-4 bg-white/95 backdrop-blur-md border-t border-[#E5E0D7] flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <NextLink
+                    href={`/product/${heroProduct.slug || heroProduct.id}`}
+                    onClick={() => recordProductView(heroProduct.id)}
+                  >
+                    <h2 className="font-serif text-sm text-[#25241F] font-medium truncate hover:text-[#8C7352] transition-colors">
+                      {heroProduct.name}
+                    </h2>
+                  </NextLink>
+                  <span className="font-serif text-xs text-[#25241F] font-bold tabular-nums">
+                    {formatPrice(heroProduct.price)}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      recordProductView(heroProduct.id);
+                      setInspectingProduct(heroProduct);
+                      sounds.playGarmentInspect();
+                    }}
+                    className="px-3 py-1.5 rounded-full bg-[#F8F6F1] hover:bg-[#F0EDE6] border border-[#E5E0D7] text-[#25241F] text-[11px] font-medium flex items-center gap-1 transition-colors cursor-pointer"
+                  >
+                    <Eye size={12} className="text-[#B49A75]" />
+                    <span>Inspect</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      addItem(heroProduct, heroProduct.colorways[0], heroProduct.sizes[0], 1, false);
+                      setHeroAdded(true);
+                      setTimeout(() => setHeroAdded(false), 1800);
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-[11px] font-medium flex items-center gap-1 transition-colors cursor-pointer ${
+                      heroAdded
+                        ? "bg-[#607B60] text-white"
+                        : "bg-[#25241F] hover:bg-[#38362F] text-white"
+                    }`}
+                  >
+                    {heroAdded ? <Check size={12} /> : <ShoppingBag size={12} className="text-[#B49A75]" />}
+                    <span>{heroAdded ? "Added" : "Acquire"}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* --- Section 4: Editorial Lookbook Slider with Clickable Hotspots --- */}
+      {/* =====================================================================
+          ACT II — THE FASHION ORBIT (Interactive Spatial Collection Explorer)
+      ===================================================================== */}
+      <FashionOrbitExperience
+        products={catalogList}
+        onInspectProduct={(p) => setInspectingProduct(p)}
+      />
+
+      {/* =====================================================================
+          ACT III — ASYMMETRICAL EDITORIAL EXHIBITION (Curated Showcase)
+      ===================================================================== */}
+      <section
+        aria-label="Asymmetrical Editorial Garment Showcase"
+        className="py-24 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 space-y-12"
+      >
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-[#E5E0D7]">
+          <div className="space-y-2">
+            <span className="text-[10px] uppercase tracking-[0.28em] text-[#8C7352] font-mono block">
+              ARCHITECTURAL EXHIBITION // CURATED PLATES
+            </span>
+            <h2 className="text-exhibition-title text-[#25241F] font-normal">
+              Selected Archival Silhouettes
+            </h2>
+          </div>
+          <div className="flex items-center gap-4">
+            <p className="text-xs text-[#77736C] max-w-sm">
+              Hover any exhibition plate to reveal alternate drapery angles, test colorway tones, or launch the 3D studio.
+            </p>
+            <NextLink
+              href="/explore"
+              className="px-5 py-2.5 rounded-full bg-[#25241F] hover:bg-[#38362F] text-white text-xs font-medium tracking-wider uppercase flex items-center gap-2 shrink-0 transition-colors"
+            >
+              <span>Full Exhibition ({catalogList.length})</span>
+              <ArrowRight size={13} className="text-[#B49A75]" />
+            </NextLink>
+          </div>
+        </div>
+
+        <AsymmetricalEditorialShowcase
+          products={curatedExhibitionPieces}
+          onInspectProduct={(p) => setInspectingProduct(p)}
+        />
+      </section>
+
+      {/* =====================================================================
+          ACT IV — FABRIC & MATERIALITY EXPLORER (Macro Loupe & Telemetry)
+      ===================================================================== */}
+      <div className="bg-[#F0EDE6]/60 border-y border-[#E5E0D7]">
+        <FabricExplorerSection
+          products={catalogList}
+          onInspectProduct={(p) => setInspectingProduct(p)}
+        />
+      </div>
+
+      {/* =====================================================================
+          ACT V — INTERACTIVE LOOKBOOK COMPOSITION (Hotspot Story)
+      ===================================================================== */}
       <section className="py-24 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 space-y-10">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>
             <span className="text-[10px] uppercase tracking-[0.28em] text-[#8C7352] font-mono block">
-              Shop the Runway Spread
+              STYLE COMPOSITION // INTERACTIVE LOOKBOOK
             </span>
-            <h2 className="font-serif text-3xl sm:text-4xl text-[#25241F] font-medium mt-1">
-              Interactive Editorial Lookbook
+            <h2 className="text-exhibition-title text-[#25241F] font-normal mt-1">
+              Complete Ensemble Narratives
             </h2>
-            <p className="text-xs text-[#77736C] mt-1 max-w-xl">
-              Click the pulsing champagne pins on each editorial photograph to inspect fabric telemetry and shop individual garments in the ensemble.
-            </p>
           </div>
           <NextLink
-            href="/collections"
+            href="/studio"
             className="text-xs text-[#25241F] hover:text-[#8C7352] font-medium flex items-center gap-1.5 transition-colors"
           >
-            <span>All Seasonal Lookbooks</span>
+            <span>Compose Your Own Outfit in 3D Studio</span>
             <ArrowRight size={13} className="text-[#B49A75]" />
           </NextLink>
         </div>
@@ -599,141 +519,106 @@ export default function LandingPage() {
         />
       </section>
 
-      {/* --- Section 5: New Arrivals Slider --- */}
-      <section className="py-20 bg-[#F0EDE6]/60 border-y border-[#E5E0D7]">
-        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
-          <InteractiveSlider
-            eyebrow="Latest Runway Editions"
-            title="New Arrivals"
-            subtitle="Newly released silhouettes freshly hung on our digital showroom rails."
-            headerAction={
+      {/* =====================================================================
+          ACT VI — DIGITAL WARDROBE & STYLE COMPOSITION CHAMBERS
+      ===================================================================== */}
+      <section className="py-20 bg-[#F0EDE6]/65 border-t border-[#E5E0D7]">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="p-8 rounded-3xl bg-white border border-[#E5E0D7] hover:border-[#B49A75] transition-all flex flex-col justify-between space-y-6 shadow-2xs">
+              <div className="space-y-3">
+                <div className="w-11 h-11 rounded-2xl bg-[#F8F6F1] border border-[#E5E0D7] flex items-center justify-center text-[#8C7352]">
+                  <Sliders size={20} />
+                </div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-[#8C7352] block">
+                  CHAMBER 01 // 3D RAIL
+                </span>
+                <h3 className="font-serif text-2xl text-[#25241F] font-medium">
+                  Interactive 3D Wardrobe
+                </h3>
+                <p className="text-xs text-[#77736C] leading-relaxed">
+                  Slide garments along a sculpted oak and champagne rail with real-time sway physics and automatic full-length framing.
+                </p>
+              </div>
               <NextLink
-                href="/explore?filter=new"
-                className="text-xs text-[#25241F] hover:text-[#8C7352] font-medium flex items-center gap-1.5 transition-colors"
+                href="/wardrobe"
+                className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#25241F] hover:text-[#8C7352]"
               >
-                <span>Explore New Releases</span>
-                <ArrowRight size={13} className="text-[#B49A75]" />
+                <span>Enter 3D Wardrobe</span>
+                <ArrowRight size={14} className="text-[#B49A75]" />
               </NextLink>
-            }
+            </div>
+
+            <div className="p-8 rounded-3xl bg-white border border-[#E5E0D7] hover:border-[#B49A75] transition-all flex flex-col justify-between space-y-6 shadow-2xs">
+              <div className="space-y-3">
+                <div className="w-11 h-11 rounded-2xl bg-[#F8F6F1] border border-[#E5E0D7] flex items-center justify-center text-[#8C7352]">
+                  <Layers size={20} />
+                </div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-[#8C7352] block">
+                  CHAMBER 02 // TRY-ON STUDIO
+                </span>
+                <h3 className="font-serif text-2xl text-[#25241F] font-medium">
+                  Style Composition Studio
+                </h3>
+                <p className="text-xs text-[#77736C] leading-relaxed">
+                  Combine outerwear, silk tops, and tailored trousers onto a 3D mannequin and save complete looks to your personal vault.
+                </p>
+              </div>
+              <NextLink
+                href="/studio"
+                className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#25241F] hover:text-[#8C7352]"
+              >
+                <span>Open Style Studio</span>
+                <ArrowRight size={14} className="text-[#B49A75]" />
+              </NextLink>
+            </div>
+
+            <div className="p-8 rounded-3xl bg-white border border-[#E5E0D7] hover:border-[#B49A75] transition-all flex flex-col justify-between space-y-6 shadow-2xs">
+              <div className="space-y-3">
+                <div className="w-11 h-11 rounded-2xl bg-[#F8F6F1] border border-[#E5E0D7] flex items-center justify-center text-[#8C7352]">
+                  <Sparkles size={20} />
+                </div>
+                <span className="text-[10px] font-mono uppercase tracking-widest text-[#8C7352] block">
+                  CHAMBER 03 // AI COUTURIER
+                </span>
+                <h3 className="font-serif text-2xl text-[#25241F] font-medium">
+                  Personal Atelier Stylist
+                </h3>
+                <p className="text-xs text-[#77736C] leading-relaxed">
+                  Consult our contextual stylist to curate bespoke ensembles tailored to gallery openings, evening galas, or architectural travel.
+                </p>
+              </div>
+              <NextLink
+                href="/stylist"
+                className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#25241F] hover:text-[#8C7352]"
+              >
+                <span>Consult AI Stylist</span>
+                <ArrowRight size={14} className="text-[#B49A75]" />
+              </NextLink>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Recently Viewed Archive Strip */}
+      {recentlyViewedProducts.length > 0 && (
+        <section className="py-20 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
+          <InteractiveSlider
+            eyebrow="Personal Viewing Dossier"
+            title="Recently Inspected Creations"
+            subtitle="Resume inspecting silhouettes from your session."
           >
-            {newArrivalsProducts.map((product) => (
+            {recentlyViewedProducts.map((product) => (
               <FashionProductCard
-                key={`new-${product.id}`}
+                key={`home-recent-${product.id}`}
                 product={product}
                 onInspect={(p) => setInspectingProduct(p)}
+                compact
               />
             ))}
           </InteractiveSlider>
-        </div>
-      </section>
-
-      {/* --- Section 6: Spatial Showroom Concept --- */}
-      <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
-        <div className="text-center max-w-3xl mx-auto space-y-3">
-          <span className="text-[10px] uppercase tracking-[0.3em] text-[#8C7352] font-mono">
-            Spatial Paradigm Shift
-          </span>
-          <h2 className="font-serif text-3xl sm:text-5xl text-[#25241F] font-medium">
-            Not a Catalog. A Physical Showroom.
-          </h2>
-          <p className="text-xs sm:text-sm text-[#77736C] leading-relaxed">
-            Traditional online fashion confines couture to flat 2D thumbnails. VESTRA restores the tactile weight, full-length drape, and spatial movement of a real luxury garment rack.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div className="p-8 sm:p-10 rounded-3xl bg-white border border-[#E5E0D7] relative overflow-hidden group hover:border-[#B49A75] transition-all flex flex-col justify-between space-y-6 shadow-2xs hover:shadow-md">
-            <div className="space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#F0EDE6] border border-[#B49A75]/40 flex items-center justify-center text-[#8C7352]">
-                <Sliders size={22} />
-              </div>
-              <span className="text-[10px] uppercase font-mono tracking-widest text-[#8C7352]">
-                Experience Mode 01
-              </span>
-              <h3 className="font-serif text-2xl text-[#25241F] font-medium">
-                The Interactive Clothing Rail
-              </h3>
-              <p className="text-xs text-[#77736C] leading-relaxed">
-                Smooth horizontal drag physics with natural garment sway on sculpted oak and champagne hangers. Click any hanger to frame the full silhouette from shoulder to hem.
-              </p>
-            </div>
-
-            <div className="pt-4 border-t border-[#E5E0D7]">
-              <NextLink
-                href="/wardrobe"
-                className="inline-flex items-center gap-2 text-xs text-[#25241F] font-semibold tracking-wider uppercase group-hover:text-[#8C7352]"
-              >
-                <span>Launch 3D Rail Experience</span>
-                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform text-[#B49A75]" />
-              </NextLink>
-            </div>
-          </div>
-
-          <div className="p-8 sm:p-10 rounded-3xl bg-white border border-[#E5E0D7] relative overflow-hidden group hover:border-[#B49A75] transition-all flex flex-col justify-between space-y-6 shadow-2xs hover:shadow-md">
-            <div className="space-y-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#F0EDE6] border border-[#B49A75]/40 flex items-center justify-center text-[#8C7352]">
-                <Layers size={22} />
-              </div>
-              <span className="text-[10px] uppercase font-mono tracking-widest text-[#8C7352]">
-                Experience Mode 02
-              </span>
-              <h3 className="font-serif text-2xl text-[#25241F] font-medium">
-                The Architectural Salon & Try-On Studio
-              </h3>
-              <p className="text-xs text-[#77736C] leading-relaxed">
-                Explore a bright travertine and alabaster 3D showroom or layer outerwear, tops, and trousers onto our interactive 3D mannequin in the Outfit Studio.
-              </p>
-            </div>
-
-            <div className="pt-4 border-t border-[#E5E0D7]">
-              <NextLink
-                href="/studio"
-                className="inline-flex items-center gap-2 text-xs text-[#25241F] font-semibold tracking-wider uppercase group-hover:text-[#8C7352]"
-              >
-                <span>Open 3D Outfit Studio</span>
-                <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform text-[#B49A75]" />
-              </NextLink>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* --- Section 7: Recently Viewed Slider --- */}
-      {recentlyViewedProducts.length > 0 && (
-        <section className="py-20 bg-[#F0EDE6]/50 border-t border-[#E5E0D7]">
-          <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8">
-            <InteractiveSlider
-              eyebrow="Your Personal Archive History"
-              title="Recently Viewed Creations"
-              subtitle="Continue inspecting garments you recently explored across the showroom."
-            >
-              {recentlyViewedProducts.map((product) => (
-                <FashionProductCard
-                  key={`recent-${product.id}`}
-                  product={product}
-                  onInspect={(p) => setInspectingProduct(p)}
-                  compact
-                />
-              ))}
-            </InteractiveSlider>
-          </div>
         </section>
       )}
-
-      {/* --- Section 8: Brand Manifesto Quote Banner --- */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 text-center relative bg-[#F8F6F1] border-t border-[#E5E0D7]">
-        <div className="max-w-4xl mx-auto space-y-6">
-          <div className="w-12 h-12 rounded-full border border-[#B49A75] bg-white flex items-center justify-center text-[#8C7352] mx-auto text-sm font-serif shadow-2xs">
-            V
-          </div>
-          <blockquote className="font-serif text-2xl sm:text-4xl text-[#25241F] font-light italic leading-snug">
-            &ldquo;We believe the future of fashion does not belong in static squares. True luxury is three-dimensional, kinetic, and deeply personal.&rdquo;
-          </blockquote>
-          <p className="text-xs uppercase tracking-[0.3em] text-[#8C7352] font-mono">
-            VESTRA Haute Atelier Manifesto • Paris • Tokyo • Milan
-          </p>
-        </div>
-      </section>
 
       {/* Product Inspector Modal */}
       {inspectingProduct && (
