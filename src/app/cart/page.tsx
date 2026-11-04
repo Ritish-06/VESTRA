@@ -39,11 +39,20 @@ export default function CartPage() {
 
   const [couponInput, setCouponInput] = useState("");
   const [couponMessage, setCouponMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [removingId, setRemovingId] = useState<string | null>(null);
 
   const subtotal = getSubtotal();
   const discount = getDiscount();
   const shipping = getShipping();
   const total = getTotal();
+
+  const handleAnimatedRemove = (id: string) => {
+    setRemovingId(id);
+    setTimeout(() => {
+      removeItem(id);
+      setRemovingId(null);
+    }, 220);
+  };
 
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,10 +107,14 @@ export default function CartPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 mt-8">
             {/* Items List */}
             <div className="lg:col-span-8 space-y-4">
-              {items.map((item) => (
+              {items.map((item) => {
+                const isRemoving = removingId === item.id;
+                return (
                 <div
                   key={item.id}
-                  className="p-5 rounded-2xl atelier-card flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between"
+                  className={`p-5 rounded-2xl atelier-card flex flex-col sm:flex-row gap-5 items-start sm:items-center justify-between transition-all duration-200 ${
+                    isRemoving ? "opacity-0 -translate-x-4 scale-95" : "opacity-100 translate-x-0 scale-100"
+                  }`}
                 >
                   <div className="flex gap-4 items-center">
                     <div
@@ -127,7 +140,7 @@ export default function CartPage() {
                       <p className="text-xs text-[#78716C] mt-0.5">
                         Size: {item.selectedSize} • Tone: {item.selectedColor.name}
                       </p>
-                      <span className="text-xs font-serif text-[#9A7B4F] font-bold mt-1 block">
+                      <span className="text-xs font-serif text-[#9A7B4F] font-bold mt-1 block tabular-nums">
                         {formatPrice(item.product.price)} each
                       </span>
                     </div>
@@ -138,19 +151,25 @@ export default function CartPage() {
                     <div className="flex items-center gap-2 border border-[#1C1917]/15 rounded-full px-3 py-1 bg-[#FAF8F5]">
                       <button
                         type="button"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="text-[#78716C] hover:text-[#1C1917]"
+                        onClick={() => {
+                          if (item.quantity <= 1) {
+                            handleAnimatedRemove(item.id);
+                          } else {
+                            updateQuantity(item.id, item.quantity - 1);
+                          }
+                        }}
+                        className="text-[#78716C] hover:text-[#1C1917] cursor-pointer"
                         aria-label="Decrease quantity"
                       >
                         <Minus size={13} />
                       </button>
-                      <span className="text-xs font-mono text-[#1C1917] px-2 font-medium">
+                      <span className="text-xs font-mono text-[#1C1917] w-6 text-center font-medium tabular-nums">
                         {item.quantity}
                       </span>
                       <button
                         type="button"
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="text-[#78716C] hover:text-[#1C1917]"
+                        className="text-[#78716C] hover:text-[#1C1917] cursor-pointer"
                         aria-label="Increase quantity"
                       >
                         <Plus size={13} />
@@ -158,7 +177,7 @@ export default function CartPage() {
                     </div>
 
                     <div className="text-right min-w-[90px]">
-                      <span className="font-serif text-base font-bold text-[#1C1917] block">
+                      <span className="font-serif text-base font-bold text-[#1C1917] block tabular-nums">
                         {formatPrice(item.product.price * item.quantity)}
                       </span>
                     </div>
@@ -167,7 +186,7 @@ export default function CartPage() {
                       <button
                         type="button"
                         onClick={() => saveItemForLater(item.id)}
-                        className="text-[#78716C] hover:text-[#9A7B4F] p-1.5 transition-colors"
+                        className="text-[#78716C] hover:text-[#9A7B4F] p-1.5 transition-colors cursor-pointer"
                         title="Save for later"
                         aria-label="Save for later"
                       >
@@ -175,8 +194,8 @@ export default function CartPage() {
                       </button>
                       <button
                         type="button"
-                        onClick={() => removeItem(item.id)}
-                        className="text-[#78716C] hover:text-red-600 p-1.5 transition-colors"
+                        onClick={() => handleAnimatedRemove(item.id)}
+                        className="text-[#78716C] hover:text-red-600 p-1.5 transition-colors cursor-pointer"
                         title="Remove item"
                         aria-label="Remove item"
                       >
@@ -185,7 +204,8 @@ export default function CartPage() {
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
 
               {/* Saved For Later Section */}
               {savedForLater && savedForLater.length > 0 && (

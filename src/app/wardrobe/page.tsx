@@ -2,23 +2,24 @@
 
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import NextLink from "next/link";
 import Navbar from "@/components/navigation/Navbar";
-import Footer from "@/components/navigation/Footer";
 import CartDrawer from "@/components/navigation/CartDrawer";
 import ProductInspectorModal from "@/components/ui/ProductInspectorModal";
 
 const WardrobeCanvas = dynamic(() => import("@/components/3d/WardrobeCanvas"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full flex flex-col items-center justify-center text-[#c5a880] gap-3">
-      <div className="w-10 h-10 rounded-full border-2 border-[#c5a880]/30 border-t-[#c5a880] animate-spin" />
-      <span className="text-xs uppercase tracking-[0.25em] font-mono text-[#9ca3af]">
-        Calibrating 3D Wardrobe...
+    <div className="w-full h-full flex flex-col items-center justify-center text-[#8C7352] gap-3">
+      <div className="w-9 h-9 rounded-full border-2 border-[#B49A75]/30 border-t-[#B49A75] animate-spin" />
+      <span className="text-xs uppercase tracking-[0.25em] font-mono text-[#77736C]">
+        Preparing 3D Showroom...
       </span>
     </div>
   ),
 });
-import { PRODUCTS } from "@/data/products";
+
+import { PRODUCTS, COLLECTIONS } from "@/data/products";
 import { Product, ProductCategory, Colorway } from "@/types/product";
 import { useCartStore } from "@/store/useCartStore";
 import { useWardrobeStore } from "@/store/useWardrobeStore";
@@ -27,38 +28,41 @@ import { sounds } from "@/utils/soundEffects";
 import { formatPrice } from "@/lib/commerce";
 import {
   Sliders,
-  Sparkles,
   ChevronLeft,
   ChevronRight,
   Eye,
   ShoppingBag,
   Heart,
   Layers,
-  ArrowRight,
-  Maximize2,
-  List,
+  ArrowUpRight,
   ZoomIn,
   ZoomOut,
   RotateCcw,
+  Check,
 } from "lucide-react";
 
 export default function WardrobePage() {
   const { addItem } = useCartStore();
-  const { toggleWishlist, isInWishlist, addWardrobeItem } = useWardrobeStore();
-  const { products } = useCatalog();
+  const { toggleWishlist, isInWishlist, recordProductView } = useWardrobeStore();
+  const { products, collections } = useCatalog();
+
+  const catalogList = products.length ? products : PRODUCTS;
+  const collectionList = collections.length ? collections : COLLECTIONS;
 
   const [mode, setMode] = useState<"rail" | "boutique">("rail");
   const [selectedCategory, setSelectedCategory] = useState<ProductCategory | "all">("all");
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products.length ? products : PRODUCTS);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(products[0] || PRODUCTS[0]);
+  const [selectedCollection, setSelectedCollection] = useState<string>("all");
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(catalogList);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(catalogList[0]);
   const [inspectingProduct, setInspectingProduct] = useState<Product | null>(null);
-  const [railOffset, setRailOffset] = useState(() => -((0 - (PRODUCTS.length - 1) / 2) * 0.58));
+  const [railOffset, setRailOffset] = useState(() => -((0 - (catalogList.length - 1) / 2) * 0.58));
   const [itemColors, setItemColors] = useState<Record<string, Colorway>>({});
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [dragStartX, setDragStartX] = useState<number | null>(null);
   const [dragStartOffset, setDragStartOffset] = useState<number>(0);
   const [zoomOffset, setZoomOffset] = useState<number>(0);
   const [resetTrigger, setResetTrigger] = useState<number>(0);
+  const [addedRailConfirm, setAddedRailConfirm] = useState<boolean>(false);
 
   const getOffsetForIndex = (idx: number, total: number) => {
     if (total <= 1) return 0;
@@ -66,15 +70,18 @@ export default function WardrobePage() {
   };
 
   useEffect(() => {
-    const nextList =
-      selectedCategory === "all"
-        ? PRODUCTS
-        : PRODUCTS.filter((p) => p.category === selectedCategory);
+    let nextList = catalogList;
+    if (selectedCategory !== "all") {
+      nextList = nextList.filter((p) => p.category === selectedCategory);
+    }
+    if (selectedCollection !== "all") {
+      nextList = nextList.filter((p) => p.collectionId === selectedCollection);
+    }
     setFilteredProducts(nextList);
     const first = nextList[0] || null;
     setSelectedProduct(first);
     setRailOffset(getOffsetForIndex(0, nextList.length));
-  }, [selectedCategory]);
+  }, [selectedCategory, selectedCollection, catalogList]);
 
   const currentIndex = selectedProduct
     ? Math.max(0, filteredProducts.findIndex((p) => p.id === selectedProduct.id))
@@ -85,6 +92,7 @@ export default function WardrobePage() {
     const clamped = Math.max(0, Math.min(filteredProducts.length - 1, idx));
     const prod = filteredProducts[clamped];
     setSelectedProduct(prod);
+    recordProductView(prod.id);
     setRailOffset(getOffsetForIndex(clamped, filteredProducts.length));
   };
 
@@ -128,30 +136,26 @@ export default function WardrobePage() {
     setTouchStartX(null);
   };
 
-  // Mouse drag & wheel handlers for smooth rail gliding
+  // Mouse drag handlers for sliding the rail horizontally
   const handlePointerDown = (e: React.PointerEvent) => {
-    if (mode !== "rail") return;
+    if (mode !== "rail" || inspectingProduct) return;
     setDragStartX(e.clientX);
     setDragStartOffset(railOffset);
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (mode !== "rail" || dragStartX === null) return;
-    const deltaPx = e.clientX - dragStartX;
-    if (Math.abs(deltaPx) > 5) {
-      const nextOffset = dragStartOffset + deltaPx * 0.0045;
-      setRailOffset(nextOffset);
-    }
+    if (dragStartX === null || mode !== "rail" || inspectingProduct) return;
+    const deltaX = (e.clientX - dragStartX) * 0.0045;
+    const maxBound = Math.max(0.5, ((filteredProducts.length - 1) * 0.58) / 2 + 0.3);
+    const nextOffset = Math.max(-maxBound, Math.min(maxBound, dragStartOffset + deltaX));
+    setRailOffset(nextOffset);
   };
 
-  const handlePointerUp = (e: React.PointerEvent) => {
-    if (mode !== "rail" || dragStartX === null) return;
-    const deltaPx = e.clientX - dragStartX;
+  const handlePointerUp = () => {
+    if (dragStartX === null) return;
     setDragStartX(null);
-    if (Math.abs(deltaPx) > 15 && filteredProducts.length > 0) {
-      // Snap to nearest hanger index based on current railOffset
-      const total = filteredProducts.length;
-      const rawIdx = (total - 1) / 2 - railOffset / 0.58;
+    if (filteredProducts.length > 0) {
+      const rawIdx = (filteredProducts.length - 1) / 2 - railOffset / 0.58;
       const nearestIdx = Math.round(rawIdx);
       sounds.playHangerSlide();
       selectByIndex(nearestIdx);
@@ -173,22 +177,25 @@ export default function WardrobePage() {
   };
 
   const categories: { id: ProductCategory | "all"; label: string }[] = [
-    { id: "all", label: "Complete Atelier" },
+    { id: "all", label: "All Pieces" },
     { id: "outerwear", label: "Outerwear" },
     { id: "tailoring", label: "Tailoring" },
     { id: "tops", label: "Tops & Knitwear" },
     { id: "trousers", label: "Trousers" },
     { id: "dresses", label: "Evening Couture" },
+    { id: "accessories", label: "Accessories" },
   ];
 
+  const isSelectedWishlisted = selectedProduct ? isInWishlist(selectedProduct.id) : false;
+
   return (
-    <div className="h-screen w-screen bg-[#070709] text-[#f5f4f0] flex flex-col overflow-hidden select-none relative">
+    <div className="h-screen w-screen bg-[#F8F6F1] text-[#25241F] flex flex-col overflow-hidden select-none relative">
       <Navbar />
       <CartDrawer />
 
       {/* Main 3D Interactive Wardrobe Stage */}
       <main
-        className="relative flex-1 w-full h-full overflow-hidden pt-16 sm:pt-20 touch-pan-y cursor-grab active:cursor-grabbing"
+        className="relative flex-1 w-full h-full overflow-hidden pt-16 sm:pt-20 touch-pan-y cursor-grab active:cursor-grabbing bright-showroom"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onPointerDown={handlePointerDown}
@@ -196,8 +203,8 @@ export default function WardrobePage() {
         onPointerUp={handlePointerUp}
         onWheel={handleWheel}
       >
-        {/* Background ambient lighting glows */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-[#c5a880]/5 rounded-full blur-[140px] pointer-events-none" />
+        {/* Subtle Warm Studio Daylight Diffusion */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[780px] h-[420px] bg-white/70 rounded-full blur-[120px] pointer-events-none" />
 
         {/* 3D Scene Viewport */}
         <div className="w-full h-full">
@@ -207,7 +214,6 @@ export default function WardrobePage() {
             onSelectProduct={(p) => {
               const idx = filteredProducts.findIndex((item) => item.id === p.id);
               if (selectedProduct?.id === p.id) {
-                // Clicking an already focused garment opens full 360° 3D inspection
                 setInspectingProduct(p);
                 sounds.playGarmentInspect();
               } else if (idx !== -1) {
@@ -227,20 +233,20 @@ export default function WardrobePage() {
         </div>
 
         {/* --- Top Controls Dock --- */}
-        <div className="absolute top-20 sm:top-24 left-0 right-0 z-20 pointer-events-none">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="absolute top-20 sm:top-22 left-0 right-0 z-20 pointer-events-none">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col lg:flex-row items-center justify-between gap-2.5">
             {/* Mode Switcher Pill & Camera Framing Controls */}
-            <div className="pointer-events-auto flex items-center gap-2">
-              <div className="flex items-center p-1 rounded-full bg-[#121216]/80 backdrop-blur-md border border-white/10 shadow-xl">
+            <div className="pointer-events-auto flex flex-wrap items-center gap-2">
+              <div className="flex items-center p-1 rounded-full bg-white/92 backdrop-blur-md border border-[#E5E0D7] shadow-xs">
                 <button
                   onClick={() => {
                     setMode("rail");
                     sounds.playClick();
                   }}
-                  className={`px-4 py-1.5 rounded-full text-xs font-medium tracking-wider transition-all flex items-center gap-1.5 ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
                     mode === "rail"
-                      ? "bg-[#c5a880] text-[#0b0b0c] font-semibold shadow-md"
-                      : "text-[#9ca3af] hover:text-white"
+                      ? "bg-[#25241F] text-white font-semibold shadow-xs"
+                      : "text-[#77736C] hover:text-[#25241F]"
                   }`}
                 >
                   <Sliders size={13} />
@@ -252,10 +258,10 @@ export default function WardrobePage() {
                     setMode("boutique");
                     sounds.playClick();
                   }}
-                  className={`px-4 py-1.5 rounded-full text-xs font-medium tracking-wider transition-all flex items-center gap-1.5 ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium tracking-wider transition-all flex items-center gap-1.5 cursor-pointer ${
                     mode === "boutique"
-                      ? "bg-[#c5a880] text-[#0b0b0c] font-semibold shadow-md"
-                      : "text-[#9ca3af] hover:text-white"
+                      ? "bg-[#25241F] text-white font-semibold shadow-xs"
+                      : "text-[#77736C] hover:text-[#25241F]"
                   }`}
                 >
                   <Layers size={13} />
@@ -263,14 +269,32 @@ export default function WardrobePage() {
                 </button>
               </div>
 
+              {/* Collection Selector */}
+              <select
+                value={selectedCollection}
+                onChange={(e) => {
+                  setSelectedCollection(e.target.value);
+                  sounds.playClick();
+                }}
+                aria-label="Filter by collection"
+                className="px-3.5 py-1.5 rounded-full bg-white/92 backdrop-blur-md border border-[#E5E0D7] text-xs font-medium text-[#25241F] shadow-xs focus:outline-none focus:border-[#B49A75] cursor-pointer"
+              >
+                <option value="all">All Collections</option>
+                {collectionList.map((col) => (
+                  <option key={col.id} value={col.id}>
+                    {col.name}
+                  </option>
+                ))}
+              </select>
+
               {/* Camera Zoom & Auto-Fit Reset Controls */}
-              <div className="flex items-center p-1 rounded-full bg-[#121216]/80 backdrop-blur-md border border-white/10 shadow-xl">
+              <div className="flex items-center p-1 rounded-full bg-white/92 backdrop-blur-md border border-[#E5E0D7] shadow-xs">
                 <button
                   onClick={() => {
                     setZoomOffset((z) => Math.max(-1.0, +(z - 0.35).toFixed(2)));
                     sounds.playClick();
                   }}
-                  className="p-1.5 rounded-full text-[#9ca3af] hover:text-white hover:bg-white/10 transition-colors"
+                  className="p-1.5 rounded-full text-[#77736C] hover:text-[#25241F] hover:bg-[#F0EDE6] transition-colors cursor-pointer"
                   title="Zoom In"
                   aria-label="Zoom In"
                 >
@@ -281,7 +305,7 @@ export default function WardrobePage() {
                     setZoomOffset((z) => Math.min(1.6, +(z + 0.35).toFixed(2)));
                     sounds.playClick();
                   }}
-                  className="p-1.5 rounded-full text-[#9ca3af] hover:text-white hover:bg-white/10 transition-colors"
+                  className="p-1.5 rounded-full text-[#77736C] hover:text-[#25241F] hover:bg-[#F0EDE6] transition-colors cursor-pointer"
                   title="Zoom Out"
                   aria-label="Zoom Out"
                 >
@@ -297,7 +321,7 @@ export default function WardrobePage() {
                     }
                     sounds.playClick();
                   }}
-                  className="px-2.5 py-1 rounded-full text-[11px] font-medium text-[#c5a880] hover:bg-[#c5a880]/15 transition-colors flex items-center gap-1"
+                  className="px-2.5 py-1 rounded-full text-[11px] font-medium text-[#8C7352] hover:bg-[#F0EDE6] transition-colors flex items-center gap-1 cursor-pointer"
                   title="Reset Camera Framing"
                 >
                   <RotateCcw size={12} />
@@ -307,7 +331,7 @@ export default function WardrobePage() {
             </div>
 
             {/* Category Filter Pills */}
-            <div className="pointer-events-auto hidden md:flex items-center gap-1 p-1 rounded-full bg-[#121216]/60 backdrop-blur-md border border-white/10">
+            <div className="pointer-events-auto hidden md:flex items-center gap-1 p-1 rounded-full bg-white/92 backdrop-blur-md border border-[#E5E0D7] shadow-xs overflow-x-auto max-w-full">
               {categories.map((cat) => (
                 <button
                   key={cat.id}
@@ -315,10 +339,10 @@ export default function WardrobePage() {
                     setSelectedCategory(cat.id);
                     sounds.playClick();
                   }}
-                  className={`px-3 py-1 rounded-full text-[11px] font-medium transition-colors ${
+                  className={`px-3 py-1 rounded-full text-[11px] font-medium transition-colors whitespace-nowrap cursor-pointer ${
                     selectedCategory === cat.id
-                      ? "bg-white/10 text-[#c5a880] border border-[#c5a880]/30"
-                      : "text-[#9ca3af] hover:text-white"
+                      ? "bg-[#F0EDE6] text-[#25241F] border border-[#B49A75] font-semibold"
+                      : "text-[#77736C] hover:text-[#25241F]"
                   }`}
                 >
                   {cat.label}
@@ -334,10 +358,10 @@ export default function WardrobePage() {
             <button
               onClick={handlePrev}
               disabled={currentIndex <= 0}
-              className={`pointer-events-auto w-11 h-11 rounded-full bg-[#121216]/80 backdrop-blur-md border border-white/10 flex items-center justify-center text-white transition-all ${
+              className={`pointer-events-auto w-11 h-11 rounded-full bg-white/92 backdrop-blur-md border border-[#E5E0D7] flex items-center justify-center text-[#25241F] transition-all cursor-pointer ${
                 currentIndex <= 0
-                  ? "opacity-30 cursor-not-allowed"
-                  : "hover:bg-[#c5a880] hover:text-[#0b0b0c] hover:scale-105 shadow-xl"
+                  ? "opacity-35 cursor-not-allowed"
+                  : "hover:bg-[#25241F] hover:text-white hover:border-[#25241F] shadow-md"
               }`}
               aria-label="Previous garment"
             >
@@ -347,10 +371,10 @@ export default function WardrobePage() {
             <button
               onClick={handleNext}
               disabled={currentIndex >= filteredProducts.length - 1}
-              className={`pointer-events-auto w-11 h-11 rounded-full bg-[#121216]/80 backdrop-blur-md border border-white/10 flex items-center justify-center text-white transition-all ${
+              className={`pointer-events-auto w-11 h-11 rounded-full bg-white/92 backdrop-blur-md border border-[#E5E0D7] flex items-center justify-center text-[#25241F] transition-all cursor-pointer ${
                 currentIndex >= filteredProducts.length - 1
-                  ? "opacity-30 cursor-not-allowed"
-                  : "hover:bg-[#c5a880] hover:text-[#0b0b0c] hover:scale-105 shadow-xl"
+                  ? "opacity-35 cursor-not-allowed"
+                  : "hover:bg-[#25241F] hover:text-white hover:border-[#25241F] shadow-md"
               }`}
               aria-label="Next garment"
             >
@@ -359,15 +383,15 @@ export default function WardrobePage() {
           </div>
         )}
 
-        {/* --- Bottom Spotlight Product HUD Bar --- */}
+        {/* --- Bottom Spotlight Product HUD Bar (Minimal & Non-Overlapping) --- */}
         {selectedProduct && (
-          <div className="absolute bottom-6 left-0 right-0 z-20 pointer-events-none">
+          <div className="absolute bottom-5 left-0 right-0 z-20 pointer-events-none">
             <div className="max-w-4xl mx-auto px-4 pointer-events-auto">
-              <div className="p-4 sm:p-5 rounded-2xl bg-[#101014]/90 backdrop-blur-xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="p-3.5 sm:p-4 rounded-2xl bg-white/95 backdrop-blur-xl border border-[#E5E0D7] shadow-[0_14px_38px_-10px_rgba(37,36,31,0.1)] flex flex-col sm:flex-row items-center justify-between gap-4">
                 {/* Product Title & Fabric Info */}
-                <div className="flex items-center gap-4 text-left w-full sm:w-auto">
+                <div className="flex items-center gap-3.5 text-left w-full sm:w-auto">
                   <div
-                    className="w-12 h-14 rounded-lg overflow-hidden bg-[#1a1a20] shrink-0 border border-white/10 hidden sm:block relative"
+                    className="w-12 h-14 rounded-lg overflow-hidden bg-[#F0EDE6] shrink-0 border border-[#E5E0D7] hidden sm:block relative"
                     style={{
                       width: "48px",
                       height: "56px",
@@ -377,7 +401,6 @@ export default function WardrobePage() {
                       maxHeight: "56px",
                     }}
                   >
-                    {/* Thumbnail preview */}
                     <img
                       src={selectedProduct.images.hero}
                       alt={selectedProduct.name}
@@ -388,34 +411,44 @@ export default function WardrobePage() {
 
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px] uppercase tracking-[0.25em] text-[#c5a880] font-mono">
+                      <span className="text-[10px] uppercase tracking-[0.22em] text-[#8C7352] font-mono font-semibold">
                         {selectedProduct.collectionName}
                       </span>
-                      <span className="text-[10px] text-[#6b7280]">•</span>
-                      <span className="text-[10px] text-[#9ca3af] font-mono">
-                        Item {currentIndex + 1} of {filteredProducts.length}
+                      <span className="text-[10px] text-[#E5E0D7]">•</span>
+                      <span className="text-[10px] text-[#77736C] font-mono">
+                        Piece {currentIndex + 1} of {filteredProducts.length}
                       </span>
                     </div>
 
-                    <h3 className="font-serif text-base sm:text-lg text-white font-medium">
-                      {selectedProduct.name}
-                    </h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-serif text-base sm:text-lg text-[#25241F] font-medium">
+                        {selectedProduct.name}
+                      </h3>
+                      <NextLink
+                        href={`/product/${selectedProduct.slug || selectedProduct.id}`}
+                        className="text-[11px] text-[#8C7352] hover:text-[#25241F] inline-flex items-center gap-0.5 font-medium transition-colors"
+                        title="Open Full Product Page"
+                      >
+                        <span className="hidden md:inline">Details</span>
+                        <ArrowUpRight size={12} />
+                      </NextLink>
+                    </div>
 
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-sm font-serif text-[#c5a880] font-bold">
+                      <span className="text-sm font-serif text-[#8C7352] font-bold">
                         {formatPrice(selectedProduct.price)}
                       </span>
-                      <span className="text-[11px] text-[#9ca3af] hidden sm:inline">
-                        — {selectedProduct.fabric.composition.split(",")[0]}
+                      <span className="text-[11px] text-[#77736C] hidden sm:inline">
+                        — {selectedProduct.fabric.name} • {selectedProduct.sizes.length} sizes
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* Color dots & Action Buttons */}
-                <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
+                {/* Color Swatches & Action Buttons */}
+                <div className="flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto justify-end">
                   {/* Color dots switcher */}
-                  <div className="flex items-center gap-1.5 mr-2">
+                  <div className="flex items-center gap-1.5 mr-1">
                     {selectedProduct.colorways.map((col) => {
                       const active =
                         (itemColors[selectedProduct.id]?.id || selectedProduct.colorways[0].id) ===
@@ -424,17 +457,32 @@ export default function WardrobePage() {
                         <button
                           key={col.id}
                           onClick={() => handleColorChange(selectedProduct, col)}
-                          className={`w-5 h-5 rounded-full border transition-all ${
+                          className={`w-5 h-5 rounded-full border transition-all cursor-pointer ${
                             active
-                              ? "border-[#c5a880] scale-110 shadow-sm"
-                              : "border-transparent opacity-60 hover:opacity-100"
+                              ? "border-[#B49A75] ring-2 ring-[#B49A75]/35 scale-110"
+                              : "border-[#E5E0D7] opacity-75 hover:opacity-100"
                           }`}
                           style={{ backgroundColor: col.hex }}
                           title={col.name}
+                          aria-label={`Select color ${col.name}`}
                         />
                       );
                     })}
                   </div>
+
+                  {/* Wishlist Toggle */}
+                  <button
+                    onClick={() => toggleWishlist(selectedProduct.id)}
+                    className={`w-9 h-9 rounded-full border flex items-center justify-center transition-colors cursor-pointer ${
+                      isSelectedWishlisted
+                        ? "bg-[#F0EDE6] border-[#B49A75] text-[#8C7352]"
+                        : "bg-[#F8F6F1] border-[#E5E0D7] text-[#77736C] hover:text-[#25241F]"
+                    }`}
+                    title={isSelectedWishlisted ? "Remove from Wishlist" : "Save to Wishlist"}
+                    aria-label="Toggle Wishlist"
+                  >
+                    <Heart size={14} className={isSelectedWishlisted ? "fill-[#B49A75]" : ""} />
+                  </button>
 
                   {/* 3D Product Inspector Button */}
                   <button
@@ -442,9 +490,9 @@ export default function WardrobePage() {
                       setInspectingProduct(selectedProduct);
                       sounds.playGarmentInspect();
                     }}
-                    className="px-4 py-2 rounded-full bg-white/[0.08] hover:bg-white/[0.15] text-white border border-white/10 text-xs font-medium tracking-wider flex items-center gap-1.5 transition-colors"
+                    className="px-3.5 py-2 rounded-full bg-[#F0EDE6] hover:bg-[#E5E0D7] text-[#25241F] border border-[#E5E0D7] text-xs font-medium tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer"
                   >
-                    <Eye size={13} className="text-[#c5a880]" />
+                    <Eye size={13} className="text-[#8C7352]" />
                     <span>Inspect 3D</span>
                   </button>
 
@@ -452,12 +500,27 @@ export default function WardrobePage() {
                   <button
                     onClick={() => {
                       const col = itemColors[selectedProduct.id] || selectedProduct.colorways[0];
-                      addItem(selectedProduct, col, selectedProduct.sizes[0], 1);
+                      addItem(selectedProduct, col, selectedProduct.sizes[0], 1, false);
+                      setAddedRailConfirm(true);
+                      setTimeout(() => setAddedRailConfirm(false), 1800);
                     }}
-                    className="px-4 py-2 rounded-full bg-[#c5a880] hover:bg-[#e6d5b8] text-[#0b0b0c] text-xs font-semibold tracking-wider flex items-center gap-1.5 transition-colors shadow-md"
+                    className={`px-4 py-2 rounded-full text-xs font-semibold tracking-wider flex items-center gap-1.5 transition-colors shadow-xs cursor-pointer ${
+                      addedRailConfirm
+                        ? "bg-[#607B60] text-white"
+                        : "bg-[#25241F] hover:bg-[#38362F] text-white"
+                    }`}
                   >
-                    <ShoppingBag size={13} />
-                    <span>Acquire</span>
+                    {addedRailConfirm ? (
+                      <>
+                        <Check size={13} />
+                        <span>Added to Bag</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingBag size={13} className="text-[#B49A75]" />
+                        <span>Add to Bag</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
@@ -477,4 +540,3 @@ export default function WardrobePage() {
     </div>
   );
 }
-

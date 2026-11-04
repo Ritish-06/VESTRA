@@ -28,69 +28,69 @@ export default function ClothingRail({
 
   return (
     <group ref={groupRef} position={[0, 0, 0]}>
-      {/* --- High-End Architectural Rail Structure --- */}
-      {/* Main Horizontal Hanging Bar (Brushed Brass) */}
+      {/* --- Bright Luxury Light Oak & Brushed Champagne Rail Structure --- */}
+      {/* Main Horizontal Hanging Bar (Brushed Champagne) */}
       <mesh position={[0, 0.55, 0]} rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.015, 0.015, railLength, 32]} />
         <meshStandardMaterial
-          color="#c5a880"
-          metalness={0.88}
-          roughness={0.25}
+          color="#B49A75"
+          metalness={0.78}
+          roughness={0.26}
         />
       </mesh>
 
       {/* Left End Finial Stopper */}
       <mesh position={[-railLength / 2, 0.55, 0]}>
         <sphereGeometry args={[0.032, 16, 16]} />
-        <meshStandardMaterial color="#c5a880" metalness={0.9} roughness={0.2} />
+        <meshStandardMaterial color="#B49A75" metalness={0.82} roughness={0.22} />
       </mesh>
 
       {/* Right End Finial Stopper */}
       <mesh position={[railLength / 2, 0.55, 0]}>
         <sphereGeometry args={[0.032, 16, 16]} />
-        <meshStandardMaterial color="#c5a880" metalness={0.9} roughness={0.2} />
+        <meshStandardMaterial color="#B49A75" metalness={0.82} roughness={0.22} />
       </mesh>
 
-      {/* Left Vertical Support Pylon */}
+      {/* Left Vertical Support Pylon (Sculpted Light Oak) */}
       <mesh position={[-railLength / 2 + 0.15, -0.38, 0]}>
         <cylinderGeometry args={[0.018, 0.018, 1.88, 20]} />
-        <meshStandardMaterial color="#1a1a1e" metalness={0.6} roughness={0.4} />
+        <meshStandardMaterial color="#C8B294" metalness={0.18} roughness={0.5} />
       </mesh>
 
-      {/* Left Gold Collar Junction */}
+      {/* Left Champagne Collar Junction */}
       <mesh position={[-railLength / 2 + 0.15, 0.55, 0]}>
         <cylinderGeometry args={[0.028, 0.028, 0.055, 20]} />
-        <meshStandardMaterial color="#c5a880" metalness={0.9} roughness={0.2} />
+        <meshStandardMaterial color="#B49A75" metalness={0.82} roughness={0.22} />
       </mesh>
 
-      {/* Left Base Foot (Heavy Matte Charcoal) */}
+      {/* Left Base Foot (Warm Travertine Stone) */}
       <mesh position={[-railLength / 2 + 0.15, -1.32, 0]}>
-        <boxGeometry args={[0.09, 0.04, 0.55]} />
-        <meshStandardMaterial color="#121215" metalness={0.5} roughness={0.5} />
+        <boxGeometry args={[0.1, 0.045, 0.56]} />
+        <meshStandardMaterial color="#E5DFD3" metalness={0.08} roughness={0.55} />
       </mesh>
 
-      {/* Right Vertical Support Pylon */}
+      {/* Right Vertical Support Pylon (Sculpted Light Oak) */}
       <mesh position={[railLength / 2 - 0.15, -0.38, 0]}>
         <cylinderGeometry args={[0.018, 0.018, 1.88, 20]} />
-        <meshStandardMaterial color="#1a1a1e" metalness={0.6} roughness={0.4} />
+        <meshStandardMaterial color="#C8B294" metalness={0.18} roughness={0.5} />
       </mesh>
 
-      {/* Right Gold Collar Junction */}
+      {/* Right Champagne Collar Junction */}
       <mesh position={[railLength / 2 - 0.15, 0.55, 0]}>
         <cylinderGeometry args={[0.028, 0.028, 0.055, 20]} />
-        <meshStandardMaterial color="#c5a880" metalness={0.9} roughness={0.2} />
+        <meshStandardMaterial color="#B49A75" metalness={0.82} roughness={0.22} />
       </mesh>
 
-      {/* Right Base Foot */}
+      {/* Right Base Foot (Warm Travertine Stone) */}
       <mesh position={[railLength / 2 - 0.15, -1.32, 0]}>
-        <boxGeometry args={[0.09, 0.04, 0.55]} />
-        <meshStandardMaterial color="#121215" metalness={0.5} roughness={0.5} />
+        <boxGeometry args={[0.1, 0.045, 0.56]} />
+        <meshStandardMaterial color="#E5DFD3" metalness={0.08} roughness={0.55} />
       </mesh>
 
-      {/* Bottom Stabilizer Crossbar */}
+      {/* Bottom Stabilizer Crossbar (Brushed Champagne) */}
       <mesh position={[0, -1.28, 0]} rotation={[0, 0, Math.PI / 2]}>
         <cylinderGeometry args={[0.011, 0.011, railLength - 0.3, 16]} />
-        <meshStandardMaterial color="#1a1a1e" metalness={0.6} roughness={0.4} />
+        <meshStandardMaterial color="#B49A75" metalness={0.7} roughness={0.32} />
       </mesh>
 
       {/* --- Garments Hanging on the Rail --- */}

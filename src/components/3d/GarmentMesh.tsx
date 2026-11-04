@@ -66,14 +66,20 @@ export default function GarmentMesh({
   wireframe = false,
 }: GarmentMeshProps) {
   const meshGroupRef = useRef<THREE.Group>(null);
-  const color = new THREE.Color(colorway.threeColor || colorway.hex);
+  const color = useMemo(() => {
+    const raw = new THREE.Color(colorway.threeColor || colorway.hex);
+    const hsl = { h: 0, s: 0, l: 0 };
+    raw.getHSL(hsl);
+    const balancedL = THREE.MathUtils.clamp(hsl.l, 0.14, 0.91);
+    return new THREE.Color().setHSL(hsl.h, hsl.s, balancedL);
+  }, [colorway.threeColor, colorway.hex]);
 
   // Subtle fabric breathing movement on hover/focus
   useFrame((state) => {
     if (!meshGroupRef.current) return;
     const t = state.clock.getElapsedTime();
     if (isHovered || isSelected) {
-      meshGroupRef.current.rotation.y = Math.sin(t * 1.4) * 0.045;
+      meshGroupRef.current.rotation.y = Math.sin(t * 1.2) * 0.035;
     } else {
       meshGroupRef.current.rotation.y = THREE.MathUtils.lerp(
         meshGroupRef.current.rotation.y,
@@ -85,29 +91,29 @@ export default function GarmentMesh({
 
   return (
     <group ref={meshGroupRef} scale={1.0}>
-      {/* --- Bespoke Walnut & Brushed Brass Hanger (Hook aligns with rail Y = 0.55) --- */}
+      {/* --- Light Sculpted Oak & Brushed Champagne Hanger (Hook aligns with rail Y = 0.55) --- */}
       <group position={[0, 0.45, 0]}>
-        {/* Brass Hook */}
+        {/* Brushed Champagne Hook */}
         <mesh position={[0, 0.08, 0]}>
           <torusGeometry args={[0.042, 0.005, 12, 32, Math.PI * 1.35]} />
           <meshStandardMaterial
-            color="#c5a880"
-            metalness={0.9}
-            roughness={0.2}
+            color="#B49A75"
+            metalness={0.78}
+            roughness={0.26}
             wireframe={wireframe}
           />
         </mesh>
-        {/* Brass Neck Stem */}
+        {/* Champagne Neck Stem */}
         <mesh position={[0, 0.03, 0]}>
           <cylinderGeometry args={[0.005, 0.005, 0.04, 12]} />
-          <meshStandardMaterial color="#c5a880" metalness={0.9} roughness={0.2} />
+          <meshStandardMaterial color="#B49A75" metalness={0.78} roughness={0.26} />
         </mesh>
-        {/* Sculpted Wooden Hanger Arms */}
+        {/* Sculpted Light Oak Hanger Arms */}
         <mesh position={[0, 0, 0]}>
           <boxGeometry args={[0.4, 0.022, 0.028]} />
           <meshStandardMaterial
-            color="#2d1e15"
-            roughness={0.68}
+            color="#C8AE8C"
+            roughness={0.55}
             metalness={0.05}
             wireframe={wireframe}
           />
@@ -115,7 +121,7 @@ export default function GarmentMesh({
         {/* Hanger Trouser Crossbar */}
         <mesh position={[0, -0.055, 0]} rotation={[0, 0, Math.PI / 2]}>
           <cylinderGeometry args={[0.004, 0.004, 0.35, 12]} />
-          <meshStandardMaterial color="#c5a880" metalness={0.85} roughness={0.25} />
+          <meshStandardMaterial color="#B49A75" metalness={0.75} roughness={0.28} />
         </mesh>
       </group>
 

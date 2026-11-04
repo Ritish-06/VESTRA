@@ -150,15 +150,17 @@ function InspectorScene({
 
   return (
     <>
-      {/* Studio Lighting Setup */}
-      <ambientLight intensity={0.72} />
-      <directionalLight position={[4, 6, 5]} intensity={1.5} color="#ffffff" castShadow />
-      <directionalLight position={[-4, 3, -3]} intensity={0.8} color="#c5a880" />
-      <pointLight position={[0, -1.5, 2.5]} intensity={0.45} color="#dfd2be" />
+      {/* Bright Soft Natural Studio Lighting Setup */}
+      <ambientLight intensity={0.86} color="#FFFDF9" />
+      <hemisphereLight args={["#FFFDF8", "#E6DFD3", 0.65]} />
+      <directionalLight position={[4, 6, 5]} intensity={1.15} color="#FFFBF4" castShadow />
+      <directionalLight position={[-4, 3, 3]} intensity={0.6} color="#F2EAE0" />
+      <directionalLight position={[0, 4, -4]} intensity={0.45} color="#DFD3C0" />
+      <pointLight position={[0, -1.5, 2.5]} intensity={0.35} color="#FFFDF8" />
 
       {/* Centered 3D Garment Model Measured by THREE.Box3 */}
       <group position={[0, 0, 0]} scale={1.0}>
-        <Float speed={1.1} rotationIntensity={0.05} floatIntensity={0.05}>
+        <Float speed={1.0} rotationIntensity={0.04} floatIntensity={0.04}>
           <group ref={modelRef}>
             <group ref={measureGroupRef}>
               <GarmentMesh
@@ -176,14 +178,14 @@ function InspectorScene({
         </Float>
       </group>
 
-      {/* Dynamic Floor Shadow Positioned Directly Below Garment Hem */}
+      {/* Soft Natural Floor Shadow Positioned Directly Below Garment Hem */}
       <ContactShadows
         position={[0, shadowY, 0]}
-        opacity={0.65}
+        opacity={0.26}
         scale={5.5}
-        blur={2.2}
+        blur={2.8}
         far={3.5}
-        color="#050507"
+        color="#8C8273"
       />
 
       {/* Interactive Orbit Camera Controls */}
@@ -208,12 +210,66 @@ function InspectorScene({
 }
 
 export default function ProductInspectorCanvas(props: ProductInspectorCanvasProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(true);
+  const [webglAvailable, setWebglAvailable] = useState(true);
+
+  useEffect(() => {
+    try {
+      const testCanvas = document.createElement("canvas");
+      const gl =
+        testCanvas.getContext("webgl2") ||
+        testCanvas.getContext("webgl") ||
+        testCanvas.getContext("experimental-webgl");
+      if (!gl) setWebglAvailable(false);
+    } catch {
+      setWebglAvailable(false);
+    }
+
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+
+    const handleVisibility = () => {
+      setIsVisible(document.visibilityState === "visible");
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, []);
+
+  if (!webglAvailable) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-[#F8F6F1]">
+        <img
+          src={props.product.images?.hero || props.product.images?.modelFront}
+          alt={props.product.name}
+          className="max-h-[82%] w-auto object-contain rounded-2xl shadow-sm"
+        />
+        <span className="text-[10px] font-mono text-[#77736C] mt-2">
+          Studio Preview • {props.activeColorway.name}
+        </span>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full h-full relative cursor-grab active:cursor-grabbing">
+    <div ref={containerRef} className="w-full h-full relative cursor-grab active:cursor-grabbing">
       <Canvas
+        frameloop={isVisible ? "always" : "never"}
         camera={{ position: [0, -0.05, 2.8], fov: 38, near: 0.05, far: 100 }}
-        dpr={[1, 2]}
-        gl={{ antialias: true, alpha: true }}
+        dpr={[1, 1.75]}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       >
         <Suspense fallback={null}>
           <InspectorScene {...props} />

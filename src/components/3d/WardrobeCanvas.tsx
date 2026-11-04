@@ -134,35 +134,100 @@ export default function WardrobeCanvas({
   zoomOffset = 0,
   resetTrigger = 0,
 }: WardrobeCanvasProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const [selectedObject, setSelectedObject] = useState<THREE.Object3D | null>(null);
+  const [isVisible, setIsVisible] = useState(true);
+  const [webglAvailable, setWebglAvailable] = useState(true);
   const controlsRef = useRef<OrbitControlsImpl | null>(null);
 
   const handleSelectedObjectChange = useCallback((obj: THREE.Object3D | null) => {
     setSelectedObject(obj);
   }, []);
 
+  useEffect(() => {
+    try {
+      const testCanvas = document.createElement("canvas");
+      const gl =
+        testCanvas.getContext("webgl2") ||
+        testCanvas.getContext("webgl") ||
+        testCanvas.getContext("experimental-webgl");
+      if (!gl) setWebglAvailable(false);
+    } catch {
+      setWebglAvailable(false);
+    }
+
+    const el = containerRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.05 }
+    );
+    observer.observe(el);
+
+    const handleVisibility = () => {
+      setIsVisible(document.visibilityState === "visible");
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, []);
+
+  if (!webglAvailable) {
+    const active = selectedProduct || products[0];
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center p-8 text-center bg-[#F8F6F1]">
+        {active && (
+          <img
+            src={active.images?.hero || active.images?.modelFront}
+            alt={active.name}
+            className="max-h-[65%] w-auto object-contain rounded-2xl shadow-md border border-[#E5E0D7]"
+          />
+        )}
+        <p className="font-serif text-base text-[#25241F] mt-4">
+          {active?.name || "VESTRA Showroom"}
+        </p>
+        <p className="text-xs text-[#77736C] mt-1">
+          Interactive 2D Showroom Fallback (WebGL hardware acceleration unavailable)
+        </p>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full h-full relative r3f-container select-none">
+    <div ref={containerRef} className="w-full h-full relative r3f-container select-none">
       <Canvas
+        frameloop={isVisible ? "always" : "never"}
         camera={{ position: [0, -0.12, 3.6], fov: 38, near: 0.05, far: 100 }}
-        dpr={[1, 2]}
-        gl={{ antialias: true, alpha: true }}
+        dpr={[1, 1.75]}
+        gl={{ antialias: true, alpha: true, powerPreference: "high-performance" }}
       >
         <Suspense fallback={null}>
-          {/* Ambient & Studio Lighting */}
-          <ambientLight intensity={0.7} />
+          {/* Bright Soft Natural Studio Lighting */}
+          <ambientLight intensity={0.85} color="#FFFDF9" />
+          <hemisphereLight args={["#FFFDF8", "#E6DFD3", 0.65]} />
           <directionalLight
             position={[5, 8, 5]}
-            intensity={1.45}
-            color="#fff8f0"
+            intensity={1.15}
+            color="#FFFBF4"
             castShadow
           />
           <directionalLight
-            position={[-5, 4, -3]}
-            intensity={0.75}
-            color="#c5a880"
+            position={[-5, 4, 4]}
+            intensity={0.6}
+            color="#F2EAE0"
           />
-          <pointLight position={[0, 2.5, 2.5]} intensity={0.5} color="#ffffff" />
+          <directionalLight
+            position={[0, 4, -5]}
+            intensity={0.45}
+            color="#DFD3C0"
+          />
+          <pointLight position={[0, 2.5, 2.5]} intensity={0.35} color="#FFFFFF" />
 
           {/* Dynamic Bounding-Box Camera Rig */}
           <CameraRig
@@ -187,11 +252,11 @@ export default function WardrobeCanvas({
               />
               <ContactShadows
                 position={[0, -1.32, 0]}
-                opacity={0.7}
+                opacity={0.28}
                 scale={10}
-                blur={2.5}
+                blur={2.8}
                 far={4}
-                color="#040406"
+                color="#8C8273"
               />
             </group>
           ) : (
@@ -204,11 +269,11 @@ export default function WardrobeCanvas({
               />
               <ContactShadows
                 position={[0, -1.89, 0]}
-                opacity={0.8}
+                opacity={0.32}
                 scale={12}
-                blur={2}
+                blur={2.6}
                 far={5}
-                color="#000000"
+                color="#8C8273"
               />
             </group>
           )}

@@ -35,7 +35,7 @@ export default async function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col bg-[#FAF8F5] text-[#1C1917] font-sans overflow-x-hidden">
+      <body className="min-h-full flex flex-col bg-[#F8F6F1] text-[#25241F] font-sans overflow-x-hidden">
         <CatalogProvider products={products} collections={collections}>
           {children}
         </CatalogProvider>

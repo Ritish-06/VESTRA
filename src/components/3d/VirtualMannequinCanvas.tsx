@@ -34,22 +34,22 @@ function MannequinScene({
   const goalTarget = useRef(new THREE.Vector3(0, 0.05, 0));
   const isTransitioning = useRef(true);
 
-  let mannequinColor = "#1a1a1f";
-  let mannequinRoughness = 0.35;
-  let mannequinMetalness = 0.2;
+  let mannequinColor = "#DFD9CE";
+  let mannequinRoughness = 0.42;
+  let mannequinMetalness = 0.08;
 
   if (avatarType === "editorial_slate") {
-    mannequinColor = "#4a4c54";
-    mannequinRoughness = 0.5;
-    mannequinMetalness = 0.1;
+    mannequinColor = "#8C867B";
+    mannequinRoughness = 0.48;
+    mannequinMetalness = 0.08;
   } else if (avatarType === "minimalist_marble") {
-    mannequinColor = "#e6e2da";
-    mannequinRoughness = 0.25;
-    mannequinMetalness = 0.05;
+    mannequinColor = "#EFECE6";
+    mannequinRoughness = 0.3;
+    mannequinMetalness = 0.04;
   } else if (avatarType === "haute_obsidian") {
-    mannequinColor = "#0e0e11";
-    mannequinRoughness = 0.2;
-    mannequinMetalness = 0.4;
+    mannequinColor = "#38362F";
+    mannequinRoughness = 0.32;
+    mannequinMetalness = 0.2;
   }
 
   // Fit entire mannequin from head to pedestal using THREE.Box3
@@ -168,18 +168,18 @@ function MannequinScene({
           </group>
         )}
 
-        {/* Pedestal Stand and Brass Rod */}
+        {/* Pedestal Stand and Brushed Champagne Rod */}
         <mesh position={[0, -0.62, 0]}>
           <cylinderGeometry args={[0.015, 0.015, 1.35, 16]} />
-          <meshStandardMaterial color="#c5a880" metalness={0.9} roughness={0.2} />
+          <meshStandardMaterial color="#B49A75" metalness={0.78} roughness={0.25} />
         </mesh>
         <mesh position={[0, -1.3, 0]}>
-          <cylinderGeometry args={[0.4, 0.43, 0.04, 32]} />
-          <meshStandardMaterial color="#141418" roughness={0.4} metalness={0.3} />
+          <cylinderGeometry args={[0.4, 0.43, 0.045, 32]} />
+          <meshStandardMaterial color="#E5DFD3" roughness={0.48} metalness={0.08} />
         </mesh>
-        <mesh position={[0, -1.28, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <mesh position={[0, -1.275, 0]} rotation={[Math.PI / 2, 0, 0]}>
           <torusGeometry args={[0.4, 0.01, 12, 32]} />
-          <meshStandardMaterial color="#c5a880" metalness={0.9} roughness={0.2} />
+          <meshStandardMaterial color="#B49A75" metalness={0.78} roughness={0.25} />
         </mesh>
 
         {/* --- Modular Clothing Layering --- */}
@@ -222,11 +222,11 @@ function MannequinScene({
 
       <ContactShadows
         position={[0, -1.4, 0]}
-        opacity={0.7}
+        opacity={0.28}
         scale={5}
-        blur={2}
+        blur={2.6}
         far={3}
-        color="#050507"
+        color="#8C8273"
       />
 
       <OrbitControls
@@ -256,10 +256,12 @@ export default function VirtualMannequinCanvas(props: VirtualMannequinCanvasProp
         gl={{ antialias: true, alpha: true }}
       >
         <Suspense fallback={null}>
-          <ambientLight intensity={0.68} />
-          <directionalLight position={[4, 6, 4]} intensity={1.5} color="#fff8f0" />
-          <directionalLight position={[-4, 3, -3]} intensity={0.7} color="#c5a880" />
-          <pointLight position={[0, 1.5, 2]} intensity={0.4} color="#ffffff" />
+          <ambientLight intensity={0.85} color="#FFFDF9" />
+          <hemisphereLight args={["#FFFDF8", "#E6DFD3", 0.65]} />
+          <directionalLight position={[4, 6, 4]} intensity={1.15} color="#FFFBF4" />
+          <directionalLight position={[-4, 3, 3]} intensity={0.6} color="#F2EAE0" />
+          <directionalLight position={[0, 4, -4]} intensity={0.45} color="#DFD3C0" />
+          <pointLight position={[0, 1.5, 2]} intensity={0.35} color="#FFFFFF" />
 
           <MannequinScene {...props} />
         </Suspense>

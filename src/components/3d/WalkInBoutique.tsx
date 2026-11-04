@@ -21,80 +21,75 @@ export default function WalkInBoutique({
 }: WalkInBoutiqueProps) {
   const roomGroupRef = useRef<THREE.Group>(null);
 
-  // Divide products into center pedestal, left gallery, and right gallery
   const centerItem = selectedProduct || products[0];
   const leftGalleryItems = products.slice(1, 4);
   const rightGalleryItems = products.slice(4, 7);
 
   return (
     <group ref={roomGroupRef} position={[0, -0.2, 0]}>
-      {/* --- Architectural Room Shell --- */}
-      {/* Luxury Dark Marble Floor */}
+      {/* --- Bright Luxury Architectural Salon Shell --- */}
+      {/* Warm Honed Travertine Limestone Floor */}
       <mesh position={[0, -1.9, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[16, 16]} />
+        <planeGeometry args={[18, 18]} />
         <meshStandardMaterial
-          color="#0c0d10"
-          roughness={0.12}
-          metalness={0.35}
+          color="#EAE5DC"
+          roughness={0.38}
+          metalness={0.06}
         />
       </mesh>
 
-      {/* Back Wall with Architectural Slat Design */}
+      {/* Back Architectural Plaster Wall */}
       <mesh position={[0, 1.5, -4]}>
-        <planeGeometry args={[16, 8]} />
-        <meshStandardMaterial color="#141519" roughness={0.8} metalness={0.1} />
+        <planeGeometry args={[18, 8]} />
+        <meshStandardMaterial color="#F3EFE7" roughness={0.85} metalness={0.02} />
       </mesh>
 
-      {/* Back Lit Onyx Panel */}
-      <mesh position={[0, 1.2, -3.95]}>
-        <planeGeometry args={[6, 4.5]} />
+      {/* Warm Back-Lit Alabaster Feature Panel */}
+      <mesh position={[0, 1.1, -3.94]}>
+        <planeGeometry args={[6.2, 4.4]} />
         <meshStandardMaterial
-          color="#1e1c18"
-          emissive="#c5a880"
-          emissiveIntensity={0.15}
-          roughness={0.4}
+          color="#FAF7F1"
+          emissive="#F4EBDD"
+          emissiveIntensity={0.22}
+          roughness={0.45}
         />
       </mesh>
 
-      {/* Ceiling with Recessed Light Tracks */}
+      {/* Champagne Architectural Frame around Feature Panel */}
+      <mesh position={[0, 1.1, -3.96]}>
+        <planeGeometry args={[6.32, 4.52]} />
+        <meshStandardMaterial color="#B49A75" metalness={0.65} roughness={0.35} />
+      </mesh>
+
+      {/* Ceiling with Warm Gallery Light Tracks */}
       <mesh position={[0, 4.2, 0]} rotation={[Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[16, 16]} />
-        <meshStandardMaterial color="#0e0e11" roughness={0.9} />
+        <planeGeometry args={[18, 18]} />
+        <meshStandardMaterial color="#F8F6F1" roughness={0.9} />
       </mesh>
 
-      {/* Ceiling Recessed Light Strips (Emissive) */}
-      <mesh position={[-2.5, 4.18, 0]}>
-        <boxGeometry args={[0.08, 0.02, 10]} />
-        <meshStandardMaterial emissive="#f5f4f0" emissiveIntensity={1.2} />
-      </mesh>
-      <mesh position={[2.5, 4.18, 0]}>
-        <boxGeometry args={[0.08, 0.02, 10]} />
-        <meshStandardMaterial emissive="#f5f4f0" emissiveIntensity={1.2} />
-      </mesh>
-
-      {/* --- Center Showcase Pedestal --- */}
+      {/* --- Center Travertine & Brushed Champagne Pedestal --- */}
       <group position={[0, -1.8, 0]}>
-        {/* Tier 1 Circular Marble Base */}
-        <mesh position={[0, 0.05, 0]}>
-          <cylinderGeometry args={[1.3, 1.4, 0.1, 36]} />
-          <meshStandardMaterial color="#18181c" roughness={0.2} metalness={0.4} />
+        {/* Tier 1 Circular Travertine Base */}
+        <mesh position={[0, 0.06, 0]}>
+          <cylinderGeometry args={[1.28, 1.38, 0.12, 40]} />
+          <meshStandardMaterial color="#E5DFD3" roughness={0.45} metalness={0.08} />
         </mesh>
-        {/* Brass Accent Ring */}
-        <mesh position={[0, 0.11, 0]}>
-          <cylinderGeometry args={[1.15, 1.15, 0.02, 36]} />
-          <meshStandardMaterial color="#c5a880" metalness={0.9} roughness={0.2} />
+        {/* Brushed Champagne Accent Ring */}
+        <mesh position={[0, 0.125, 0]}>
+          <cylinderGeometry args={[1.14, 1.14, 0.02, 40]} />
+          <meshStandardMaterial color="#B49A75" metalness={0.78} roughness={0.25} />
         </mesh>
-        {/* Illuminated Edge Ring */}
-        <mesh position={[0, 0.01, 0]} rotation={[Math.PI / 2, 0, 0]}>
-          <torusGeometry args={[1.35, 0.02, 12, 48]} />
-          <meshStandardMaterial emissive="#c5a880" emissiveIntensity={0.8} />
+        {/* Outer Champagne Trim Ring */}
+        <mesh position={[0, 0.015, 0]} rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[1.36, 0.015, 12, 48]} />
+          <meshStandardMaterial color="#B49A75" metalness={0.75} roughness={0.28} />
         </mesh>
       </group>
 
       {/* Centerpiece Garment on Floating Pedestal Display */}
       {centerItem && (
-        <group position={[0, 0.25, 0]}>
-          <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.15}>
+        <group position={[0, 0.12, 0]}>
+          <Float speed={1.1} rotationIntensity={0.08} floatIntensity={0.06}>
             <group
               onClick={(e) => {
                 e.stopPropagation();
@@ -110,6 +105,7 @@ export default function WalkInBoutique({
               <GarmentMesh
                 geometryType={centerItem.geometryType}
                 colorway={itemColors[centerItem.id] || centerItem.colorways[0]}
+                modelUrl={centerItem.modelUrl}
                 roughness={centerItem.fabric.roughness}
                 metalness={centerItem.fabric.metalness}
                 sheen={centerItem.fabric.sheen}
@@ -118,30 +114,27 @@ export default function WalkInBoutique({
             </group>
           </Float>
 
-          {/* Central Spotlight directly on the centerpiece */}
+          {/* Soft Natural Gallery Spotlight on Centerpiece */}
           <spotLight
-            position={[0, 3.8, 1.2]}
-            target-position={[0, 0, 0]}
-            intensity={2.8}
-            angle={0.45}
-            penumbra={0.6}
-            color="#fff8ed"
+            position={[0, 3.8, 1.5]}
+            intensity={1.6}
+            angle={0.5}
+            penumbra={0.7}
+            color="#FFFDF8"
           />
         </group>
       )}
 
       {/* --- Left Wall Gallery Rail --- */}
-      <group position={[-3.2, 0, -1]} rotation={[0, 0.4, 0]}>
-        {/* Horizontal Brass Wall Bar */}
+      <group position={[-3.1, 0, -1]} rotation={[0, 0.38, 0]}>
         <mesh position={[0, 0.5, 0]} rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.015, 0.015, 2.8, 16]} />
-          <meshStandardMaterial color="#c5a880" metalness={0.9} roughness={0.25} />
+          <cylinderGeometry args={[0.015, 0.015, 2.7, 16]} />
+          <meshStandardMaterial color="#B49A75" metalness={0.78} roughness={0.26} />
         </mesh>
-        {/* Left Gallery Items */}
         {leftGalleryItems.map((prod, i) => (
           <group
             key={prod.id}
-            position={[(i - 1) * 0.7, 0, 0]}
+            position={[(i - 1) * 0.72, 0, 0]}
             onClick={(e) => {
               e.stopPropagation();
               onSelectProduct(prod);
@@ -156,6 +149,7 @@ export default function WalkInBoutique({
             <GarmentMesh
               geometryType={prod.geometryType}
               colorway={itemColors[prod.id] || prod.colorways[0]}
+              modelUrl={prod.modelUrl}
               roughness={prod.fabric.roughness}
               metalness={prod.fabric.metalness}
               sheen={prod.fabric.sheen}
@@ -165,17 +159,15 @@ export default function WalkInBoutique({
       </group>
 
       {/* --- Right Wall Gallery Rail --- */}
-      <group position={[3.2, 0, -1]} rotation={[0, -0.4, 0]}>
-        {/* Horizontal Brass Wall Bar */}
+      <group position={[3.1, 0, -1]} rotation={[0, -0.38, 0]}>
         <mesh position={[0, 0.5, 0]} rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.015, 0.015, 2.8, 16]} />
-          <meshStandardMaterial color="#c5a880" metalness={0.9} roughness={0.25} />
+          <cylinderGeometry args={[0.015, 0.015, 2.7, 16]} />
+          <meshStandardMaterial color="#B49A75" metalness={0.78} roughness={0.26} />
         </mesh>
-        {/* Right Gallery Items */}
         {rightGalleryItems.map((prod, i) => (
           <group
             key={prod.id}
-            position={[(i - 1) * 0.7, 0, 0]}
+            position={[(i - 1) * 0.72, 0, 0]}
             onClick={(e) => {
               e.stopPropagation();
               onSelectProduct(prod);
@@ -190,6 +182,7 @@ export default function WalkInBoutique({
             <GarmentMesh
               geometryType={prod.geometryType}
               colorway={itemColors[prod.id] || prod.colorways[0]}
+              modelUrl={prod.modelUrl}
               roughness={prod.fabric.roughness}
               metalness={prod.fabric.metalness}
               sheen={prod.fabric.sheen}

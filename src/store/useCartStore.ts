@@ -4,6 +4,7 @@ import { Product, Colorway } from "@/types/product";
 import { CartItem, PromoCode, Order } from "@/types/cart";
 import { sounds } from "@/utils/soundEffects";
 import { shippingFeeFor } from "@/lib/commerce";
+import { useWardrobeStore } from "@/store/useWardrobeStore";
 
 interface CartState {
   items: CartItem[];
@@ -11,9 +12,16 @@ interface CartState {
   isOpen: boolean;
   promoCode: PromoCode | null;
   orders: Order[];
+  lastAddedAt: number;
   
   // Actions
-  addItem: (product: Product, selectedColor: Colorway, selectedSize: string, quantity?: number) => void;
+  addItem: (
+    product: Product,
+    selectedColor: Colorway,
+    selectedSize: string,
+    quantity?: number,
+    openDrawer?: boolean
+  ) => void;
   removeItem: (itemId: string) => void;
   saveItemForLater: (itemId: string) => void;
   moveToCart: (itemId: string) => void;
@@ -46,17 +54,20 @@ export const useCartStore = create<CartState>()(
       isOpen: false,
       promoCode: null,
       orders: [],
+      lastAddedAt: 0,
 
-      addItem: (product, selectedColor, selectedSize, quantity = 1) => {
+      addItem: (product, selectedColor, selectedSize, quantity = 1, openDrawer = true) => {
         const itemId = `${product.id}-${selectedColor.id}-${selectedSize}`;
         const existingItem = get().items.find((item) => item.id === itemId);
+        const now = Date.now();
 
         if (existingItem) {
           set((state) => ({
             items: state.items.map((item) =>
               item.id === itemId ? { ...item, quantity: item.quantity + quantity } : item
             ),
-            isOpen: true,
+            isOpen: openDrawer ? true : state.isOpen,
+            lastAddedAt: now,
           }));
         } else {
           set((state) => ({
@@ -68,12 +79,20 @@ export const useCartStore = create<CartState>()(
                 selectedColor,
                 selectedSize,
                 quantity,
-                addedAt: Date.now(),
+                addedAt: now,
               },
             ],
-            isOpen: true,
+            isOpen: openDrawer ? true : state.isOpen,
+            lastAddedAt: now,
           }));
         }
+        useWardrobeStore
+          .getState()
+          .showToast(
+            "Added to Shopping Bag",
+            `${product.name} • ${selectedColor.name} (${selectedSize})`,
+            "bag"
+          );
         sounds.playChime();
       },
 

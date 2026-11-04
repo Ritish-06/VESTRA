@@ -11,9 +11,9 @@ const VirtualMannequinCanvas = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-full flex flex-col items-center justify-center text-[#c5a880] gap-3">
-        <div className="w-10 h-10 rounded-full border-2 border-[#c5a880]/30 border-t-[#c5a880] animate-spin" />
-        <span className="text-xs uppercase tracking-[0.25em] font-mono text-[#9ca3af]">
+      <div className="w-full h-full flex flex-col items-center justify-center text-[#8C7352] gap-3">
+        <div className="w-9 h-9 rounded-full border-2 border-[#B49A75]/30 border-t-[#B49A75] animate-spin" />
+        <span className="text-xs uppercase tracking-[0.25em] font-mono text-[#77736C]">
           Sculpting 3D Avatar Rig...
         </span>
       </div>
@@ -23,7 +23,7 @@ const VirtualMannequinCanvas = dynamic(
 import { PRODUCTS } from "@/data/products";
 import { STYLIST_PROMPTS } from "@/data/stylistPresets";
 import { Product } from "@/types/product";
-import { AvatarModelType, OutfitLook } from "@/types/wardrobe";
+import { AvatarModelType } from "@/types/wardrobe";
 import { useWardrobeStore } from "@/store/useWardrobeStore";
 import { useCartStore } from "@/store/useCartStore";
 import { useCatalog } from "@/components/providers/CatalogProvider";
@@ -34,11 +34,9 @@ import {
   ShoppingBag,
   BookmarkCheck,
   RotateCw,
+  RotateCcw,
   Trash2,
   Check,
-  Layers,
-  ArrowRight,
-  UserCheck,
 } from "lucide-react";
 
 export default function StudioPage() {
@@ -59,12 +57,13 @@ export default function StudioPage() {
   const [occasionInput, setOccasionInput] = useState("");
   const [savedSuccess, setSavedSuccess] = useState(false);
   const [autoRotate, setAutoRotate] = useState(false);
+  const [resetTrigger, setResetTrigger] = useState(0);
   const [activeCategoryTab, setActiveCategoryTab] = useState<"outerwear" | "top" | "trousers">("outerwear");
 
   const avatarOptions: { id: AvatarModelType; label: string; desc: string; color: string }[] = [
-    { id: "haute_obsidian", label: "Haute Obsidian", desc: "Mirror Noir Mannequin", color: "#111116" },
-    { id: "editorial_slate", label: "Editorial Slate", desc: "Smoked Matte Titanium", color: "#4a4c54" },
-    { id: "minimalist_marble", label: "Minimalist Marble", desc: "Greek Alabaster Stone", color: "#e6e2da" },
+    { id: "minimalist_marble", label: "Minimalist Marble", desc: "Greek Alabaster Stone", color: "#EFECE6" },
+    { id: "editorial_slate", label: "Warm Travertine", desc: "Honed Limestone", color: "#8C867B" },
+    { id: "haute_obsidian", label: "Sculpted Bronze", desc: "Deep Charcoal Patina", color: "#38362F" },
   ];
 
   const sourceProducts = products.length ? products : PRODUCTS;
@@ -105,38 +104,50 @@ export default function StudioPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#070709] text-[#f5f4f0] flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-[#F8F6F1] text-[#25241F] flex flex-col relative overflow-hidden">
       <Navbar />
       <CartDrawer />
 
       {/* Main Studio Area */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16 flex flex-col lg:flex-row gap-8 items-stretch">
-        {/* Left Side: 3D Virtual Try-On Mannequin Canvas */}
-        <div className="w-full lg:w-7/12 h-[540px] sm:h-[620px] lg:h-auto rounded-3xl bg-gradient-to-b from-[#111115] to-[#09090c] border border-white/[0.08] relative overflow-hidden flex flex-col shadow-2xl">
+        {/* Left Side: Bright 3D Virtual Try-On Mannequin Canvas */}
+        <div className="w-full lg:w-7/12 h-[540px] sm:h-[620px] lg:h-auto rounded-3xl bright-showroom border border-[#E5E0D7] relative overflow-hidden flex flex-col shadow-sm">
           {/* Header Overlay */}
           <div className="absolute top-5 left-5 right-5 z-10 flex items-center justify-between pointer-events-none">
             <div className="pointer-events-auto flex items-center gap-2">
-              <span className="text-[10px] uppercase tracking-[0.25em] text-[#c5a880] px-3 py-1 rounded-full bg-black/40 border border-[#c5a880]/30 backdrop-blur-md font-mono flex items-center gap-1.5">
-                <Sparkles size={12} className="text-[#c5a880]" />
+              <span className="text-[10px] uppercase tracking-[0.22em] text-[#8C7352] px-3 py-1 rounded-full bg-white/90 border border-[#E5E0D7] backdrop-blur-xs font-mono font-semibold flex items-center gap-1.5">
+                <Sparkles size={12} className="text-[#B49A75]" />
                 Virtual Fitting Room
               </span>
             </div>
 
-            {/* Turntable Auto-Rotate */}
+            {/* Turntable Auto-Rotate & Reset View */}
             <div className="pointer-events-auto flex items-center gap-2">
               <button
                 onClick={() => {
                   setAutoRotate(!autoRotate);
                   sounds.playClick();
                 }}
-                className={`text-xs px-3 py-1 rounded-full border backdrop-blur-md flex items-center gap-1.5 transition-colors ${
+                className={`text-xs px-3 py-1 rounded-full border backdrop-blur-xs flex items-center gap-1.5 transition-colors cursor-pointer ${
                   autoRotate
-                    ? "bg-[#c5a880]/20 border-[#c5a880] text-[#c5a880]"
-                    : "bg-black/30 border-white/10 text-[#9ca3af] hover:text-white"
+                    ? "bg-[#25241F] border-[#25241F] text-white"
+                    : "bg-white/90 border-[#E5E0D7] text-[#77736C] hover:text-[#25241F]"
                 }`}
               >
                 <RotateCw size={12} className={autoRotate ? "animate-spin" : ""} />
-                <span className="text-[11px]">360° Turntable</span>
+                <span className="text-[11px]">360° Turn</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setResetTrigger((prev) => prev + 1);
+                  sounds.playClick();
+                }}
+                className="text-xs px-2.5 py-1 rounded-full border bg-white/90 border-[#E5E0D7] text-[#77736C] hover:text-[#25241F] hover:border-[#B49A75] backdrop-blur-xs flex items-center gap-1 transition-colors cursor-pointer"
+                title="Reset Camera View"
+              >
+                <RotateCcw size={12} />
+                <span className="text-[11px]">Reset</span>
               </button>
             </div>
           </div>
@@ -149,27 +160,28 @@ export default function StudioPage() {
               outerwear={activeLook.outerwear}
               trousers={activeLook.trousers}
               autoRotate={autoRotate}
+              resetTrigger={resetTrigger}
             />
           </div>
 
           {/* Bottom Avatar Switcher Dock */}
-          <div className="p-4 bg-[#0a0a0d]/90 backdrop-blur-md border-t border-white/[0.06] flex items-center justify-between gap-2 z-10">
-            <span className="text-[10px] uppercase tracking-[0.2em] text-[#9ca3af] font-mono hidden sm:inline">
-              Avatar Silhouette:
+          <div className="p-4 bg-white/90 backdrop-blur-md border-t border-[#E5E0D7] flex flex-wrap items-center justify-between gap-2 z-10">
+            <span className="text-[10px] uppercase tracking-[0.2em] text-[#77736C] font-mono hidden sm:inline">
+              Mannequin Finish:
             </span>
             <div className="flex items-center gap-2">
               {avatarOptions.map((av) => (
                 <button
                   key={av.id}
                   onClick={() => setSelectedAvatar(av.id)}
-                  className={`px-3 py-1 rounded-full text-xs flex items-center gap-2 border transition-all ${
+                  className={`px-3 py-1 rounded-full text-xs flex items-center gap-2 border transition-all cursor-pointer ${
                     selectedAvatar === av.id
-                      ? "bg-white/10 text-white border-[#c5a880] shadow-sm"
-                      : "text-[#9ca3af] border-white/5 hover:border-white/20"
+                      ? "bg-[#F0EDE6] text-[#25241F] border-[#B49A75] font-semibold shadow-2xs"
+                      : "bg-white text-[#77736C] border-[#E5E0D7] hover:border-[#B49A75]/60 hover:text-[#25241F]"
                   }`}
                 >
                   <span
-                    className="w-2.5 h-2.5 rounded-full border border-white/30"
+                    className="w-2.5 h-2.5 rounded-full border border-[#25241F]/20"
                     style={{ backgroundColor: av.color }}
                   />
                   <span>{av.label}</span>
@@ -179,11 +191,11 @@ export default function StudioPage() {
 
             <button
               onClick={() => clearLook()}
-              className="text-xs text-[#9ca3af] hover:text-red-400 p-1 transition-colors flex items-center gap-1"
+              className="text-xs text-[#77736C] hover:text-[#B45C52] p-1 transition-colors flex items-center gap-1 cursor-pointer"
               title="Reset All Layers"
             >
               <Trash2 size={13} />
-              <span className="hidden sm:inline">Strip Layers</span>
+              <span className="hidden sm:inline">Clear Layers</span>
             </button>
           </div>
         </div>
@@ -191,27 +203,27 @@ export default function StudioPage() {
         {/* Right Side: Outfit Mix-and-Match Controller & Curator */}
         <div className="w-full lg:w-5/12 flex flex-col justify-between space-y-6">
           {/* Layer Selector Tabs */}
-          <div className="p-6 rounded-3xl bg-[#0e0e12] border border-white/[0.08] shadow-xl space-y-5">
+          <div className="p-6 rounded-3xl bg-white border border-[#E5E0D7] shadow-xs space-y-5">
             <div>
-              <span className="text-[10px] uppercase tracking-[0.3em] text-[#c5a880] font-mono">
+              <span className="text-[10px] uppercase tracking-[0.28em] text-[#8C7352] font-mono font-semibold">
                 Layering Matrix
               </span>
-              <h2 className="font-serif text-2xl text-white font-medium mt-1">
+              <h2 className="font-serif text-2xl text-[#25241F] font-medium mt-1">
                 Curate Your Silhouette
               </h2>
             </div>
 
             {/* Category Sub-tabs */}
-            <div className="flex gap-2 border-b border-white/[0.06] pb-3">
+            <div className="flex gap-2 border-b border-[#E5E0D7] pb-3">
               <button
                 onClick={() => {
                   setActiveCategoryTab("outerwear");
                   sounds.playClick();
                 }}
-                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${
+                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
                   activeCategoryTab === "outerwear"
-                    ? "bg-[#c5a880] text-[#0b0b0c] font-bold"
-                    : "text-[#9ca3af] hover:text-white bg-white/[0.03]"
+                    ? "bg-[#25241F] text-white font-semibold"
+                    : "text-[#77736C] hover:text-[#25241F] bg-[#F8F6F1] border border-[#E5E0D7]"
                 }`}
               >
                 Outerwear ({outerwearProducts.length})
@@ -221,10 +233,10 @@ export default function StudioPage() {
                   setActiveCategoryTab("top");
                   sounds.playClick();
                 }}
-                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${
+                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
                   activeCategoryTab === "top"
-                    ? "bg-[#c5a880] text-[#0b0b0c] font-bold"
-                    : "text-[#9ca3af] hover:text-white bg-white/[0.03]"
+                    ? "bg-[#25241F] text-white font-semibold"
+                    : "text-[#77736C] hover:text-[#25241F] bg-[#F8F6F1] border border-[#E5E0D7]"
                 }`}
               >
                 Tops & Silks ({topProducts.length})
@@ -234,10 +246,10 @@ export default function StudioPage() {
                   setActiveCategoryTab("trousers");
                   sounds.playClick();
                 }}
-                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors ${
+                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
                   activeCategoryTab === "trousers"
-                    ? "bg-[#c5a880] text-[#0b0b0c] font-bold"
-                    : "text-[#9ca3af] hover:text-white bg-white/[0.03]"
+                    ? "bg-[#25241F] text-white font-semibold"
+                    : "text-[#77736C] hover:text-[#25241F] bg-[#F8F6F1] border border-[#E5E0D7]"
                 }`}
               >
                 Trousers ({trouserProducts.length})
@@ -264,13 +276,13 @@ export default function StudioPage() {
                         setLookPiece(activeCategoryTab, p);
                       }
                     }}
-                    className={`p-2.5 rounded-xl border text-left flex gap-3 transition-all ${
+                    className={`p-2.5 rounded-xl border text-left flex gap-3 transition-all cursor-pointer ${
                       isSelected
-                        ? "bg-[#c5a880]/15 border-[#c5a880] shadow-[0_0_15px_rgba(197,168,128,0.2)]"
-                        : "bg-white/[0.02] border-white/5 hover:border-white/15 hover:bg-white/[0.04]"
+                        ? "bg-[#F0EDE6] border-[#B49A75] shadow-xs"
+                        : "bg-[#F8F6F1] border-[#E5E0D7] hover:border-[#B49A75]/60"
                     }`}
                   >
-                    <div className="w-12 h-14 rounded-lg bg-[#18181e] overflow-hidden flex-shrink-0 relative">
+                    <div className="w-12 h-14 rounded-lg bg-[#F0EDE6] overflow-hidden shrink-0 relative border border-[#E5E0D7]">
                       <img
                         src={p.images.hero}
                         alt={p.name}
@@ -279,15 +291,15 @@ export default function StudioPage() {
                     </div>
                     <div className="flex-1 min-w-0 flex flex-col justify-between">
                       <div>
-                        <h4 className="font-serif text-xs text-white truncate">
+                        <h4 className="font-serif text-xs text-[#25241F] font-medium truncate">
                           {p.name}
                         </h4>
-                        <p className="text-[10px] text-[#9ca3af] truncate">
+                        <p className="text-[10px] text-[#77736C] capitalize truncate">
                           {p.category}
                         </p>
                       </div>
-                      <span className="text-xs font-serif text-[#c5a880] font-bold">
-                        ${p.price.toLocaleString()}
+                      <span className="text-xs font-serif text-[#8C7352] font-bold">
+                        {formatPrice(p.price)}
                       </span>
                     </div>
                   </button>
@@ -297,8 +309,8 @@ export default function StudioPage() {
           </div>
 
           {/* Quick-load Pre-Curated Runway Looks */}
-          <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/[0.06]">
-            <span className="text-[10px] uppercase tracking-[0.25em] text-[#9ca3af] font-mono block mb-2">
+          <div className="p-4 rounded-2xl bg-[#F0EDE6] border border-[#E5E0D7]">
+            <span className="text-[10px] uppercase tracking-[0.22em] text-[#8C7352] font-mono font-semibold block mb-2">
               Atelier Curated Combinations
             </span>
             <div className="flex flex-wrap gap-2">
@@ -306,7 +318,7 @@ export default function StudioPage() {
                 <button
                   key={prompt.id}
                   onClick={() => loadOutfitLook(prompt.recommendedLook)}
-                  className="px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-[#c5a880]/20 hover:border-[#c5a880]/50 border border-white/10 text-xs text-white/90 transition-colors"
+                  className="px-3 py-1.5 rounded-full bg-white hover:bg-[#25241F] hover:text-white border border-[#E5E0D7] text-xs text-[#25241F] transition-colors cursor-pointer"
                 >
                   {prompt.recommendedLook.name}
                 </button>
@@ -315,17 +327,17 @@ export default function StudioPage() {
           </div>
 
           {/* Total Ensemble Summary & Action Buttons */}
-          <div className="p-6 rounded-3xl bg-[#0e0e12] border border-white/[0.08] shadow-xl space-y-4">
-            <div className="flex items-baseline justify-between border-b border-white/[0.06] pb-3">
+          <div className="p-6 rounded-3xl bg-white border border-[#E5E0D7] shadow-xs space-y-4">
+            <div className="flex items-baseline justify-between border-b border-[#E5E0D7] pb-3">
               <div>
-                <span className="text-[10px] uppercase tracking-[0.2em] text-[#9ca3af] font-mono">
+                <span className="text-[10px] uppercase tracking-[0.2em] text-[#77736C] font-mono">
                   Ensemble Valuation
                 </span>
-                <p className="text-xs text-[#9ca3af]">
+                <p className="text-xs text-[#77736C]">
                   {currentPieces.length} {currentPieces.length === 1 ? "piece" : "pieces"} layered
                 </p>
               </div>
-              <span className="font-serif text-2xl font-bold text-[#c5a880]">
+              <span className="font-serif text-2xl font-bold text-[#8C7352]">
                 {formatPrice(ensembleTotal)}
               </span>
             </div>
@@ -337,18 +349,18 @@ export default function StudioPage() {
                 placeholder="Name your custom look (e.g. Venice Biennale)"
                 value={outfitName}
                 onChange={(e) => setOutfitName(e.target.value)}
-                className="flex-1 bg-white/[0.03] border border-white/10 rounded-xl px-3.5 py-2 text-xs text-white placeholder-[#6b7280] focus:outline-none focus:border-[#c5a880]"
+                className="flex-1 bg-[#F8F6F1] border border-[#E5E0D7] rounded-xl px-3.5 py-2 text-xs text-[#25241F] placeholder-[#77736C] focus:outline-none focus:border-[#B49A75]"
               />
               <button
                 type="submit"
                 disabled={currentPieces.length === 0}
-                className={`px-4 py-2 rounded-xl text-xs font-medium tracking-wider flex items-center gap-1.5 transition-colors ${
+                className={`px-4 py-2 rounded-xl text-xs font-medium tracking-wider flex items-center gap-1.5 transition-colors cursor-pointer ${
                   currentPieces.length === 0
-                    ? "opacity-40 cursor-not-allowed bg-white/5 text-[#9ca3af]"
-                    : "bg-white/[0.08] hover:bg-[#c5a880] hover:text-[#0b0b0c] text-white"
+                    ? "opacity-40 cursor-not-allowed bg-[#F0EDE6] text-[#77736C]"
+                    : "bg-[#F0EDE6] hover:bg-[#E5E0D7] border border-[#E5E0D7] text-[#25241F]"
                 }`}
               >
-                {savedSuccess ? <Check size={14} className="text-emerald-400" /> : <BookmarkCheck size={14} />}
+                {savedSuccess ? <Check size={14} className="text-[#607B60]" /> : <BookmarkCheck size={14} className="text-[#8C7352]" />}
                 <span>{savedSuccess ? "Saved" : "Save Look"}</span>
               </button>
             </form>
@@ -357,14 +369,14 @@ export default function StudioPage() {
             <button
               onClick={handleAcquireEntireLook}
               disabled={currentPieces.length === 0}
-              className={`w-full py-3.5 rounded-full font-semibold text-xs tracking-widest uppercase flex items-center justify-center gap-2 transition-all shadow-lg ${
+              className={`w-full py-3.5 rounded-full font-semibold text-xs tracking-widest uppercase flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer ${
                 currentPieces.length === 0
-                  ? "opacity-40 cursor-not-allowed bg-white/10 text-[#9ca3af]"
-                  : "bg-gradient-to-r from-[#c5a880] to-[#e6d5b8] text-[#0b0b0c] hover:shadow-[0_0_25px_rgba(197,168,128,0.3)]"
+                  ? "opacity-40 cursor-not-allowed bg-[#F0EDE6] text-[#77736C]"
+                  : "bg-[#25241F] hover:bg-[#38362F] text-white"
               }`}
             >
-              <ShoppingBag size={15} />
-              <span>Acquire Entire Look ({currentPieces.length} items)</span>
+              <ShoppingBag size={15} className="text-[#B49A75]" />
+              <span>Add Entire Look to Bag ({currentPieces.length} items)</span>
             </button>
           </div>
         </div>
@@ -374,4 +386,3 @@ export default function StudioPage() {
     </div>
   );
 }
-

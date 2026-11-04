@@ -6,36 +6,41 @@ import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
 import CartDrawer from "@/components/navigation/CartDrawer";
 import ProductInspectorModal from "@/components/ui/ProductInspectorModal";
+import FashionProductCard from "@/components/ui/FashionProductCard";
+import InteractiveSlider from "@/components/ui/InteractiveSlider";
+import LookbookHotspotSlider from "@/components/ui/LookbookHotspotSlider";
 import { useCatalog } from "@/components/providers/CatalogProvider";
 import { Product } from "@/types/product";
-import { useCartStore } from "@/store/useCartStore";
-import { sounds } from "@/utils/soundEffects";
-import { formatPrice } from "@/lib/commerce";
-import { Eye, ShoppingBag, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 export default function CollectionsPage() {
   const { products, collections } = useCatalog();
-  const { addItem } = useCartStore();
   const [inspectingProduct, setInspectingProduct] = useState<Product | null>(null);
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] text-[#1C1917] flex flex-col justify-between">
+    <div className="min-h-screen bg-[#F8F6F1] text-[#25241F] flex flex-col justify-between">
       <Navbar />
       <CartDrawer />
 
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-20 space-y-20">
         {/* Page Heading */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <span className="text-[10px] uppercase tracking-[0.3em] text-[#9A7B4F] font-mono">
+          <span className="text-[10px] uppercase tracking-[0.3em] text-[#8C7352] font-mono">
             Seasonal Haute Drops
           </span>
-          <h1 className="font-serif text-4xl sm:text-6xl text-[#1C1917] font-medium">
-            Curated Collections
+          <h1 className="font-serif text-4xl sm:text-6xl text-[#25241F] font-medium">
+            Curated Collections & Lookbooks
           </h1>
-          <p className="text-xs sm:text-sm text-[#78716C] leading-relaxed">
-            Each collection is a focused architectural study in silhouette, drape geometry, and material provenance.
+          <p className="text-xs sm:text-sm text-[#77736C] leading-relaxed">
+            Each collection is a focused architectural study in silhouette, drape geometry, and material provenance. Tap any lookbook hotspot or swipe through individual capsule releases.
           </p>
         </div>
+
+        {/* Interactive Lookbook Hotspot Slider */}
+        <LookbookHotspotSlider
+          products={products}
+          onInspectProduct={(p) => setInspectingProduct(p)}
+        />
 
         {/* Collections Stack */}
         {collections.map((collection, idx) => {
@@ -46,41 +51,41 @@ export default function CollectionsPage() {
           return (
             <section
               key={collection.id}
-              className="rounded-3xl atelier-card overflow-hidden p-6 sm:p-10 space-y-8"
+              className="rounded-3xl bg-white border border-[#E5E0D7] shadow-2xs overflow-hidden p-6 sm:p-10 space-y-10"
             >
               {/* Collection Banner Header */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
                 <div className="lg:col-span-7 space-y-4">
                   <div className="flex items-center gap-3">
-                    <span className="text-xs font-mono text-[#9A7B4F] px-3 py-1 rounded-full bg-[#C5A880]/15 border border-[#C5A880]/30 font-semibold">
+                    <span className="text-xs font-mono text-[#8C7352] px-3 py-1 rounded-full bg-[#F0EDE6] border border-[#B49A75]/40 font-semibold">
                       {collection.season}
                     </span>
-                    <span className="text-xs text-[#78716C] font-mono">
+                    <span className="text-xs text-[#77736C] font-mono">
                       Collection 0{idx + 1}
                     </span>
                   </div>
 
-                  <h2 className="font-serif text-3xl sm:text-4xl text-[#1C1917] font-medium">
+                  <h2 className="font-serif text-3xl sm:text-4xl text-[#25241F] font-medium">
                     {collection.name}
                   </h2>
 
-                  <p className="font-serif text-base text-[#1C1917]/80 italic">
+                  <p className="font-serif text-base text-[#25241F]/80 italic">
                     &ldquo;{collection.tagline}&rdquo;
                   </p>
 
-                  <p className="text-xs text-[#78716C] leading-relaxed max-w-xl">
+                  <p className="text-xs text-[#77736C] leading-relaxed max-w-xl">
                     {collection.description}
                   </p>
 
                   {/* Palette Swatches */}
                   <div className="pt-2 flex items-center gap-2">
-                    <span className="text-[10px] uppercase tracking-wider text-[#78716C] font-mono mr-2">
+                    <span className="text-[10px] uppercase tracking-wider text-[#77736C] font-mono mr-2">
                       Tone Palette:
                     </span>
                     {collection.palette.map((color, i) => (
                       <span
                         key={i}
-                        className="w-5 h-5 rounded-full border border-[#1C1917]/15 shadow-xs"
+                        className="w-5 h-5 rounded-full border border-[#25241F]/15 shadow-2xs"
                         style={{ backgroundColor: color }}
                         title={color}
                       />
@@ -88,74 +93,42 @@ export default function CollectionsPage() {
                   </div>
                 </div>
 
-                <div className="lg:col-span-5 h-64 sm:h-72 rounded-2xl overflow-hidden relative border border-[#1C1917]/10">
+                <div className="lg:col-span-5 h-64 sm:h-72 rounded-2xl overflow-hidden relative border border-[#E5E0D7] editorial-reveal">
                   <img
                     src={collection.coverImage}
                     alt={collection.name}
-                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent flex items-end p-6">
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#25241F]/75 via-transparent to-transparent flex items-end justify-between p-6">
                     <span className="text-xs font-serif text-white tracking-widest uppercase">
                       {collectionProducts.length} Bespoke Designs
                     </span>
+                    <NextLink
+                      href="/wardrobe"
+                      className="text-[11px] font-medium text-[#DFD3C0] hover:text-white flex items-center gap-1"
+                    >
+                      <span>View on 3D Rail</span>
+                      <ArrowRight size={12} />
+                    </NextLink>
                   </div>
                 </div>
               </div>
 
-              {/* Pieces Grid for this Collection */}
-              <div className="pt-6 border-t border-[#1C1917]/[0.06]">
-                <h3 className="text-xs uppercase tracking-[0.25em] text-[#9A7B4F] font-mono mb-4">
-                  Archive Pieces in {collection.name}
-                </h3>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Interactive Horizontal Slider for Collection Pieces */}
+              <div className="pt-6 border-t border-[#E5E0D7]">
+                <InteractiveSlider
+                  eyebrow={`Archive Capsule 0${idx + 1}`}
+                  title={`Creations in ${collection.name}`}
+                >
                   {collectionProducts.map((p) => (
-                    <div
+                    <FashionProductCard
                       key={p.id}
-                      className="group p-3 rounded-xl bg-[#FAF8F5] border border-[#1C1917]/[0.06] hover:border-[#C5A880] transition-all flex flex-col justify-between"
-                    >
-                      <div className="aspect-[3/4] w-full rounded-lg bg-white overflow-hidden relative mb-3 border border-[#1C1917]/[0.04]">
-                        <img
-                          src={p.images.hero}
-                          alt={p.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <button
-                          onClick={() => {
-                            setInspectingProduct(p);
-                            sounds.playGarmentInspect();
-                          }}
-                          className="absolute bottom-2 left-2 right-2 py-2 rounded-full bg-[#1C1917]/90 backdrop-blur-md text-white text-[11px] font-medium flex items-center justify-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                        >
-                          <Eye size={12} className="text-[#C5A880]" />
-                          <span>Inspect in 3D</span>
-                        </button>
-                      </div>
-
-                        <div>
-                          <NextLink href={`/product/${p.slug || p.id}`}>
-                            <h4 className="font-serif text-sm text-[#1C1917] font-medium truncate hover:text-[#9A7B4F] transition-colors">
-                              {p.name}
-                            </h4>
-                          </NextLink>
-                          <div className="flex items-center justify-between mt-2 pt-2 border-t border-[#1C1917]/[0.06]">
-                            <span className="text-xs font-serif text-[#9A7B4F] font-bold">
-                              {formatPrice(p.price)}
-                            </span>
-                          <button
-                            onClick={() => {
-                              addItem(p, p.colorways[0], p.sizes[0], 1);
-                            }}
-                            className="text-xs text-[#78716C] hover:text-[#1C1917] font-medium flex items-center gap-1 transition-colors cursor-pointer"
-                          >
-                            <ShoppingBag size={12} />
-                            <span>Acquire</span>
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                      product={p}
+                      onInspect={(prod) => setInspectingProduct(prod)}
+                    />
                   ))}
-                </div>
+                </InteractiveSlider>
               </div>
             </section>
           );
@@ -174,4 +147,3 @@ export default function CollectionsPage() {
     </div>
   );
 }
-

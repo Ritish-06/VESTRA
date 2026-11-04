@@ -5,9 +5,17 @@ import { WardrobeItem, OutfitLook, AvatarModelType, UserStyleProfile } from "@/t
 import { PRODUCTS } from "@/data/products";
 import { sounds } from "@/utils/soundEffects";
 
+export interface AtelierToast {
+  id: number;
+  title: string;
+  subtitle?: string;
+  type?: "bag" | "wishlist" | "wardrobe" | "info";
+}
+
 interface WardrobeState {
   wardrobeItems: WardrobeItem[];
   wishlistIds: string[];
+  recentlyViewedIds: string[];
   savedOutfits: OutfitLook[];
   selectedAvatar: AvatarModelType;
   activeLook: {
@@ -18,12 +26,16 @@ interface WardrobeState {
     accessory?: Product;
   };
   styleProfile: UserStyleProfile;
+  activeToast: AtelierToast | null;
 
   // Actions
   addWardrobeItem: (product: Product, selectedColor: Colorway, selectedSize: string) => void;
   removeWardrobeItem: (id: string) => void;
   toggleWishlist: (productId: string) => void;
   isInWishlist: (productId: string) => boolean;
+  recordProductView: (productId: string) => void;
+  showToast: (title: string, subtitle?: string, type?: AtelierToast["type"]) => void;
+  dismissToast: () => void;
   
   // Try-on & Look Actions
   setSelectedAvatar: (avatar: AvatarModelType) => void;
@@ -69,8 +81,10 @@ export const useWardrobeStore = create<WardrobeState>()(
     (set, get) => ({
       wardrobeItems: DEFAULT_WARDROBE_ITEMS,
       wishlistIds: ["vestra-gown-05", "vestra-leather-06"],
+      recentlyViewedIds: ["vestra-trench-01", "vestra-gown-05", "vestra-blazer-02"],
       savedOutfits: [],
       selectedAvatar: "haute_obsidian",
+      activeToast: null,
       activeLook: {
         outerwear: PRODUCTS[1], // Blazer
         top: PRODUCTS[6], // Cashmere
@@ -102,6 +116,12 @@ export const useWardrobeStore = create<WardrobeState>()(
               addedAt: Date.now(),
             },
           ],
+          activeToast: {
+            id: Date.now(),
+            title: "Hung on 3D Wardrobe Rail",
+            subtitle: `${product.name} • ${selectedColor.name}`,
+            type: "wardrobe",
+          },
         }));
         sounds.playHangerSlide();
       },
@@ -117,15 +137,51 @@ export const useWardrobeStore = create<WardrobeState>()(
         const current = get().wishlistIds;
         const exists = current.includes(productId);
         if (exists) {
-          set({ wishlistIds: current.filter((id) => id !== productId) });
+          set({
+            wishlistIds: current.filter((id) => id !== productId),
+            activeToast: {
+              id: Date.now(),
+              title: "Removed from Vault Wishlist",
+              type: "wishlist",
+            },
+          });
         } else {
-          set({ wishlistIds: [...current, productId] });
+          set({
+            wishlistIds: [...current, productId],
+            activeToast: {
+              id: Date.now(),
+              title: "Saved to Private Vault Wishlist",
+              type: "wishlist",
+            },
+          });
           sounds.playChime();
         }
       },
 
       isInWishlist: (productId) => {
         return get().wishlistIds.includes(productId);
+      },
+
+      recordProductView: (productId) => {
+        if (!productId) return;
+        const current = get().recentlyViewedIds || [];
+        const next = [productId, ...current.filter((id) => id !== productId)].slice(0, 10);
+        set({ recentlyViewedIds: next });
+      },
+
+      showToast: (title, subtitle, type = "info") => {
+        set({
+          activeToast: {
+            id: Date.now(),
+            title,
+            subtitle,
+            type,
+          },
+        });
+      },
+
+      dismissToast: () => {
+        set({ activeToast: null });
       },
 
       setSelectedAvatar: (avatar) => {
@@ -197,6 +253,15 @@ export const useWardrobeStore = create<WardrobeState>()(
     }),
     {
       name: "vestra_wardrobe_storage",
+      partialize: (state) => ({
+        wardrobeItems: state.wardrobeItems,
+        wishlistIds: state.wishlistIds,
+        recentlyViewedIds: state.recentlyViewedIds,
+        savedOutfits: state.savedOutfits,
+        selectedAvatar: state.selectedAvatar,
+        activeLook: state.activeLook,
+        styleProfile: state.styleProfile,
+      }),
     }
   )
 );
