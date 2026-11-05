@@ -81,6 +81,24 @@ export default function Footer() {
                     <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity text-[#B49A75]" />
                   </NextLink>
                 </li>
+                <li>
+                  <NextLink
+                    href="/collections"
+                    className="text-[#77736C] hover:text-[#25241F] transition-colors flex items-center gap-1 group"
+                  >
+                    <span>Curatorial Collections</span>
+                    <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity text-[#B49A75]" />
+                  </NextLink>
+                </li>
+                <li>
+                  <NextLink
+                    href="/lookbook"
+                    className="text-[#77736C] hover:text-[#25241F] transition-colors flex items-center gap-1 group"
+                  >
+                    <span>Photographic Lookbook</span>
+                    <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity text-[#B49A75]" />
+                  </NextLink>
+                </li>
               </ul>
             </div>
 
@@ -90,8 +108,8 @@ export default function Footer() {
               </h4>
               <ul className="space-y-2.5">
                 <li>
-                  <NextLink href="/orders" className="text-[#77736C] hover:text-[#25241F] transition-colors">
-                    Order Tracking
+                  <NextLink href="/track-order" className="text-[#77736C] hover:text-[#25241F] transition-colors">
+                    Order Tracking & Dispatch
                   </NextLink>
                 </li>
                 <li>

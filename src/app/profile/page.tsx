@@ -96,52 +96,75 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Tab Navigation */}
-        <div className="flex gap-4 border-b border-[#1C1917]/[0.08] pb-4">
-          <button
-            onClick={() => {
-              setActiveTab("wardrobe");
-              sounds.playClick();
-            }}
-            className={`pb-2 text-sm font-medium transition-colors border-b-2 -mb-[18px] flex items-center gap-2 ${
-              activeTab === "wardrobe"
-                ? "text-[#1C1917] border-[#C5A880] font-semibold"
-                : "text-[#78716C] border-transparent hover:text-[#1C1917]"
-            }`}
-          >
-            <Sliders size={15} className={activeTab === "wardrobe" ? "text-[#9A7B4F]" : ""} />
-            <span>My Virtual Wardrobe Rail ({wardrobeItems.length})</span>
-          </button>
+        {/* Tab Navigation & Sub-Pages */}
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#1C1917]/[0.08] pb-4">
+          <div className="flex gap-4">
+            <button
+              onClick={() => {
+                setActiveTab("wardrobe");
+                sounds.playClick();
+              }}
+              className={`pb-2 text-sm font-medium transition-colors border-b-2 -mb-[18px] flex items-center gap-2 cursor-pointer ${
+                activeTab === "wardrobe"
+                  ? "text-[#1C1917] border-[#C5A880] font-semibold"
+                  : "text-[#78716C] border-transparent hover:text-[#1C1917]"
+              }`}
+            >
+              <Sliders size={15} className={activeTab === "wardrobe" ? "text-[#9A7B4F]" : ""} />
+              <span>Virtual Wardrobe Rail ({wardrobeItems.length})</span>
+            </button>
 
-          <button
-            onClick={() => {
-              setActiveTab("outfits");
-              sounds.playClick();
-            }}
-            className={`pb-2 text-sm font-medium transition-colors border-b-2 -mb-[18px] flex items-center gap-2 ${
-              activeTab === "outfits"
-                ? "text-[#1C1917] border-[#C5A880] font-semibold"
-                : "text-[#78716C] border-transparent hover:text-[#1C1917]"
-            }`}
-          >
-            <BookmarkCheck size={15} className={activeTab === "outfits" ? "text-[#9A7B4F]" : ""} />
-            <span>Saved Custom Ensembles ({savedOutfits.length})</span>
-          </button>
+            <button
+              onClick={() => {
+                setActiveTab("outfits");
+                sounds.playClick();
+              }}
+              className={`pb-2 text-sm font-medium transition-colors border-b-2 -mb-[18px] flex items-center gap-2 cursor-pointer ${
+                activeTab === "outfits"
+                  ? "text-[#1C1917] border-[#C5A880] font-semibold"
+                  : "text-[#78716C] border-transparent hover:text-[#1C1917]"
+              }`}
+            >
+              <BookmarkCheck size={15} className={activeTab === "outfits" ? "text-[#9A7B4F]" : ""} />
+              <span>Saved Outfits ({savedOutfits.length})</span>
+            </button>
 
-          <button
-            onClick={() => {
-              setActiveTab("preferences");
-              sounds.playClick();
-            }}
-            className={`pb-2 text-sm font-medium transition-colors border-b-2 -mb-[18px] flex items-center gap-2 ${
-              activeTab === "preferences"
-                ? "text-[#1C1917] border-[#C5A880] font-semibold"
-                : "text-[#78716C] border-transparent hover:text-[#1C1917]"
-            }`}
-          >
-            <Sparkles size={15} className={activeTab === "preferences" ? "text-[#9A7B4F]" : ""} />
-            <span>Style DNA & Measurements</span>
-          </button>
+            <button
+              onClick={() => {
+                setActiveTab("preferences");
+                sounds.playClick();
+              }}
+              className={`pb-2 text-sm font-medium transition-colors border-b-2 -mb-[18px] flex items-center gap-2 cursor-pointer ${
+                activeTab === "preferences"
+                  ? "text-[#1C1917] border-[#C5A880] font-semibold"
+                  : "text-[#78716C] border-transparent hover:text-[#1C1917]"
+              }`}
+            >
+              <Sparkles size={15} className={activeTab === "preferences" ? "text-[#9A7B4F]" : ""} />
+              <span>Measurements</span>
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <NextLink
+              href="/profile/orders"
+              className="px-3.5 py-1.5 rounded-full bg-white border border-[#1C1917]/15 hover:border-[#1C1917] text-xs font-medium text-[#1C1917] transition-colors"
+            >
+              Orders & Dockets
+            </NextLink>
+            <NextLink
+              href="/profile/addresses"
+              className="px-3.5 py-1.5 rounded-full bg-white border border-[#1C1917]/15 hover:border-[#1C1917] text-xs font-medium text-[#1C1917] transition-colors"
+            >
+              Addresses
+            </NextLink>
+            <NextLink
+              href="/profile/settings"
+              className="px-3.5 py-1.5 rounded-full bg-white border border-[#1C1917]/15 hover:border-[#1C1917] text-xs font-medium text-[#1C1917] transition-colors"
+            >
+              Settings
+            </NextLink>
+          </div>
         </div>
 
         {/* Tab 1: Virtual Wardrobe Rail Collection */}

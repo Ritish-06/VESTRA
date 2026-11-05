@@ -18,6 +18,8 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 
+import { PRODUCTS } from "@/data/products";
+
 interface HotspotPin {
   id: string;
   xPercent: number;
@@ -37,12 +39,12 @@ interface LookbookSlide {
 }
 
 interface LookbookHotspotSliderProps {
-  products: Product[];
+  products?: Product[];
   onInspectProduct?: (product: Product) => void;
 }
 
 export default function LookbookHotspotSlider({
-  products,
+  products = PRODUCTS,
   onInspectProduct,
 }: LookbookHotspotSliderProps) {
   const { addItem } = useCartStore();

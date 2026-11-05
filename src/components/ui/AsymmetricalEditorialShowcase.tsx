@@ -274,32 +274,44 @@ function EditorialGarmentPlate({
 
 interface AsymmetricalEditorialShowcaseProps {
   products: Product[];
+  title?: string;
+  subtitle?: string;
   onInspectProduct?: (product: Product) => void;
 }
 
 export default function AsymmetricalEditorialShowcase({
   products,
+  title,
+  subtitle,
   onInspectProduct,
 }: AsymmetricalEditorialShowcaseProps) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      {products.map((product, idx) => {
-        // Alternate 7-column and 5-column asymmetrical layout every row:
-        // Row 0: [7, 5], Row 1: [5, 7], Row 2: [7, 5]...
-        const row = Math.floor(idx / 2);
-        const isFirstInRow = idx % 2 === 0;
-        const featuredSpan = row % 2 === 0 ? isFirstInRow : !isFirstInRow;
+    <div className="space-y-8">
+      {(title || subtitle) && (
+        <div className="space-y-1">
+          {title && <h3 className="font-serif text-2xl text-[#25241F]">{title}</h3>}
+          {subtitle && <p className="text-xs text-[#77736C]">{subtitle}</p>}
+        </div>
+      )}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        {products.map((product, idx) => {
+          // Alternate 7-column and 5-column asymmetrical layout every row:
+          // Row 0: [7, 5], Row 1: [5, 7], Row 2: [7, 5]...
+          const row = Math.floor(idx / 2);
+          const isFirstInRow = idx % 2 === 0;
+          const featuredSpan = row % 2 === 0 ? isFirstInRow : !isFirstInRow;
 
-        return (
-          <EditorialGarmentPlate
-            key={product.id}
-            product={product}
-            index={idx}
-            featuredSpan={featuredSpan}
-            onInspect={onInspectProduct}
-          />
-        );
-      })}
+          return (
+            <EditorialGarmentPlate
+              key={product.id}
+              product={product}
+              index={idx}
+              featuredSpan={featuredSpan}
+              onInspect={onInspectProduct}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }

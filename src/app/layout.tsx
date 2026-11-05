@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { getCatalog } from "@/lib/catalog";
 import { CatalogProvider } from "@/components/providers/CatalogProvider";
+import { SmoothScrollProvider } from "@/components/providers/SmoothScrollProvider";
 
 export const metadata: Metadata = {
   title: "VESTRA — The Future of Digital Fashion | 3D Wardrobe & Atelier",
@@ -37,7 +38,9 @@ export default async function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-[#F8F6F1] text-[#25241F] font-sans overflow-x-hidden">
         <CatalogProvider products={products} collections={collections}>
-          {children}
+          <SmoothScrollProvider>
+            {children}
+          </SmoothScrollProvider>
         </CatalogProvider>
       </body>
     </html>

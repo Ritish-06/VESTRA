@@ -89,11 +89,11 @@ export default function Navbar() {
   };
 
   const navLinks = [
-    { href: "/wardrobe", label: "Wardrobe", badge: "3D", icon: Sliders },
     { href: "/explore", label: "Explore", icon: Compass },
     { href: "/collections", label: "Collections", icon: Layers },
+    { href: "/wardrobe", label: "Wardrobe", badge: "3D", icon: Sliders },
+    { href: "/lookbook", label: "Lookbook", icon: Sparkles },
     { href: "/studio", label: "Studio", badge: "Try-On", icon: Sparkles },
-    { href: "/stylist", label: "Stylist", icon: Sparkles },
   ];
 
   const cartCount = mounted ? getItemCount() : 0;
@@ -117,7 +117,11 @@ export default function Navbar() {
     e.preventDefault();
     setSearchOpen(false);
     sounds.playClick();
-    router.push("/explore");
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      router.push("/search");
+    }
   };
 
   return (
